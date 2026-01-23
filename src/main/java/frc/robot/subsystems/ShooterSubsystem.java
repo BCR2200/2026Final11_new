@@ -13,7 +13,7 @@ public class ShooterSubsystem extends SubsystemBase {
     private boolean velocityMode = true;
     public PIDMotor shootPIDMotor;
     
-    private static final double INCREMENT_RPS = 4.0; // rps
+    private static final double RPS_STEP = 4.0; // rps
     private static final double INCREMENT_FACTOR = 0.05; // 5 percent
     private static final double MAX_RPS = 84.0; // 5000 rpm in rps
 
@@ -55,7 +55,7 @@ public class ShooterSubsystem extends SubsystemBase {
      */
     public void incrementShooterSpeed() {
         if (velocityMode) {
-            shooterSpeed += INCREMENT_RPS;
+            shooterSpeed = ExtraMath.clamp(shooterSpeed + RPS_STEP, -MAX_RPS, MAX_RPS);
         }
         else {
             shooterSpeedFactor = ExtraMath.clamp(shooterSpeedFactor + INCREMENT_FACTOR, -1, 1);
@@ -68,7 +68,7 @@ public class ShooterSubsystem extends SubsystemBase {
      */
     public void decrementShooterSpeed() {
         if (velocityMode) {
-            shooterSpeed = ExtraMath.clamp(shooterSpeed - INCREMENT_RPS, -MAX_RPS, MAX_RPS);
+            shooterSpeed = ExtraMath.clamp(shooterSpeed - RPS_STEP, -MAX_RPS, MAX_RPS);
         }
         else {
             shooterSpeedFactor = ExtraMath.clamp(shooterSpeedFactor - INCREMENT_FACTOR, -1, 1); 

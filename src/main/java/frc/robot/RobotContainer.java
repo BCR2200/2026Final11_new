@@ -45,6 +45,8 @@ public class RobotContainer {
    * joysticks}.
    */
   private void configureBindings() {
+    // Back button is 2 squares
+    // Start button is 3 horizontal lines
 
     // Shooter Speed Controls
     m_driverController.a().onTrue(new InstantCommand(() -> m_shooterSubsystem.incrementShooterSpeed()));
@@ -63,6 +65,10 @@ public class RobotContainer {
     // Linear Actuator Controls, 0-100 mm
     m_driverController.leftBumper().onTrue(new InstantCommand(() -> m_linearActuator.incrementPosition(-5)));
     m_driverController.rightBumper().onTrue(new InstantCommand(() -> m_linearActuator.incrementPosition(5)));
+
+    // PID Tuning Controls for shooter
+    m_driverController.start().onTrue(new InstantCommand(() -> m_shooterSubsystem.shootPIDMotor.putPIDF()));
+    m_driverController.back().onTrue(new InstantCommand(() -> m_shooterSubsystem.shootPIDMotor.fetchPIDFFromDashboard()));
 
   }
   

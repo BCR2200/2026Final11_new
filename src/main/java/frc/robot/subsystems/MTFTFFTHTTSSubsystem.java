@@ -13,7 +13,7 @@ public class MTFTFFTHTTSSubsystem extends SubsystemBase {
     private boolean velocityMode = true;
     public PIDMotor feedPIDMotor;
 
-    private static final double INCREMENT_RPS = 4.0; // rps
+    private static final double RPS_STEP = 4.0; // rps
     private static final double INCREMENT_FACTOR = 0.05; // 5 percent
     private static final double MAX_RPS = 84.0; // 5000 rpm in rps
 
@@ -47,7 +47,7 @@ public class MTFTFFTHTTSSubsystem extends SubsystemBase {
      */
     public void incrementFeedingSpeed() {
         if (velocityMode) {
-            feederSpeed = ExtraMath.clamp(feederSpeed - INCREMENT_RPS, -MAX_RPS, MAX_RPS);
+            feederSpeed = ExtraMath.clamp(feederSpeed + RPS_STEP, -MAX_RPS, MAX_RPS);
         }
         else {
             feederSpeedFactor = ExtraMath.clamp(feederSpeedFactor + INCREMENT_FACTOR, -1, 1);
@@ -60,7 +60,7 @@ public class MTFTFFTHTTSSubsystem extends SubsystemBase {
      */
     public void decrementFeedingSpeed() {
         if (velocityMode) {
-            feederSpeed -= INCREMENT_RPS;
+            feederSpeed = ExtraMath.clamp(feederSpeed - RPS_STEP, -MAX_RPS, MAX_RPS);
         }
         else {
             feederSpeedFactor = ExtraMath.clamp(feederSpeedFactor - INCREMENT_FACTOR, -1, 1);
