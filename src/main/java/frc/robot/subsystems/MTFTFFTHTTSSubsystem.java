@@ -9,12 +9,13 @@ import frc.robot.PIDMotor;
 public class MTFTFFTHTTSSubsystem extends SubsystemBase {
     private boolean isFeeding = false;
     private double feederSpeed; // in rps
-    private double feederPercentage; // it's a percent output from -1.0 to 1.0
+    private double feederSpeedFactor; // from -1.0 to 1.0
     private boolean velocityMode = true;
     public PIDMotor feedPIDMotor;
 
-    private final double incrementRPS = 4.0; // rps
-    private final double incrementPercentage = 0.05; // percent
+    private static final double INCREMENT_RPS = 4.0; // rps
+    private static final double INCREMENT_FACTOR = 0.05; // 5 percent
+    private static final double MAX_RPS = 84.0; // 5000 rpm in rps
 
     public MTFTFFTHTTSSubsystem() {
         // These numbers are placeholders, we don't actually know what they should be yet
@@ -46,10 +47,10 @@ public class MTFTFFTHTTSSubsystem extends SubsystemBase {
      */
     public void incrementFeedingSpeed() {
         if (velocityMode) {
-            feederSpeed += incrementRPS;
+            feederSpeed = ExtraMath.clamp(feederSpeed - INCREMENT_RPS, -MAX_RPS, MAX_RPS);
         }
         else {
-            feederPercentage = ExtraMath.clamp(feederPercentage + incrementPercentage, -1, 1);
+            feederSpeedFactor = ExtraMath.clamp(feederSpeedFactor + INCREMENT_FACTOR, -1, 1);
         }
     }
     
@@ -59,17 +60,17 @@ public class MTFTFFTHTTSSubsystem extends SubsystemBase {
      */
     public void decrementFeedingSpeed() {
         if (velocityMode) {
-            feederSpeed -= incrementRPS;
+            feederSpeed -= INCREMENT_RPS;
         }
         else {
-            feederPercentage = ExtraMath.clamp(feederPercentage - incrementPercentage, -1, 1);
+            feederSpeedFactor = ExtraMath.clamp(feederSpeedFactor - INCREMENT_FACTOR, -1, 1);
         }
     }
 
     @Override
     public void periodic() {
         SmartDashboard.putNumber("Feeder Speed", feederSpeed);
-        SmartDashboard.putNumber("Feeder Percentage", feederPercentage);
+        SmartDashboard.putNumber("Feeder Percentage", feederSpeedFactor);
         SmartDashboard.putBoolean("Feeder VelocityMode", velocityMode);
         SmartDashboard.putBoolean("Is Feeding", isFeeding);
         SmartDashboard.putNumber("Feeder Actual Speed", feedPIDMotor.getVelocity());
@@ -84,7 +85,8 @@ public class MTFTFFTHTTSSubsystem extends SubsystemBase {
                 feedPIDMotor.setPercentOutput(0);
         } else {
             if (isFeeding)
-                feedPIDMotor.setPercentOutput(feederPercentage);
+                // factor is -1 to 1, converted to a factor of MAX_RPS max speed
+                feedPIDMotor.setVelocityTarget(feederSpeedFactor * MAX_RPS); 
             else
                 feedPIDMotor.setPercentOutput(0);
         }

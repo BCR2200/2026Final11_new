@@ -9,12 +9,13 @@ import frc.robot.PIDMotor;
 public class ShooterSubsystem extends SubsystemBase {
     private boolean isShooting = false;
     private double shooterSpeed; // in rps
-    private double shooterPercentage; // it's a percent output from -1.0 to 1.0
+    private double shooterSpeedFactor; // from -1.0 to 1.0
     private boolean velocityMode = true;
     public PIDMotor shootPIDMotor;
     
-    private final double incrementRPS = 4.0; // rps
-    private final double incrementPercentage = 0.05; // percent
+    private static final double INCREMENT_RPS = 4.0; // rps
+    private static final double INCREMENT_FACTOR = 0.05; // 5 percent
+    private static final double MAX_RPS = 84.0; // 5000 rpm in rps
 
     public ShooterSubsystem() {
         // These numbers are placeholders, we don't actually know what they should be yet
@@ -40,23 +41,24 @@ public class ShooterSubsystem extends SubsystemBase {
         shooterSpeed = speed;
     }
 
-    public double getShooterPercentage() {
-        return shooterPercentage;
+    public double getShooterSpeedFactor() {
+        return shooterSpeedFactor;
     }
 
-    public void setShooterPercentage(double percentage) {
-        shooterPercentage = percentage;
+    public void setShooterSpeedFactor(double percentage) {
+        shooterSpeedFactor = percentage;
     }
+
     /**
      * will increase speed by the constant value incrementRPS and incrementPercentage
      * @param increment
      */
     public void incrementShooterSpeed() {
         if (velocityMode) {
-            shooterSpeed += incrementRPS;
+            shooterSpeed += INCREMENT_RPS;
         }
         else {
-            shooterPercentage = ExtraMath.clamp(shooterPercentage + incrementPercentage, -1, 1);
+            shooterSpeedFactor = ExtraMath.clamp(shooterSpeedFactor + INCREMENT_FACTOR, -1, 1);
         }
     }
 
@@ -66,24 +68,24 @@ public class ShooterSubsystem extends SubsystemBase {
      */
     public void decrementShooterSpeed() {
         if (velocityMode) {
-            shooterSpeed -= incrementRPS;
+            shooterSpeed = ExtraMath.clamp(shooterSpeed - INCREMENT_RPS, -MAX_RPS, MAX_RPS);
         }
         else {
-            shooterPercentage = ExtraMath.clamp(shooterPercentage - incrementPercentage, -1, 1);
+            shooterSpeedFactor = ExtraMath.clamp(shooterSpeedFactor - INCREMENT_FACTOR, -1, 1); 
         }
     }
 
     @Override
     public void periodic() {
         SmartDashboard.putNumber("Shooter Speed", shooterSpeed);
-        SmartDashboard.putNumber("Shooter Percentage", shooterPercentage);
+        SmartDashboard.putNumber("Shooter Percentage", shooterSpeedFactor);
         SmartDashboard.putBoolean("Shooter VelocityMode", velocityMode);
         SmartDashboard.putBoolean("Is Shooting", isShooting);
         SmartDashboard.putNumber("Shooter Actual Speed", shootPIDMotor.getVelocity());
 
         isShooting = SmartDashboard.getBoolean("Is Shooting", isShooting);
         velocityMode = SmartDashboard.getBoolean("Shooter VelocityMode", velocityMode);
-        
+
         if (velocityMode) {
             if (isShooting)
                 shootPIDMotor.setVelocityTarget(shooterSpeed);
@@ -91,7 +93,8 @@ public class ShooterSubsystem extends SubsystemBase {
                 shootPIDMotor.setPercentOutput(0);
         } else {
             if (isShooting)
-                shootPIDMotor.setPercentOutput(shooterPercentage);
+                // factor is -1 to 1, converted to a factor of MAX_RPS max speed
+                shootPIDMotor.setVelocityTarget(shooterSpeedFactor * MAX_RPS);
             else
                 shootPIDMotor.setPercentOutput(0);
         }
