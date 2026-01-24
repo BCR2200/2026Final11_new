@@ -23,7 +23,7 @@ public class RobotContainer {
   private final ExampleSubsystem m_exampleSubsystem = new ExampleSubsystem();
   private final ShooterSubsystem m_shooterSubsystem = new ShooterSubsystem();
   private final TTFTFFTHTTSSubsystem m_feederSubsystem = new TTFTFFTHTTSSubsystem();
-  private final LinearActuator m_linearActuator = new LinearActuator(Constants.LINEAR_ACTUATOR_CHANNEL, 100, 20);
+  private final LinearActuator m_linearActuator = new LinearActuator(Constants.LINEAR_ACTUATOR_CHANNEL, 100, 20, "Actuator");
 
   // Replace with CommandPS4Controller or CommandJoystick if needed
   private final CommandXboxController m_driverController =
@@ -67,7 +67,10 @@ public class RobotContainer {
     m_driverController.rightBumper().onTrue(new InstantCommand(() -> m_linearActuator.incrementPosition(5)));
 
     // PID Tuning Controls for shooter
-    m_driverController.start().onTrue(new InstantCommand(() -> m_shooterSubsystem.shootPIDMotor.putPIDF()));
+    m_driverController.start().onTrue(new InstantCommand(() -> {
+      m_shooterSubsystem.shootPIDMotor.putPIDF();
+      this.m_linearActuator.dashboardPutPosition();
+    }));
     m_driverController.back().onTrue(new InstantCommand(() -> m_shooterSubsystem.shootPIDMotor.fetchPIDFFromDashboard()));
 
   }
