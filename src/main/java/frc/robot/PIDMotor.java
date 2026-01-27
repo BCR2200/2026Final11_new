@@ -8,6 +8,8 @@ import com.ctre.phoenix6.hardware.*;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.MotorAlignmentValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
+
+import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
@@ -243,7 +245,10 @@ public class PIDMotor {
         if (!code.isOK()) {
             System.err.printf("Error updating PIDF (%s): %s\n", name, code.getDescription());
         } else {
-            System.err.println("Updated PIDF values");
+            System.err.printf("Updated PIDF values: p = %.4f, i = %.4f, d = %.4f, s = %.4f, v = %.4f, a = %.4f, maxV = %.4f, maxA = %.4f, maxJerk = %.4f\n",
+                    talonFXConfigs.Slot0.kP, talonFXConfigs.Slot0.kI, talonFXConfigs.Slot0.kD,
+                    talonFXConfigs.Slot0.kS, talonFXConfigs.Slot0.kV, talonFXConfigs.Slot0.kA,
+                    maxV, maxA, maxJerk);
         }
     }
 
@@ -430,11 +435,24 @@ public class PIDMotor {
     // Sets the velocity target of the motor.
     public void setVelocityTarget(double targetVelocity) {
         catchUninit();
+        final TrapezoidProfile m_profile = new TrapezoidProfile(
+           new TrapezoidProfile.Constraints(0.01, 0.01)
+        );
+        // Velocity target state is going into the "position" parameter, because we're
+        // using a velocity control mode, which is like running a PID loop on a derivative
+        // of position (velocity). Everything shifts over...
+        TrapezoidProfile.State m_goal = new TrapezoidProfile.State(targetVelocity, 0);
+        TrapezoidProfile.State m_setpoint = new TrapezoidProfile.State();
+        m_setpoint = m_profile.calculate(0.020, m_setpoint, m_goal);
+
         this.target = targetVelocity;
 
         var velocityControl = new VelocityVoltage(targetVelocity);
         velocityControl.withEnableFOC(false);
-        velocityControl.Acceleration = maxA;
+        // send the request to the device
+        // note: "position" is velocity, and "velocity" is acceleration
+        velocityControl.Velocity = m_setpoint.position;
+        velocityControl.Acceleration = m_setpoint.velocity;
 
         StatusCode code = motor.setControl(velocityControl);
         if (!code.isOK()) {
