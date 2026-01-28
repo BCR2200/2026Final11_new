@@ -20,7 +20,7 @@ public class ShooterSubsystem extends SubsystemBase {
     public ShooterSubsystem() {
         // These numbers are placeholders, we don't actually know what they should be yet
         shootPIDMotor = PIDMotor.makeMotor(Constants.SHOOTER_MOTOR_ID, "shooter", 1.0, 0.0, 0.1,
-                0.25, 0.1, 0.01, 100.0, 0.01, 0.00);
+                0.25, 0.1, 0.01, 100.0, 0.5, 0.00);
         shootPIDMotor.setCurrentLimit(60);
         shootPIDMotor.setIdleCoastMode();
     }
@@ -67,11 +67,13 @@ public class ShooterSubsystem extends SubsystemBase {
 
     @Override
     public void periodic() {
+
         SmartDashboard.putNumber("Shooter Speed", shooterSpeed);
         SmartDashboard.putNumber("Shooter Percentage", shooterSpeedFactor);
         SmartDashboard.putBoolean("Shooter VelocityMode", velocityMode);
         SmartDashboard.putBoolean("Is Shooting", isShooting);
         SmartDashboard.putNumber("Shooter Actual Speed", shootPIDMotor.getVelocity());
+        SmartDashboard.putNumber("Shooter Accel", shootPIDMotor.getAcceleration());
 
         isShooting = SmartDashboard.getBoolean("Is Shooting", isShooting);
         velocityMode = SmartDashboard.getBoolean("Shooter VelocityMode", velocityMode);
@@ -79,8 +81,10 @@ public class ShooterSubsystem extends SubsystemBase {
         if (velocityMode) {
             if (isShooting)
                 shootPIDMotor.setVelocityTarget(shooterSpeed);
-            else
+            else {
+                shootPIDMotor.setVelocityTarget(0);
                 shootPIDMotor.setPercentOutput(0);
+            }
         } else {
             if (isShooting)
                 // factor is -1 to 1, converted to a factor of MAX_RPS max speed

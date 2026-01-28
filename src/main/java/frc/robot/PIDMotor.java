@@ -9,6 +9,7 @@ import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.MotorAlignmentValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.units.measure.AngularAcceleration;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -35,6 +36,7 @@ public class PIDMotor {
 
     // This can be used as both position and velocity target
     double target = 0.0;
+    double currentVelocity = 0.0;
 
     private final DutyCycleOut dutyCycleOut = new DutyCycleOut(0);
     private final MotionMagicVoltage motionMagicVoltage = new MotionMagicVoltage(0);
@@ -429,12 +431,23 @@ public class PIDMotor {
 
     // Sets the velocity target of the motor.
     public void setVelocityTarget(double targetVelocity) {
-        catchUninit();
-        this.target = targetVelocity;
 
-        var velocityControl = new VelocityVoltage(targetVelocity);
+        if (targetVelocity == 0) {
+            currentVelocity = 0;
+        } else if (targetVelocity > currentVelocity) {
+            currentVelocity += maxA; // rps
+            currentVelocity = Math.min(currentVelocity, targetVelocity);
+        } else if (targetVelocity < currentVelocity) {
+            currentVelocity -= maxA; // rps
+            currentVelocity = Math.max(currentVelocity, targetVelocity);
+        }
+
+        catchUninit();
+        this.target = currentVelocity;
+
+        var velocityControl = new VelocityVoltage(currentVelocity);
         velocityControl.withEnableFOC(false);
-        velocityControl.Acceleration = maxA;
+        // velocityControl.Acceleration = maxA;
 
         StatusCode code = motor.setControl(velocityControl);
         if (!code.isOK()) {
@@ -472,5 +485,13 @@ public class PIDMotor {
 
     public void putCurrent() {
         SmartDashboard.putNumber(name + " Current", getCurrent());
+    }
+    public double getAcceleration() {
+        StatusSignal<AngularAcceleration> status = motor.getAcceleration();
+        StatusCode code = status.getStatus();
+        if (!code.isOK()) {
+            System.err.printf("Error getting acceleration (%s): %s\n", name, code.getDescription());
+        }
+        return status.getValueAsDouble();
     }
 }
