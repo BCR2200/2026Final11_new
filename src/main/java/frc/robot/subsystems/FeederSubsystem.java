@@ -19,8 +19,8 @@ public class FeederSubsystem extends SubsystemBase {
 
     public FeederSubsystem() {
         // These numbers are placeholders, we don't actually know what they should be yet
-        feedPIDMotor = PIDMotor.makeMotor(Constants.FEEDER_MOTOR_ID, "feeder", 1.0, 0.0, 0.1,
-                0.25, 0.1, 0.01, 100.0, 300.0, 0.00);
+        feedPIDMotor = PIDMotor.makeMotor(Constants.FEEDER_MOTOR_ID, "feeder", 0.11, 0.0, 0.0,
+                0.25, 1.2, 0.01, MAX_RPS, MAX_RPS / 5, 0.00);
         feedPIDMotor.setCurrentLimit(60);
         feedPIDMotor.setIdleCoastMode();
     }
@@ -72,6 +72,7 @@ public class FeederSubsystem extends SubsystemBase {
         SmartDashboard.putBoolean("Feeder VelocityMode", velocityMode);
         SmartDashboard.putBoolean("Is Feeding", isFeeding);
         SmartDashboard.putNumber("Feeder Actual Speed", feedPIDMotor.getVelocity());
+        SmartDashboard.putNumber("Feeder Accel", feedPIDMotor.getAcceleration());
 
         isFeeding = SmartDashboard.getBoolean("Is Feeding", isFeeding);
         velocityMode = SmartDashboard.getBoolean("Feeder VelocityMode", velocityMode);
