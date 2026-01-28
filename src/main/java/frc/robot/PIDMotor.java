@@ -8,6 +8,8 @@ import com.ctre.phoenix6.hardware.*;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.MotorAlignmentValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
+
+import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularAcceleration;
 import edu.wpi.first.units.measure.AngularVelocity;
@@ -245,7 +247,10 @@ public class PIDMotor {
         if (!code.isOK()) {
             System.err.printf("Error updating PIDF (%s): %s\n", name, code.getDescription());
         } else {
-            System.err.println("Updated PIDF values");
+            System.err.printf("Updated PIDF values: p = %.4f, i = %.4f, d = %.4f, s = %.4f, v = %.4f, a = %.4f, maxV = %.4f, maxA = %.4f, maxJerk = %.4f\n",
+                    talonFXConfigs.Slot0.kP, talonFXConfigs.Slot0.kI, talonFXConfigs.Slot0.kD,
+                    talonFXConfigs.Slot0.kS, talonFXConfigs.Slot0.kV, talonFXConfigs.Slot0.kA,
+                    maxV, maxA, maxJerk);
         }
     }
 
