@@ -4,19 +4,25 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.ExtraMath;
 import frc.robot.PIDMotor;
+import frc.robot.Interpolator;
 
 public class ShooterSubsystem extends SubsystemBase {
     private boolean isShooting = false;
     private double shooterSpeed = 84; // in rps
+
     private boolean isFeeding = false;
     private double feederSpeed = 100; // in rps
+
     public PIDMotor shootPIDMotor;
     public PIDMotor feedPIDMotor;
+    
+    public Interpolator shooterAngleInterpolator;
+    public Interpolator shooterVelocityInterpolator;
     
     private static final double RPS_STEP = 4.0; // rps
     private static final double MAX_RPS = 140.0; // 5000 rpm in rps is 84. Max the motors can go is ~140 rps
 
-    public ShooterSubsystem(int shooterMotorID, int feederMotorID) {
+    public ShooterSubsystem(int shooterMotorID, int feederMotorID, Interpolator shooterAngleInterpolator, Interpolator shooterVelocityInterpolator) {
         // These numbers are placeholders, we don't actually know what they should be yet
         shootPIDMotor = PIDMotor.makeMotor(shooterMotorID, "shooter", 0.11, 0.0, 0.0,
                 0.25, 1.2, 0.01, MAX_RPS, MAX_RPS / 5, 0.00);
@@ -27,6 +33,8 @@ public class ShooterSubsystem extends SubsystemBase {
                 0.25, 1.2, 0.01, MAX_RPS, MAX_RPS / 5, 0.00);
         feedPIDMotor.setCurrentLimit(60);
         feedPIDMotor.setIdleCoastMode();
+        this.shooterAngleInterpolator = shooterAngleInterpolator;
+        this.shooterVelocityInterpolator = shooterVelocityInterpolator;
     }
 
     public boolean getIsShooting() {

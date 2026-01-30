@@ -22,8 +22,42 @@ public class RobotContainer {
   private static final double ACTUATOR_STEP = 0.05;
 
   // The robot's subsystems and commands are defined here...
-  private final ShooterSubsystem m_shooterSubsystem = new ShooterSubsystem(Constants.SHOOTER_MOTOR_ID, Constants.FEEDER_MOTOR_ID);
+  private final ShooterSubsystem m_shooterSubsystemJohn = new ShooterSubsystem(
+    Constants.SHOOTER_MOTOR_ID, Constants.FEEDER_MOTOR_ID, 
+    new Interpolator(
+      new double[] {2, 4, 10, 20}, 
+      new double[] {0.5, 3, 10, 70}
+    ),
+    new Interpolator(
+      new double[] {2, 4, 10, 20}, 
+      new double[] {30, 50, 80, 110}  
+    )
+  );
+  private final ShooterSubsystem m_shooterSubsystemJawbreaker = new ShooterSubsystem(
+    Constants.SHOOTER_MOTOR_ID, Constants.FEEDER_MOTOR_ID,
+    new Interpolator(
+      new double[] {2, 4, 10, 20}, 
+      new double[] {0.5, 3, 10, 70}
+    ),
+    new Interpolator(
+      new double[] {2, 4, 10, 20}, 
+      new double[] {30, 50, 80, 110}  
+    )
+  );
+  private final ShooterSubsystem m_shooterSubsystemTaylor = new ShooterSubsystem(
+    Constants.SHOOTER_MOTOR_ID, Constants.FEEDER_MOTOR_ID,
+    new Interpolator(
+      new double[] {2, 4, 10, 20}, 
+      new double[] {0.5, 3, 10, 70}
+    ),
+    new Interpolator(
+      new double[] {2, 4, 10, 20}, 
+      new double[] {30, 50, 80, 110}  
+    )
+  );
   public final LinearActuatorSubsystem m_linearActuatorSubsystem = new LinearActuatorSubsystem(Constants.LINEAR_ACTUATOR_CHANNEL, "Actuator");
+
+  
 
   // Replace with CommandPS4Controller or CommandJoystick if needed
   private final CommandXboxController m_driverController =
@@ -36,8 +70,8 @@ public class RobotContainer {
   }
 
   public void disableMotors() {
-    m_shooterSubsystem.setIsShooting(false);
-    m_shooterSubsystem.setIsFeeding(false);
+    m_shooterSubsystemJawbreaker.setIsShooting(false);
+    m_shooterSubsystemJawbreaker.setIsFeeding(false);
   }
 
   /**
@@ -54,19 +88,19 @@ public class RobotContainer {
     // Start button is 3 horizontal lines
 
     // Shooter Speed Controls
-    m_driverController.a().onTrue(new InstantCommand(() -> m_shooterSubsystem.incrementShooterSpeed()));
-    m_driverController.b().onTrue(new InstantCommand(() -> m_shooterSubsystem.decrementShooterSpeed()));
+    m_driverController.a().onTrue(new InstantCommand(() -> m_shooterSubsystemJawbreaker.incrementShooterSpeed()));
+    m_driverController.b().onTrue(new InstantCommand(() -> m_shooterSubsystemJawbreaker.decrementShooterSpeed()));
     // Shooter On/off Controls
-    m_driverController.rightTrigger().whileTrue(new InstantCommand(() -> m_shooterSubsystem.setIsShooting(true)))
-                                     .whileFalse(new InstantCommand(() -> m_shooterSubsystem.setIsShooting(false)));
+    m_driverController.rightTrigger().whileTrue(new InstantCommand(() -> m_shooterSubsystemJawbreaker.setIsShooting(true)))
+                                     .whileFalse(new InstantCommand(() -> m_shooterSubsystemJawbreaker.setIsShooting(false)));
 
     // Feeder Speed Controls
-    m_driverController.y().onTrue(new InstantCommand(() -> m_shooterSubsystem.incrementFeederSpeed()));
-    m_driverController.x().onTrue(new InstantCommand(() -> m_shooterSubsystem.decrementFeederSpeed()));
-    
+    m_driverController.y().onTrue(new InstantCommand(() -> m_shooterSubsystemJawbreaker.incrementFeederSpeed()));
+    m_driverController.x().onTrue(new InstantCommand(() -> m_shooterSubsystemJawbreaker.decrementFeederSpeed()));
+
     // Feeder On/off Controls
-    m_driverController.leftTrigger().whileTrue(new InstantCommand(() -> m_shooterSubsystem.setIsFeeding(true)))
-                                    .whileFalse(new InstantCommand(() -> m_shooterSubsystem.setIsFeeding(false)));
+    m_driverController.leftTrigger().whileTrue(new InstantCommand(() -> m_shooterSubsystemJawbreaker.setIsFeeding(true)))
+                                    .whileFalse(new InstantCommand(() -> m_shooterSubsystemJawbreaker.setIsFeeding(false)));
     // Linear Actuator Controls, 0.0-1.0 (total length)
     m_driverController.leftBumper().onTrue(new InstantCommand(() -> 
         m_linearActuatorSubsystem.setPosition(m_linearActuatorSubsystem.getPosition() - ACTUATOR_STEP)));
@@ -74,8 +108,8 @@ public class RobotContainer {
         m_linearActuatorSubsystem.setPosition(m_linearActuatorSubsystem.getPosition() + ACTUATOR_STEP)));
 
     // PID Tuning Controls for shooter
-    m_driverController.start().onTrue(new InstantCommand(() -> m_shooterSubsystem.shootPIDMotor.putPIDF()));
-    m_driverController.back().onTrue(new InstantCommand(() -> m_shooterSubsystem.shootPIDMotor.fetchPIDFFromDashboard()));
+    m_driverController.start().onTrue(new InstantCommand(() -> m_shooterSubsystemJawbreaker.shootPIDMotor.putPIDF()));
+    m_driverController.back().onTrue(new InstantCommand(() -> m_shooterSubsystemJawbreaker.shootPIDMotor.fetchPIDFFromDashboard()));
 
   }
   
