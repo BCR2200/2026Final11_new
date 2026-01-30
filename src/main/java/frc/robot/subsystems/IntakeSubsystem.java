@@ -57,8 +57,10 @@ public class IntakeSubsystem extends SubsystemBase {
 
         tiltPIDMotor = PIDMotor.makeMotor(tiltMotorID, "tilt", 0.11, 0.0, 0.0,
                 0.25, 1.2, 0.01, TILT_ABSOLUTE_MAX_RPS, TILT_ABSOLUTE_MAX_ACCEL, 0.00);
-        tiltPIDMotor.setCurrentLimit(60);
+        tiltPIDMotor.setCurrentLimit(20);
         tiltPIDMotor.setIdleCoastMode();
+
+        this.intakeMotorSpeed = intakePIDMotor.getPosition();
     }
 
     /**
