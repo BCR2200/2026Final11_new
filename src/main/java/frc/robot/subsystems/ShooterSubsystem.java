@@ -5,6 +5,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.ExtraMath;
 import frc.robot.PIDMotor;
 import frc.robot.Interpolator;
+import frc.robot.LinearActuator;
 
 public class ShooterSubsystem extends SubsystemBase {
     private boolean isShooting = false;
@@ -15,6 +16,7 @@ public class ShooterSubsystem extends SubsystemBase {
 
     public PIDMotor shootPIDMotor;
     public PIDMotor feedPIDMotor;
+    public LinearActuator linearActuator;
     
     public Interpolator shooterAngleInterpolator;
     public Interpolator shooterVelocityInterpolator;
@@ -35,6 +37,7 @@ public class ShooterSubsystem extends SubsystemBase {
         feedPIDMotor.setIdleCoastMode();
         this.shooterAngleInterpolator = shooterAngleInterpolator;
         this.shooterVelocityInterpolator = shooterVelocityInterpolator;
+        this.linearActuator = new LinearActuator(0, "shooter " + shooterMotorID);
     }
 
     public boolean getIsShooting() {
@@ -87,6 +90,13 @@ public class ShooterSubsystem extends SubsystemBase {
      */
     public void decrementFeederSpeed() {
         feederSpeed = ExtraMath.clamp(feederSpeed - RPS_STEP, -MAX_RPS, MAX_RPS);
+    }
+
+    public void setActuatorPosition(double position) {
+        linearActuator.setPosition(position);
+    }
+    public double getActuatorPosition() {
+        return linearActuator.getPosition();
     }
 
     @Override

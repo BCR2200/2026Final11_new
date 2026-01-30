@@ -55,9 +55,6 @@ public class RobotContainer {
       new double[] {30, 50, 80, 110}  
     )
   );
-  public final LinearActuatorSubsystem m_linearActuatorSubsystem = new LinearActuatorSubsystem(Constants.LINEAR_ACTUATOR_CHANNEL, "Actuator");
-
-  
 
   // Replace with CommandPS4Controller or CommandJoystick if needed
   private final CommandXboxController m_driverController =
@@ -103,9 +100,9 @@ public class RobotContainer {
                                     .whileFalse(new InstantCommand(() -> m_shooterSubsystemJawbreaker.setIsFeeding(false)));
     // Linear Actuator Controls, 0.0-1.0 (total length)
     m_driverController.leftBumper().onTrue(new InstantCommand(() -> 
-        m_linearActuatorSubsystem.setPosition(m_linearActuatorSubsystem.getPosition() - ACTUATOR_STEP)));
+        m_shooterSubsystemJawbreaker.setActuatorPosition(m_shooterSubsystemJawbreaker.getActuatorPosition() - ACTUATOR_STEP)));
     m_driverController.rightBumper().onTrue(new InstantCommand(() -> 
-        m_linearActuatorSubsystem.setPosition(m_linearActuatorSubsystem.getPosition() + ACTUATOR_STEP)));
+        m_shooterSubsystemJawbreaker.setActuatorPosition(m_shooterSubsystemJawbreaker.getActuatorPosition() + ACTUATOR_STEP)));
 
     // PID Tuning Controls for shooter
     m_driverController.start().onTrue(new InstantCommand(() -> m_shooterSubsystemJawbreaker.shootPIDMotor.putPIDF()));
