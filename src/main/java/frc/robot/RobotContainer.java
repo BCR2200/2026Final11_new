@@ -56,6 +56,8 @@ public class RobotContainer {
     )
   );
 
+  private final FloorFeedSubsystem m_floorFeedSubsystem = new FloorFeedSubsystem();
+
   // Replace with CommandPS4Controller or CommandJoystick if needed
   private final CommandXboxController m_driverController =
       new CommandXboxController(OperatorConstants.kDriverControllerPort);
