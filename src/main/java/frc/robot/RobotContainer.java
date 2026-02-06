@@ -104,6 +104,17 @@ public class RobotContainer {
       m_shooterSubsystemJawbreaker.decrementShooterSpeed();
       m_shooterSubsystemTaylor.decrementShooterSpeed();
     }));
+    // Feeder Speed Controls
+    m_driverController.y().onTrue(new InstantCommand(() -> {
+      m_shooterSubsystemJohn.incrementFeederSpeed();
+      m_shooterSubsystemJawbreaker.incrementFeederSpeed();
+      m_shooterSubsystemTaylor.incrementFeederSpeed();
+    }));
+    m_driverController.x().onTrue(new InstantCommand(() -> {
+      m_shooterSubsystemJohn.decrementFeederSpeed();
+      m_shooterSubsystemJawbreaker.decrementFeederSpeed();
+      m_shooterSubsystemTaylor.decrementFeederSpeed();
+    }));
 
     // Shooter and Feeder On/off Controls
     m_driverController.rightTrigger()
@@ -128,18 +139,6 @@ public class RobotContainer {
       m_shooterSubsystemTaylor.setIsFeeding(false);
 
       m_floorFeedSubsystem.setIsFeeding(false);
-    }));
-
-    // Feeder Speed Controls
-    m_driverController.y().onTrue(new InstantCommand(() -> {
-      m_shooterSubsystemJohn.incrementFeederSpeed();
-      m_shooterSubsystemJawbreaker.incrementFeederSpeed();
-      m_shooterSubsystemTaylor.incrementFeederSpeed();
-    }));
-    m_driverController.x().onTrue(new InstantCommand(() -> {
-      m_shooterSubsystemJohn.decrementFeederSpeed();
-      m_shooterSubsystemJawbreaker.decrementFeederSpeed();
-      m_shooterSubsystemTaylor.decrementFeederSpeed();
     }));
 
     // Linear Actuator Controls, 0.0-1.0 (total length)
@@ -184,7 +183,21 @@ public class RobotContainer {
       m_intakeSubsystem.setIsIntaking(false);
     }));
 
-    // TODO: Bind climb controls
+    // Intake tilt controls with d-pad left and right
+    m_driverController.povLeft().onTrue(new InstantCommand(() -> {
+      // TODO
+    }));
+    m_driverController.povRight().onTrue(new InstantCommand(() -> {
+      // TODO
+    }));
+
+    // Climber extend/retract controls with d-pad up and down
+    m_driverController.povUp().onTrue(new InstantCommand(() -> {
+      m_climberSubsystem.extend();
+    }));
+    m_driverController.povDown().onTrue(new InstantCommand(() -> {
+      m_climberSubsystem.retract();
+    }));
 
   }
   
