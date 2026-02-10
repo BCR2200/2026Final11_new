@@ -4,12 +4,23 @@
 
 package frc.robot;
 
-import frc.robot.Constants.OperatorConstants;
-import frc.robot.subsystems.*;
+import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
+import com.ctre.phoenix6.swerve.SwerveRequest;
+
+import static edu.wpi.first.units.Units.*;
+
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.robot.Constants.OperatorConstants;
+import frc.robot.commands.DetectFuel;
+import frc.robot.drive.CommandSwerveDrivetrain;
+import frc.robot.drive.Telemetry;
+import frc.robot.drive.TunerConstantsComp;
+import frc.robot.subsystems.*;
+
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -18,7 +29,18 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
  * subsystems, commands, and trigger mappings) should be declared here.
  */
 public class RobotContainer {
-  
+
+  private double MaxSpeed = TunerConstantsComp.kSpeedAt12Volts.in(MetersPerSecond) * 0.2; // kSpeedAt12Volts desired top speed
+  private double MaxAngularRate = RotationsPerSecond.of(0.75).in(RadiansPerSecond); // 3/4 of a rotation per second max angular velocity
+
+  /* Setting up bindings for necessary control of the swerve drive platform */
+  private final SwerveRequest.FieldCentric drive = new SwerveRequest.FieldCentric()
+          .withDeadband(MaxSpeed * 0.1).withRotationalDeadband(MaxAngularRate * 0.1) // Add a 10% deadband
+          .withDriveRequestType(DriveRequestType.OpenLoopVoltage); // Use open-loop control for drive motors
+  private final Telemetry logger = new Telemetry(MaxSpeed);
+
+  public final CommandSwerveDrivetrain drivetrain = TunerConstantsComp.createDrivetrain();
+
   private static final double ACTUATOR_STEP = 0.05;
 
   // The robot's subsystems and commands are defined here...
@@ -72,6 +94,7 @@ public class RobotContainer {
   public RobotContainer() {
     // Configure the trigger bindings
     configureBindings();
+    configureDrivetrainBindings();
   }
 
   public void disableMotors() {
@@ -142,12 +165,12 @@ public class RobotContainer {
     }));
 
     // Linear Actuator Controls, 0.0-1.0 (total length)
-    m_driverController.leftBumper().onTrue(new InstantCommand(() -> {
+    m_driverController.povLeft().onTrue(new InstantCommand(() -> {
       m_shooterSubsystemJohn.setActuatorPosition(m_shooterSubsystemJohn.getActuatorPosition() - ACTUATOR_STEP);
       m_shooterSubsystemJawbreaker.setActuatorPosition(m_shooterSubsystemJawbreaker.getActuatorPosition() - ACTUATOR_STEP);
       m_shooterSubsystemTaylor.setActuatorPosition(m_shooterSubsystemTaylor.getActuatorPosition() - ACTUATOR_STEP);
     }));
-    m_driverController.rightBumper().onTrue(new InstantCommand(() -> {
+    m_driverController.povRight().onTrue(new InstantCommand(() -> {
       m_shooterSubsystemJohn.setActuatorPosition(m_shooterSubsystemJohn.getActuatorPosition() + ACTUATOR_STEP);
       m_shooterSubsystemJawbreaker.setActuatorPosition(m_shooterSubsystemJawbreaker.getActuatorPosition() + ACTUATOR_STEP);
       m_shooterSubsystemTaylor.setActuatorPosition(m_shooterSubsystemTaylor.getActuatorPosition() + ACTUATOR_STEP);
@@ -155,15 +178,13 @@ public class RobotContainer {
 
     // PID Tuning Controls for all shooter motors
     m_driverController.start().onTrue(new InstantCommand(() -> {
-      m_shooterSubsystemJohn.shootPIDMotor.putPIDF();
-      m_shooterSubsystemJawbreaker.shootPIDMotor.putPIDF();
-      m_shooterSubsystemTaylor.shootPIDMotor.putPIDF();
-
-    }));
-    m_driverController.back().onTrue(new InstantCommand(() -> {
       m_shooterSubsystemJohn.shootPIDMotor.fetchPIDFFromDashboard();
       m_shooterSubsystemJawbreaker.shootPIDMotor.fetchPIDFFromDashboard();
       m_shooterSubsystemTaylor.shootPIDMotor.fetchPIDFFromDashboard();
+
+      m_shooterSubsystemJohn.shootPIDMotor.putPIDF();
+      m_shooterSubsystemJawbreaker.shootPIDMotor.putPIDF();
+      m_shooterSubsystemTaylor.shootPIDMotor.putPIDF();
     }));
 
     // Intake speed controls with d-pad up and down
@@ -184,12 +205,12 @@ public class RobotContainer {
     }));
 
     // Intake tilt controls with d-pad left and right
-    m_driverController.povLeft().onTrue(new InstantCommand(() -> {
-      // TODO
-    }));
-    m_driverController.povRight().onTrue(new InstantCommand(() -> {
-      // TODO
-    }));
+    // m_driverController.povLeft().onTrue(new InstantCommand(() -> {
+    //   // TODO
+    // }));
+    // m_driverController.povRight().onTrue(new InstantCommand(() -> {
+    //   // TODO
+    // }));
 
     // Climber extend/retract controls with d-pad up and down
     m_driverController.povUp().onTrue(new InstantCommand(() -> {
@@ -199,6 +220,31 @@ public class RobotContainer {
       m_climberSubsystem.retract();
     }));
 
+  }
+
+  private void configureDrivetrainBindings() {
+    // Note that X is defined as forward according to WPILib convention,
+    // and Y is defined as to the left according to WPILib convention.
+    drivetrain.setDefaultCommand(
+        // Drivetrain will execute this command periodically
+        drivetrain.applyRequest(() -> drive.withVelocityX(-m_driverController.getLeftY() * MaxSpeed) // Drive forward with negative Y
+            .withVelocityY(-m_driverController.getLeftX() * MaxSpeed) // Drive left with negative X
+            .withRotationalRate(-m_driverController.getRightX() * MaxAngularRate) // Drive counterclockwise with negative X
+        )
+    );
+
+    // Idle while the robot is disabled. This ensures the configured
+    // neutral mode is applied to the drive motors while disabled.
+    final var idle = new SwerveRequest.Idle();
+    RobotModeTriggers.disabled().whileTrue(
+        drivetrain.applyRequest(() -> idle).ignoringDisable(true));
+
+    // reset the field-centric heading on left bumper press
+    m_driverController.back().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
+
+    m_driverController.leftBumper().whileTrue(new DetectFuel(drivetrain));
+
+    drivetrain.registerTelemetry(logger::telemeterize);
   }
   
   /**
