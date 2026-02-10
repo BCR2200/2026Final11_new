@@ -29,11 +29,11 @@ public class ShooterSubsystem extends SubsystemBase {
         shootPIDMotor = PIDMotor.makeMotor(shooterMotorID, name + " shooter", 0.11, 0.0, 0.0,
                 0.25, 1.2, 0.01, MAX_RPS, MAX_RPS / 5, 0.00);
         shootPIDMotor.setCurrentLimit(60);
-        shootPIDMotor.setIdleCoastMode();
+        shootPIDMotor.setIdleCoastMode(); // We want this to be as low as possible while maintaining performance
 
         feedPIDMotor = PIDMotor.makeMotor(feederMotorID, name + " feeder", 0.11, 0.0, 0.0,
                 0.25, 1.2, 0.01, MAX_RPS, MAX_RPS / 5, 0.00);
-        feedPIDMotor.setCurrentLimit(60);
+        feedPIDMotor.setCurrentLimit(60); // Want variable current limits, like 30 for starting, then raise to 60
         feedPIDMotor.setIdleCoastMode();
         this.shooterAngleInterpolator = shooterAngleInterpolator;
         this.shooterVelocityInterpolator = shooterVelocityInterpolator;

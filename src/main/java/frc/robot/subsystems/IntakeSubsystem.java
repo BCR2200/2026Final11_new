@@ -57,7 +57,7 @@ public class IntakeSubsystem extends SubsystemBase {
 
         tiltPIDMotor = PIDMotor.makeMotor(tiltMotorID, "tilt", 0.11, 0.0, 0.0,
                 0.25, 1.2, 0.01, TILT_ABSOLUTE_MAX_RPS, TILT_ABSOLUTE_MAX_ACCEL, 0.00);
-        tiltPIDMotor.setCurrentLimit(20);
+        tiltPIDMotor.setCurrentLimit(6); // Bring up may be more ike 3-4A
         tiltPIDMotor.setIdleCoastMode();
 
         this.intakeMotorSpeed = intakePIDMotor.getPosition();
@@ -124,7 +124,7 @@ public class IntakeSubsystem extends SubsystemBase {
      * Set the target absolute tilt position, in full rotations.
      * @param position the tilt position in full rotations
      */
-    public void setTiltPosition(double position) {
+    public void setTiltPosition(double position) { // We want an Up, Middle and Down preset
         tiltPositionAbsolute = position;
         tiltPIDMotor.setTarget(tiltPositionAbsolute, tiltMaxSpeed, tiltMaxAccel);
     }

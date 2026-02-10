@@ -42,9 +42,9 @@ public class FloorFeedSubsystem extends SubsystemBase {
     private static final double PARAM_MJ = 0.00;
 
     public FloorFeedSubsystem() {
-        motor = PIDMotor.makeMotor(Constants.FLOOR_FEED_MOTOR_ID, "Floor Feed",
-            PARAM_P, PARAM_I, PARAM_D, PARAM_S, PARAM_V, PARAM_A, PARAM_MV, PARAM_MA, PARAM_MJ);
-        motor.setCurrentLimit(60);
+        motor = PIDMotor.makeMotor(Constants.FLOOR_FEED_MOTOR_ID, "Floor Feed", 0.11, 0.0, 0.0,
+                0.25, 1.2, 0.01, MAX_RPS, MAX_RPS / 5, 0.00);
+        motor.setCurrentLimit(60); // Probably too high, only a 1:2 or smth reduction
         motor.setIdleCoastMode();
     }
 
