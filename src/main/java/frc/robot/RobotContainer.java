@@ -4,12 +4,23 @@
 
 package frc.robot;
 
-import frc.robot.Constants.OperatorConstants;
-import frc.robot.subsystems.*;
+import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
+import com.ctre.phoenix6.swerve.SwerveRequest;
+
+import static edu.wpi.first.units.Units.*;
+
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.robot.Constants.OperatorConstants;
+import frc.robot.commands.DetectFuelCmd;
+import frc.robot.drive.CommandSwerveDrivetrain;
+import frc.robot.drive.Telemetry;
+import frc.robot.drive.TunerConstantsComp;
+import frc.robot.subsystems.*;
+
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -18,7 +29,19 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
  * subsystems, commands, and trigger mappings) should be declared here.
  */
 public class RobotContainer {
-  
+
+  private double MaxSpeed = TunerConstantsComp.kSpeedAt12Volts.in(MetersPerSecond) * 0.2; // kSpeedAt12Volts desired top speed
+  private double MaxAngularRate = RotationsPerSecond.of(0.75).in(RadiansPerSecond); // 3/4 of a rotation per second max angular velocity
+  private boolean isManualMode = false;
+
+  /* Setting up bindings for necessary control of the swerve drive platform */
+  private final SwerveRequest.FieldCentric drive = new SwerveRequest.FieldCentric()
+          .withDeadband(MaxSpeed * 0.1).withRotationalDeadband(MaxAngularRate * 0.1) // Add a 10% deadband
+          .withDriveRequestType(DriveRequestType.OpenLoopVoltage); // Use open-loop control for drive motors
+  private final Telemetry logger = new Telemetry(MaxSpeed);
+
+  public final CommandSwerveDrivetrain drivetrain = TunerConstantsComp.createDrivetrain();
+
   private static final double ACTUATOR_STEP = 0.05;
 
   //passed into subsystem constructor
@@ -32,33 +55,57 @@ public class RobotContainer {
   // The robot's subsystems and commands are defined here...
   private final ShooterSubsystem m_shooterSubsystemJohn = new ShooterSubsystem( "John",
     Constants.JOHN_SHOOTER_MOTOR_ID, Constants.JOHN_FEEDER_MOTOR_ID, Constants.JOHN_LINEAR_ACTUATOR_CHANNEL, shooterCurrentLimit, feederCurrentLimit,
-    new Interpolator(
-      new double[] {2, 4, 10, 20}, 
-      new double[] {0, 0.25, 0.5, 1}
+    new Interpolator( // Placeholders for shoot angles
+      new double[] {2, 4, 10, 20},
+      new double[] {1, 0.75, 0.5, 0.25}
     ),
-    new Interpolator(
+    new Interpolator( // Placeholders for shoot velocities
+      new double[] {2, 4, 10, 20}, 
+      new double[] {30, 50, 80, 110}  
+    ),
+    new Interpolator( // Placeholders for pass angles
+      new double[] {2, 4, 10, 20},
+      new double[] {1, 0.75, 0.5, 0.25}
+    ),
+    new Interpolator( // Placeholders for pass velocities
       new double[] {2, 4, 10, 20}, 
       new double[] {0, 0.25, 0.5, 1}  
     )
   );
   private final ShooterSubsystem m_shooterSubsystemJawbreaker = new ShooterSubsystem( "Jawbreaker",
     Constants.JAWBREAKER_SHOOTER_MOTOR_ID, Constants.JAWBREAKER_FEEDER_MOTOR_ID, Constants.JAWBREAKER_LINEAR_ACTUATOR_CHANNEL, shooterCurrentLimit, feederCurrentLimit,
-    new Interpolator(
-      new double[] {2, 4, 10, 20}, 
-      new double[] {0.5, 3, 10, 70}
+    new Interpolator( // Placeholders for shoot angles
+      new double[] {2, 4, 10, 20},
+      new double[] {1, 0.75, 0.5, 0.25}
     ),
-    new Interpolator(
+    new Interpolator( // Placeholders for shoot velocities
+      new double[] {2, 4, 10, 20}, 
+      new double[] {30, 50, 80, 110}  
+    ),
+    new Interpolator( // Placeholders for pass angles
+      new double[] {2, 4, 10, 20},
+      new double[] {1, 0.75, 0.5, 0.25}
+    ),
+    new Interpolator( // Placeholders for pass velocities
       new double[] {2, 4, 10, 20}, 
       new double[] {30, 50, 80, 110}  
     )
   );
   private final ShooterSubsystem m_shooterSubsystemTaylor = new ShooterSubsystem( "Taylor",
     Constants.TAYLOR_SHOOTER_MOTOR_ID, Constants.TAYLOR_FEEDER_MOTOR_ID, Constants.TAYLOR_LINEAR_ACTUATOR_CHANNEL, shooterCurrentLimit, feederCurrentLimit,
-    new Interpolator(
-      new double[] {2, 4, 10, 20}, 
-      new double[] {0.5, 3, 10, 70}
+    new Interpolator( // Placeholders for shoot angles
+      new double[] {2, 4, 10, 20},
+      new double[] {1, 0.75, 0.5, 0.25}
     ),
-    new Interpolator(
+    new Interpolator( // Placeholders for shoot velocities
+      new double[] {2, 4, 10, 20}, 
+      new double[] {30, 50, 80, 110}  
+    ),
+    new Interpolator( // Placeholders for pass angles
+      new double[] {2, 4, 10, 20},
+      new double[] {1, 0.75, 0.5, 0.25}
+    ),
+    new Interpolator( // Placeholders for pass velocities
       new double[] {2, 4, 10, 20}, 
       new double[] {30, 50, 80, 110}  
     )
@@ -81,6 +128,7 @@ public class RobotContainer {
   public RobotContainer() {
     // Configure the trigger bindings
     configureBindings();
+    configureDrivetrainBindings();
   }
 
   public void disableMotors() {
@@ -102,112 +150,59 @@ public class RobotContainer {
     // Start button is 3 horizontal lines
     // POV is the D-pad
 
-    // Shooter Speed Controls
-    m_driverController.a().onTrue(new InstantCommand(() -> {
-      m_shooterSubsystemJohn.incrementShooterSpeed();
-      m_shooterSubsystemJawbreaker.incrementShooterSpeed();
-      m_shooterSubsystemTaylor.incrementShooterSpeed();
+    m_driverController.leftBumper().whileTrue(new DetectFuelCmd(drivetrain));
+    m_driverController.leftTrigger().whileTrue(new InstantCommand(() -> m_intakeSubsystem.setIsIntaking(true))).whileFalse(new InstantCommand(() -> m_intakeSubsystem.setIsIntaking(false)));
+    m_driverController.rightBumper().whileTrue(new InstantCommand(() -> {})); // TODO: implement pass
+    m_driverController.rightTrigger().whileTrue(new InstantCommand(() -> {})); // TODO: implement shoot-to-goal
+
+    m_driverController.b().whileTrue(new InstantCommand(() -> {})); // TODO: implement right climb
+    m_driverController.x().whileTrue(new InstantCommand(() -> {})); // TODO: implement left climb
+
+    m_driverController.povLeft().whileTrue(new InstantCommand(() -> {})); // TODO: implement reset alliance - possibly reseed field-centric?
+    m_driverController.povRight().whileTrue(new InstantCommand(() -> {})); // TODO: implement reset facing angle
+    m_driverController.povUp().whileTrue(new InstantCommand(() -> {
+      if (isManualMode) {
+        m_shooterSubsystemJohn.setActuatorPosition(m_shooterSubsystemJohn.getActuatorPosition() - ACTUATOR_STEP);
+        m_shooterSubsystemJawbreaker.setActuatorPosition(m_shooterSubsystemJawbreaker.getActuatorPosition() - ACTUATOR_STEP);
+        m_shooterSubsystemTaylor.setActuatorPosition(m_shooterSubsystemTaylor.getActuatorPosition() - ACTUATOR_STEP);
+      }
     }));
-    m_driverController.b().onTrue(new InstantCommand(() -> {
-      m_shooterSubsystemJohn.decrementShooterSpeed();
-      m_shooterSubsystemJawbreaker.decrementShooterSpeed();
-      m_shooterSubsystemTaylor.decrementShooterSpeed();
-    }));
-    // Feeder Speed Controls
-    m_driverController.y().onTrue(new InstantCommand(() -> {
-      m_shooterSubsystemJohn.incrementFeederSpeed();
-      m_shooterSubsystemJawbreaker.incrementFeederSpeed();
-      m_shooterSubsystemTaylor.incrementFeederSpeed();
-    }));
-    m_driverController.x().onTrue(new InstantCommand(() -> {
-      m_shooterSubsystemJohn.decrementFeederSpeed();
-      m_shooterSubsystemJawbreaker.decrementFeederSpeed();
-      m_shooterSubsystemTaylor.decrementFeederSpeed();
+    m_driverController.povDown().whileTrue(new InstantCommand(() -> {
+      if (isManualMode) {
+        m_shooterSubsystemJohn.setActuatorPosition(m_shooterSubsystemJohn.getActuatorPosition() + ACTUATOR_STEP);
+        m_shooterSubsystemJawbreaker.setActuatorPosition(m_shooterSubsystemJawbreaker.getActuatorPosition() + ACTUATOR_STEP);
+        m_shooterSubsystemTaylor.setActuatorPosition(m_shooterSubsystemTaylor.getActuatorPosition() + ACTUATOR_STEP);
+      }
     }));
 
-    // Shooter and Feeder On/off Controls
-    m_driverController.rightTrigger()
-    .whileTrue(new InstantCommand(() -> {
-      m_shooterSubsystemJohn.setIsShooting(true);
-      m_shooterSubsystemJawbreaker.setIsShooting(true);
-      m_shooterSubsystemTaylor.setIsShooting(true);
+    m_driverController.start().whileTrue(new InstantCommand(() -> {})); // TODO: implement unjam
+    m_driverController.back().whileTrue(new InstantCommand(() -> this.isManualMode = !this.isManualMode));
 
-      m_shooterSubsystemJohn.setIsFeeding(true);
-      m_shooterSubsystemJawbreaker.setIsFeeding(true);
-      m_shooterSubsystemTaylor.setIsFeeding(true);
+  }
 
-      m_floorFeedSubsystem.setIsFeeding(true);
-    }))
-    .whileFalse(new InstantCommand(() -> {
-      m_shooterSubsystemJohn.setIsShooting(false);
-      m_shooterSubsystemJawbreaker.setIsShooting(false);
-      m_shooterSubsystemTaylor.setIsShooting(false);
+  private void configureDrivetrainBindings() {
+    // Note that X is defined as forward according to WPILib convention,
+    // and Y is defined as to the left according to WPILib convention.
+    drivetrain.setDefaultCommand(
+        // Drivetrain will execute this command periodically
+        drivetrain.applyRequest(() -> drive.withVelocityX(-m_driverController.getLeftY() * MaxSpeed) // Drive forward with negative Y
+            .withVelocityY(-m_driverController.getLeftX() * MaxSpeed) // Drive left with negative X
+            .withRotationalRate(-m_driverController.getRightX() * MaxAngularRate) // Drive counterclockwise with negative X
+        )
+    );
 
-      m_shooterSubsystemJohn.setIsFeeding(false);
-      m_shooterSubsystemJawbreaker.setIsFeeding(false);
-      m_shooterSubsystemTaylor.setIsFeeding(false);
+    // Idle while the robot is disabled. This ensures the configured
+    // neutral mode is applied to the drive motors while disabled.
+    final var idle = new SwerveRequest.Idle();
+    RobotModeTriggers.disabled().whileTrue(
+        drivetrain.applyRequest(() -> idle).ignoringDisable(true));
 
-      m_floorFeedSubsystem.setIsFeeding(false);
-    }));
+    // reset the field-centric heading on left bumper press
+    m_driverController.back().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
 
-    // Linear Actuator Controls, 0.0-1.0 (total length)
-    m_driverController.leftBumper().onTrue(new InstantCommand(() -> {
-      m_shooterSubsystemJohn.setActuatorPosition(m_shooterSubsystemJohn.getActuatorPosition() - ACTUATOR_STEP);
-      m_shooterSubsystemJawbreaker.setActuatorPosition(m_shooterSubsystemJawbreaker.getActuatorPosition() - ACTUATOR_STEP);
-      m_shooterSubsystemTaylor.setActuatorPosition(m_shooterSubsystemTaylor.getActuatorPosition() - ACTUATOR_STEP);
-    }));
-    m_driverController.rightBumper().onTrue(new InstantCommand(() -> {
-      m_shooterSubsystemJohn.setActuatorPosition(m_shooterSubsystemJohn.getActuatorPosition() + ACTUATOR_STEP);
-      m_shooterSubsystemJawbreaker.setActuatorPosition(m_shooterSubsystemJawbreaker.getActuatorPosition() + ACTUATOR_STEP);
-      m_shooterSubsystemTaylor.setActuatorPosition(m_shooterSubsystemTaylor.getActuatorPosition() + ACTUATOR_STEP);
-    }));
+    m_driverController.leftBumper().whileTrue(new DetectFuelCmd(drivetrain));
 
-    // PID Tuning Controls for all shooter motors
-    m_driverController.start().onTrue(new InstantCommand(() -> {
-      m_shooterSubsystemJohn.shootPIDMotor.putPIDF();
-      m_shooterSubsystemJawbreaker.shootPIDMotor.putPIDF();
-      m_shooterSubsystemTaylor.shootPIDMotor.putPIDF();
-
-    }));
-    m_driverController.back().onTrue(new InstantCommand(() -> {
-      m_shooterSubsystemJohn.shootPIDMotor.fetchPIDFFromDashboard();
-      m_shooterSubsystemJawbreaker.shootPIDMotor.fetchPIDFFromDashboard();
-      m_shooterSubsystemTaylor.shootPIDMotor.fetchPIDFFromDashboard();
-    }));
-
-    // Intake speed controls with d-pad up and down
-    m_driverController.povUp().onTrue(new InstantCommand(() -> {
-      m_intakeSubsystem.incrementIntakeSpeed();
-    }));
-    m_driverController.povDown().onTrue(new InstantCommand(() -> {
-      m_intakeSubsystem.decrementIntakeSpeed();
-    }));
-
-    // Intake on/off control with left trigger
-    m_driverController.leftTrigger()
-    .whileTrue(new InstantCommand(() -> {
-      m_intakeSubsystem.setIsIntaking(true);
-    }))
-    .whileFalse(new InstantCommand(() -> {
-      m_intakeSubsystem.setIsIntaking(false);
-    }));
-
-    // Intake tilt controls with d-pad left and right
-    m_driverController.povLeft().onTrue(new InstantCommand(() -> {
-      // TODO
-    }));
-    m_driverController.povRight().onTrue(new InstantCommand(() -> {
-      // TODO
-    }));
-
-    // Climber extend/retract controls with d-pad up and down
-    m_driverController.povUp().onTrue(new InstantCommand(() -> {
-      m_climberSubsystem.extend();
-    }));
-    m_driverController.povDown().onTrue(new InstantCommand(() -> {
-      m_climberSubsystem.retract();
-    }));
-
+    drivetrain.registerTelemetry(logger::telemeterize);
   }
   
   /**

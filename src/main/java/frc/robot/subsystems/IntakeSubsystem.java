@@ -124,7 +124,7 @@ public class IntakeSubsystem extends SubsystemBase {
      * Set the target absolute tilt position, in full rotations.
      * @param position the tilt position in full rotations
      */
-    public void setTiltPosition(double position) {
+    public void setTiltPosition(double position) { // We want an Up, Middle and Down preset
         tiltPositionAbsolute = position;
         tiltPIDMotor.setTarget(tiltPositionAbsolute, tiltMaxSpeed, tiltMaxAccel);
     }

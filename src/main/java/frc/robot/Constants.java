@@ -38,5 +38,9 @@ public final class Constants {
   // also placeholders
   public static final int FLOOR_FEED_MOTOR_ID = 9;
   public static final int CLIMB_MOTOR_ID = 10;
+
+  // Limelight names
+  public static final String SHOOTER_LIMELIGHT_NAME = "";
+  public static final String FEEDER_LIMELIGHT_NAME = "";
   
 }
