@@ -21,7 +21,7 @@ public class RobotContainer {
   
   private static final double ACTUATOR_STEP = 0.05;
 
-  
+  //passed into subsystem constructor
   private static final int climbCurrentLimit = 30;
   private static final int floorCurrentLimit = 30;
   private static final int intakeCurrentLimit = 30;
