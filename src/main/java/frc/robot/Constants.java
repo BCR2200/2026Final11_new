@@ -17,30 +17,56 @@ public final class Constants {
     public static final int kDriverControllerPort = 0;
   }
 
-  // placeholder motor IDs and channels
+  // left shooter IDs and channel
   public static final int JOHN_SHOOTER_MOTOR_ID = 3;
   public static final int JOHN_FEEDER_MOTOR_ID = 4;
   public static final int JOHN_LINEAR_ACTUATOR_CHANNEL = 1;
 
+  // middle shooter IDs and channel
   public static final int JAWBREAKER_SHOOTER_MOTOR_ID = 1;
   public static final int JAWBREAKER_FEEDER_MOTOR_ID = 2;
   public static final int JAWBREAKER_LINEAR_ACTUATOR_CHANNEL = 0;
 
-  // placeholder motor IDs and channels
+  // right shooter IDs and channel
   public static final int TAYLOR_SHOOTER_MOTOR_ID = 5;
   public static final int TAYLOR_FEEDER_MOTOR_ID = 6;
   public static final int TAYLOR_LINEAR_ACTUATOR_CHANNEL = 2;
 
-  // placeholder motor IDs
+  // intake motor IDs
   public static final int INTAKE_MOTOR_ID = 7;
   public static final int TILT_MOTOR_ID = 8;
-
-  // also placeholders
   public static final int FLOOR_FEED_MOTOR_ID = 9;
+  
+  // climb motor ID
   public static final int CLIMB_MOTOR_ID = 10;
 
   // Limelight names
   public static final String SHOOTER_LIMELIGHT_NAME = "";
   public static final String FEEDER_LIMELIGHT_NAME = "";
+
+  // left front drive motor IDs
+  public static final int LEFT_FRONT_DRIVE = 11;
+  public static final int LEFT_FRONT_STEER = 13;
   
+  // left rear drive motor IDs
+  public static final int LEFT_REAR_STEER = 12;
+  public static final int LEFT_REAR_DRIVE = 14;
+
+  // right rear drive motor IDs
+  public static final int RIGHT_REAR_STEER = 15;
+  public static final int RIGHT_REAR_DRIVE = 17;
+  
+  // right front drive motor IDs
+  public static final int RIGHT_FRONT_STEER = 16;
+  public static final int RIGHT_FRONT_DRIVE = 18;
+
+  // encoder IDs
+  public static final int FRONT_LEFT_ENC = 19;
+  public static final int BACK_LEFT_ENC = 20;
+  public static final int FRONT_RIGHT_ENC = 21;
+  public static final int BACK_RIGHT_ENC = 22;
+
+  // pigeon ID
+  public static final int PIGEON = 23;
+
 }
