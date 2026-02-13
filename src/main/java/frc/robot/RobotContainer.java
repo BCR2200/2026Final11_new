@@ -9,6 +9,8 @@ import com.ctre.phoenix6.swerve.SwerveRequest;
 
 import static edu.wpi.first.units.Units.*;
 
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -49,7 +51,7 @@ public class RobotContainer {
   //passed into subsystem constructor
   private static final int climbCurrentLimit = 30;
   private static final int floorCurrentLimit = 30;
-  private static final int intakeCurrentLimit = 30;
+  private static final int intakeCurrentLimit = 60;
   private static final int tiltCurrentLimit = 8;
   private static final int shooterCurrentLimit = 30;
   private static final int feederCurrentLimit = 30;
@@ -157,6 +159,7 @@ public class RobotContainer {
     m_driverController.rightBumper().whileTrue(new PassCmd(drivetrain, m_shooterSubsystemJohn, m_shooterSubsystemJawbreaker, m_shooterSubsystemTaylor, m_floorFeedSubsystem)); // TODONE
     m_driverController.rightTrigger().whileTrue(new InstantCommand(() -> {})); // TODO: implement shoot-to-goal
 
+
     m_driverController.b().whileTrue(new InstantCommand(() -> {})); // TODO: implement right climb
     m_driverController.a().whileTrue(new InstantCommand(()-> {
       m_shooterSubsystemJohn.updateParameters();
@@ -167,6 +170,7 @@ public class RobotContainer {
       m_intakeSubsystem.updateParameters();
     }));
     m_driverController.x().whileTrue(new InstantCommand(() -> {})); // TODO: implement left climb
+    m_driverController.y().onTrue(new InstantCommand(() -> updateDrivetrainRobotPerspective()));
 
     m_driverController.povLeft().whileTrue(new InstantCommand(() -> {})); // TODO: implement reset alliance - possibly reseed field-centric?
     m_driverController.povRight().whileTrue(new InstantCommand(() -> {})); // TODO: implement reset facing angle
@@ -213,6 +217,16 @@ public class RobotContainer {
     m_driverController.leftBumper().whileTrue(new DetectFuelCmd(drivetrain));
 
     drivetrain.registerTelemetry(logger::telemeterize);
+  }
+
+  public void updateDrivetrainRobotPerspective() {
+    Rotation2d forward;
+    if (Robot.alliance == Alliance.Red) {
+      forward = new Rotation2d(Math.PI);
+    } else {
+      forward = new Rotation2d(0);
+    }
+    drivetrain.setOperatorPerspectiveForward(forward);
   }
   
   /**

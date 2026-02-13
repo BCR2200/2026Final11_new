@@ -125,8 +125,8 @@ public class IntakeSubsystem extends SubsystemBase {
      * @param position the tilt position in full rotations
      */
     public void setTiltPosition(double position) { // We want an Up, Middle and Down preset
-        tiltPositionAbsolute = position;
-        tiltPIDMotor.setTarget(tiltPositionAbsolute, tiltMaxSpeed, tiltMaxAccel);
+        // tiltPositionAbsolute = position;
+        // tiltPIDMotor.setTarget(tiltPositionAbsolute, tiltMaxSpeed, tiltMaxAccel);
     }
 
     public void updateParameters(){
@@ -149,8 +149,10 @@ public class IntakeSubsystem extends SubsystemBase {
 
         // isIntaking = SmartDashboard.getBoolean("Is Intaking", isIntaking);
 
-        if (isIntaking)
-            intakePIDMotor.setVelocityTarget(intakeMotorSpeed);
+        if (isIntaking) {
+            // intakePIDMotor.setVelocityTarget(intakeMotorSpeed);
+            intakePIDMotor.setPercentOutput(1);
+        }
         else {
             intakePIDMotor.setPercentOutput(0);
         }
