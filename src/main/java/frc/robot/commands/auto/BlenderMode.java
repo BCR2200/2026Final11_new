@@ -6,6 +6,8 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import com.ctre.phoenix6.swerve.SwerveRequest;
+import com.ctre.phoenix6.swerve.SwerveRequest.Idle;
+import com.ctre.phoenix6.swerve.SwerveRequest.RobotCentric;
 import com.pathplanner.lib.path.GoalEndState;
 import com.pathplanner.lib.path.PathConstraints;
 import com.pathplanner.lib.path.PathPlannerPath;
@@ -21,7 +23,8 @@ import frc.robot.LimelightHelpers;
 import frc.robot.RobotContainer;
 import frc.robot.drive.CommandSwerveDrivetrain;
 
-public class BlenderMode extends AutoCommand {
+public class BlenderMode extends Command {
+
     private final PathPlannerPath blueHub;
     private final PathPlannerPath wallLeftFromBlue;
     private final PathPlannerPath redHub;
@@ -35,18 +38,30 @@ public class BlenderMode extends AutoCommand {
     private double currentPointX;
     private double currentPointY;
     private String closestWall;
+    private CommandSwerveDrivetrain drivetrain;
+
+    List<Pose2d> blueHubWaypoints;
+    List<Pose2d> wallLFromBPoints;
+    List<Pose2d> redHubWaypoints;
+    List<Pose2d> wallRFromBPoints;
 
     public BlenderMode(RobotContainer robot, CommandSwerveDrivetrain drivetrain, SwerveRequest.RobotCentric swerve) {
+        this.drivetrain = drivetrain;
+
         blueHub = AutoBuildingBlocks.loadPathOrThrow("Blue Hub");
         wallLeftFromBlue = AutoBuildingBlocks.loadPathOrThrow("WallLeftFromBlue");
         redHub = AutoBuildingBlocks.loadPathOrThrow("Red Hub");
         wallRightFromBlue = AutoBuildingBlocks.loadPathOrThrow("WallRightFromBlue");
 
-        List<Pose2d> blueHubWaypoints = blueHub.getPathPoses();
-        List<Pose2d> wallLFromBPoints = wallLeftFromBlue.getPathPoses();
-        List<Pose2d> redHubWaypoints = redHub.getPathPoses();
-        List<Pose2d> wallRFromBPoints = wallRightFromBlue.getPathPoses();
+        blueHubWaypoints = blueHub.getPathPoses();
+        wallLFromBPoints = wallLeftFromBlue.getPathPoses();
+        redHubWaypoints = redHub.getPathPoses();
+        wallRFromBPoints = wallRightFromBlue.getPathPoses();
+    }
 
+    // Called when the command is initially scheduled.
+    @Override
+    public void initialize() {
         for (int x = 0; x < blueHubWaypoints.size(); x++) {
             comparedPointX = blueHubWaypoints.get(x).getX();
             comparedPointY = blueHubWaypoints.get(x).getY();
@@ -111,19 +126,19 @@ public class BlenderMode extends AutoCommand {
             }
         }
 
-        switch(closestWall){
+        switch (closestWall) {
             case "blueHub":
-            endPoint = blueHubWaypoints.get(blueHubWaypoints.size()-1);
-            break;
+                endPoint = blueHubWaypoints.get(blueHubWaypoints.size() - 1);
+                break;
             case "wallLeftFromBlue":
-            endPoint = wallLFromBPoints.get(wallLFromBPoints.size()-1);
-            break;
+                endPoint = wallLFromBPoints.get(wallLFromBPoints.size() - 1);
+                break;
             case "redHub":
-            endPoint = redHubWaypoints.get(redHubWaypoints.size()-1);
-            break;
+                endPoint = redHubWaypoints.get(redHubWaypoints.size() - 1);
+                break;
             case "wallRightFromBlue":
-            endPoint = wallRFromBPoints.get(wallRFromBPoints.size()-1);
-            break;
+                endPoint = wallRFromBPoints.get(wallRFromBPoints.size() - 1);
+                break;
         }
 
         // Create a list of waypoints from poses. Each pose represents one waypoint.
@@ -134,7 +149,7 @@ public class BlenderMode extends AutoCommand {
                 closestPoint,
                 endPoint);
 
-        //TODO FOR GRAHAM
+        // TODO FOR GRAHAM
         PathConstraints constraints = new PathConstraints(3.0, 3.0, 2 * Math.PI, 4 * Math.PI); // The constraints for
                                                                                                // this path.
         // PathConstraints constraints = PathConstraints.unlimitedConstraints(12.0); //
@@ -147,7 +162,7 @@ public class BlenderMode extends AutoCommand {
                 constraints,
                 null, // The ideal starting state, this is only relevant for pre-planned paths, so can
                       // be null for on-the-fly paths.
-                //TODO put case to change the ending angle depending on path to match
+                // TODO put case to change the ending angle depending on path to match
                 new GoalEndState(0.0, Rotation2d.fromDegrees(-90)) // Goal end state. You can set a holonomic rotation
                                                                    // here. If using a differential drivetrain, the
                                                                    // rotation will have no effect.
@@ -157,18 +172,21 @@ public class BlenderMode extends AutoCommand {
         path.preventFlipping = true;
     }
 
+    // Called every time the scheduler runs while the command is scheduled.
     @Override
-    List<Pose2d> getAllRawPathPoses() {
-        return Stream
-                .of(blueHub.getPathPoses(), wallLeftFromBlue.getPathPoses(), redHub.getPathPoses(),
-                        wallRightFromBlue.getPathPoses())
-                .flatMap(Collection::stream)
-                .collect(Collectors.toList());
+    public void execute() {
     }
 
     @Override
-    public Pose2d getRawStartingPose() {
-        return blueHub.getStartingHolonomicPose().orElseThrow();
+    public void end(boolean interrupted) {
+        drivetrain.applyRequest(SwerveRequest.Idle::new);
     }
 
+    // Returns true when the command should end.
+    @Override
+    public boolean isFinished() {
+        return false;
+    }
+
+    
 }

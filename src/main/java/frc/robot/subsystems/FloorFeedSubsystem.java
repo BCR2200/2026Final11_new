@@ -87,10 +87,15 @@ public class FloorFeedSubsystem extends SubsystemBase {
         this.updateTargets();
     }
 
+    public void updateParameters(){
+        motorSpeedCentre = SmartDashboard.getNumber("Floor Feed motor speed centre", motorSpeedCentre);
+        motor.fetchPIDFFromDashboard();
+    }
+
     @Override
     public void periodic() {
         
-        this.motorSpeedCentre = SmartDashboard.getNumber("Floor Feed motor speed centre", this.motorSpeedCentre);
+        // this.motorSpeedCentre = SmartDashboard.getNumber("Floor Feed motor speed centre", this.motorSpeedCentre);
 
         // This method will be called once per scheduler run
         if (isFeeding) {

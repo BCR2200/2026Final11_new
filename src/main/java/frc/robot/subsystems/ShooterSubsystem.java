@@ -114,6 +114,14 @@ public class ShooterSubsystem extends SubsystemBase {
     public double getActuatorPosition() {
         return linearActuator.getPosition();
     }
+    
+    public void updateParameters(){
+        shooterSpeed = SmartDashboard.getNumber("Shooter Speed", shooterSpeed);
+        shootPIDMotor.fetchPIDFFromDashboard();
+
+        feederSpeed = SmartDashboard.getNumber("Feeder Speed", feederSpeed);
+        feedPIDMotor.fetchPIDFFromDashboard();
+    }
 
     /**
      * sets the linear actuator to an interpolated passing position based on provided distance 
@@ -138,8 +146,8 @@ public class ShooterSubsystem extends SubsystemBase {
         SmartDashboard.putNumber("Feeder Actual Speed", feedPIDMotor.getVelocity());
         SmartDashboard.putNumber("Feeder Accel", feedPIDMotor.getAcceleration());
 
-        isShooting = SmartDashboard.getBoolean("Is Shooting", isShooting);
-        isFeeding = SmartDashboard.getBoolean("Is Feeding", isFeeding);
+        // isShooting = SmartDashboard.getBoolean("Is Shooting", isShooting);
+        // isFeeding = SmartDashboard.getBoolean("Is Feeding", isFeeding);
 
         if (isShooting) {
             shootPIDMotor.setVelocityTarget(shooterSpeed);
@@ -157,10 +165,5 @@ public class ShooterSubsystem extends SubsystemBase {
         else {
             feedPIDMotor.setPercentOutput(0);
         }
-    }
-
-    @Override
-    public void simulationPeriodic() {
-        // This method will be called once per scheduler run during simulation
     }
 }

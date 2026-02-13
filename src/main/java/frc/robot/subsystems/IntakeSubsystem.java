@@ -129,6 +129,11 @@ public class IntakeSubsystem extends SubsystemBase {
         tiltPIDMotor.setTarget(tiltPositionAbsolute, tiltMaxSpeed, tiltMaxAccel);
     }
 
+    public void updateParameters(){
+        intakeMotorSpeed = SmartDashboard.getNumber("Intake Speed", intakeMotorSpeed);
+        intakePIDMotor.fetchPIDFFromDashboard();
+    }
+
     /**
      * {@inheritDoc}
      */
@@ -142,7 +147,7 @@ public class IntakeSubsystem extends SubsystemBase {
         SmartDashboard.putNumber("Tilt Position Target", tiltPositionAbsolute);
         SmartDashboard.putNumber("Tilt Actual Position", tiltPIDMotor.getPosition());
 
-        isIntaking = SmartDashboard.getBoolean("Is Intaking", isIntaking);
+        // isIntaking = SmartDashboard.getBoolean("Is Intaking", isIntaking);
 
         if (isIntaking)
             intakePIDMotor.setVelocityTarget(intakeMotorSpeed);

@@ -212,8 +212,7 @@ public class PIDMotor {
     }
 
     /**
-     * Fetches the PIDF values from the SmartDashboard. Call `updatePIDF` to send
-     * the values to the motor controller.
+     * Fetches the PIDF values from the SmartDashboard. 
      */
     public void fetchPIDFFromDashboard() {
         catchUninit();

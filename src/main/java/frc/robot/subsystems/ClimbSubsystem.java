@@ -1,9 +1,11 @@
 package frc.robot.subsystems;
 
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.PIDMotor;
 
-public class ClimbSubsystem {
+public class ClimbSubsystem extends SubsystemBase {
     
     private boolean isExtended = false;
     private PIDMotor climbMotor;
@@ -24,6 +26,11 @@ public class ClimbSubsystem {
         return isExtended;
     }
     
+    public void updateParameters(){
+        climbMotor.fetchPIDFFromDashboard();
+    }
+
+    // TODO: no periodic. boken
     public void extend() {
         this.climbMotor.setTarget(EXTENDED_POSITION);
         this.isExtended = true;
