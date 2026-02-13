@@ -50,7 +50,7 @@ public class RobotContainer {
   private static final int climbCurrentLimit = 30;
   private static final int floorCurrentLimit = 30;
   private static final int intakeCurrentLimit = 30;
-  private static final int tiltCurrentLimit = 20;
+  private static final int tiltCurrentLimit = 8;
   private static final int shooterCurrentLimit = 30;
   private static final int feederCurrentLimit = 30;
   
