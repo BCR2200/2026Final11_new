@@ -153,8 +153,8 @@ public class RobotContainer {
     // POV is the D-pad
 
     m_driverController.leftBumper().whileTrue(new DetectFuelCmd(drivetrain));
-    m_driverController.leftTrigger().whileTrue(new InstantCommand(() -> m_intakeSubsystem.setIsIntaking(true))).whileFalse(new InstantCommand(() -> m_intakeSubsystem.setIsIntaking(false)));
-    m_driverController.rightBumper().whileTrue(new PassCmd(drivetrain, m_shooterSubsystemJohn, m_shooterSubsystemJawbreaker, m_shooterSubsystemTaylor, m_floorFeedSubsystem));
+    m_driverController.leftTrigger().whileTrue(new InstantCommand(() -> m_intakeSubsystem.setIsIntaking(true))).whileFalse(new InstantCommand(() -> m_intakeSubsystem.setIsIntaking(false))); 
+    m_driverController.rightBumper().whileTrue(new PassCmd(drivetrain, m_shooterSubsystemJohn, m_shooterSubsystemJawbreaker, m_shooterSubsystemTaylor, m_floorFeedSubsystem)); // TODONE
     m_driverController.rightTrigger().whileTrue(new InstantCommand(() -> {})); // TODO: implement shoot-to-goal
 
     m_driverController.b().whileTrue(new InstantCommand(() -> {})); // TODO: implement right climb
