@@ -1,7 +1,5 @@
 package frc.robot.commands.auto;
 
-import frc.robot.input.SnapButton;
-
 import com.pathplanner.lib.path.PathPlannerPath;
 
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
