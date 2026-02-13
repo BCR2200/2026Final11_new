@@ -20,6 +20,7 @@ import frc.robot.commands.PassCmd;
 import frc.robot.drive.CommandSwerveDrivetrain;
 import frc.robot.drive.Telemetry;
 import frc.robot.drive.TunerConstantsComp;
+import frc.robot.drive.TunerConstantsPrac;
 import frc.robot.subsystems.*;
 
 
@@ -41,7 +42,7 @@ public class RobotContainer {
           .withDriveRequestType(DriveRequestType.OpenLoopVoltage); // Use open-loop control for drive motors
   private final Telemetry logger = new Telemetry(MaxSpeed);
 
-  public final CommandSwerveDrivetrain drivetrain = TunerConstantsComp.createDrivetrain();
+  public final CommandSwerveDrivetrain drivetrain = TunerConstantsPrac.createDrivetrain();
 
   private static final double ACTUATOR_STEP = 0.05;
 
