@@ -54,6 +54,7 @@ public class ShooterSubsystem extends SubsystemBase {
         this.shooterAngleInterpolator = shooterAngleInterpolator;
         this.shooterVelocityInterpolator = shooterVelocityInterpolator;
         this.linearActuator = new LinearActuator(actuatorChannel, name + " linear actuator");
+        setActuatorPosition(1);
         this.passAngleInterpolator = passAngleInterpolator;
         this.passVelocityInterpolator = passVelocityInterpolator;
     }
@@ -118,7 +119,7 @@ public class ShooterSubsystem extends SubsystemBase {
     }
 
     public void setActuatorPosition(double position) {
-        linearActuator.setPosition(position);
+        linearActuator.setPosition(ExtraMath.clamp(position, 0.15, 1));
     }
     public double getActuatorPosition() {
         return linearActuator.getPosition();
