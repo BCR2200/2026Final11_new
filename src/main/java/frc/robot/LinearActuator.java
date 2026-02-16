@@ -24,8 +24,9 @@ public class LinearActuator {
      * Set the target position of the linear actuator.
      * @param setpoint the target position of the servo (0.0-1.0, factor of total length)
      */
-    public void setPosition(double setpoint) {
-        target = ExtraMath.clamp(setpoint, -0.000, 1);
+    public void setTargetPosition(double setpoint) {
+        // clamp to [0.15, 1] because below ~15% the mechanism binds and breaks the servo
+        target = ExtraMath.clamp(setpoint, 0.15, 1);
         servo.setPosition(target);
     }
     
@@ -33,12 +34,7 @@ public class LinearActuator {
      * Get the current position target.
      * @return current target position
      */
-    public double getPosition() {
+    public double getTargetPosition() {
         return target;
     }
-
-    public void dashboardPutPosition() {
-        SmartDashboard.putNumber(this.name + " actuator position", this.servo.getPosition());
-    }
-
 }

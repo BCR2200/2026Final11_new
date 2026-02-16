@@ -1,41 +1,33 @@
 package frc.robot.subsystems;
 
+import edu.wpi.first.epilogue.Logged;
+import edu.wpi.first.epilogue.NotLogged;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.ExtraMath;
 import frc.robot.PIDMotor;
 
+@Logged
 public class IntakeSubsystem extends SubsystemBase {
+
+    // Logged automatically by Epilogue
     private boolean isIntaking = false;
-    private double intakeMotorSpeed = 84; // in rps
     private double tiltPositionAbsolute = 0.0; // 0.0 to 1.0
+
+    @Logged(name = "IntakeMotor")
     public PIDMotor intakePIDMotor;
+    @Logged(name = "TiltMotor")
     public PIDMotor tiltPIDMotor;
 
+    @NotLogged
     private double tiltMaxSpeed = 140.0;
+    @NotLogged
     private double tiltMaxAccel = 140.0 / 5.0;
 
-    /**
-     * The maximum rotational speed of the intake motor, in rotations per
-     * second.
-     */
-    private static final double INTAKE_MAX_RPS = 140.0; // 5000 rpm in rps is 84. Max the motors can go is ~140 rps
-    /**
-     * The absolute maximum rotational speed of the tilt motor, in rotations
-     * per second. There is a separate field that can be modified on the fly,
-     * but the speed will never exceed this value.
-     */
-    private static final double TILT_ABSOLUTE_MAX_RPS = 140.0; // past motor's physical limits
-    /**
-     * The absolute maximum acceleration of the tilt motor, in rotations
-     * per second squared. There is a separate field that can be modified on
-     * the fly, but the acceleration will never exceed this value.
-     */
-    private static final double TILT_ABSOLUTE_MAX_ACCEL = TILT_ABSOLUTE_MAX_RPS * 2; // max 500ms startup? This might be too restrictive but that is unknown until testing
-    /**
-     * The step size used by the increment and decrement functions.
-     */
-    private static final double INTAKE_RPS_STEP = 4.0; // rps
+    @NotLogged
+    private static final double TILT_ABSOLUTE_MAX_RPS = 140.0;
+    @NotLogged
+    private static final double TILT_ABSOLUTE_MAX_ACCEL = TILT_ABSOLUTE_MAX_RPS * 2;
 
     // Functions:
     // 1. Feed - boolean, speed profile
@@ -51,7 +43,7 @@ public class IntakeSubsystem extends SubsystemBase {
      */
     public IntakeSubsystem(int intakeMotorID, int tiltMotorID, int intakeCurrentLimit, int tiltCurrentLimit) {
         intakePIDMotor = PIDMotor.makeMotor(intakeMotorID, "intake", 0.11, 0.0, 0.0,
-                0.25, 1.2, 0.01, INTAKE_MAX_RPS, INTAKE_MAX_RPS / 5, 0.00);
+                0.25, 1.2, 0.01, 0, 0, 0.00);
         intakePIDMotor.setCurrentLimit(intakeCurrentLimit);
         intakePIDMotor.setIdleCoastMode();
 
@@ -59,8 +51,6 @@ public class IntakeSubsystem extends SubsystemBase {
                 0.25, 1.2, 0.01, TILT_ABSOLUTE_MAX_RPS, TILT_ABSOLUTE_MAX_ACCEL, 0.00);
         tiltPIDMotor.setCurrentLimit(tiltCurrentLimit);
         tiltPIDMotor.setIdleCoastMode();
-
-        this.intakeMotorSpeed = intakePIDMotor.getPosition();
     }
 
     /**
@@ -78,39 +68,6 @@ public class IntakeSubsystem extends SubsystemBase {
      */
     public void setIsIntaking(boolean intaking) {
         isIntaking = intaking;
-    }
-    /**
-     * Get the currently requested intake motor speed, in rotations per second.
-     * A negative speed indicates running the motor in reverse.
-     * @return the intake motor speed in rotations per second
-     */
-    public double getIntakeSpeed() {
-        return intakeMotorSpeed;
-    }
-    /**
-     * Request the intake motor to run at the given speed, in rotations per
-     * second. A negative speed indicates running the motor in reverse.
-     * @param speed the intake motor speed in rotations per second
-     */
-    public void setIntakeSpeed(double speed) {
-        intakeMotorSpeed = speed;
-    }
-
-    /**
-     * Increment the current intake motor speed by some constant step,
-     * specified by {@code INTAKE_RPS_STEP}. The speed will never exceed
-     * {@code INTAKE_MAX_RPS}.
-     */
-    public void incrementIntakeSpeed() {
-        intakeMotorSpeed = ExtraMath.clamp(intakeMotorSpeed + INTAKE_RPS_STEP, -INTAKE_MAX_RPS, INTAKE_MAX_RPS);
-    }
-    /**
-     * Decrement the current intake motor speed by some constant step,
-     * specified by {@code INTAKE_RPS_STEP}. The speed will never exceed
-     * {@code -INTAKE_MAX_RPS}.
-     */
-    public void decrementIntakeSpeed() {
-        intakeMotorSpeed = ExtraMath.clamp(intakeMotorSpeed - INTAKE_RPS_STEP, -INTAKE_MAX_RPS, INTAKE_MAX_RPS);
     }
 
     /**
@@ -130,33 +87,16 @@ public class IntakeSubsystem extends SubsystemBase {
     }
 
     public void updateParameters(){
-        intakeMotorSpeed = SmartDashboard.getNumber("Intake Speed", intakeMotorSpeed);
-        intakePIDMotor.fetchPIDFFromDashboard();
+        // TODO: tilt motor
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void periodic() {
-
-        SmartDashboard.putNumber("Intake Speed", intakeMotorSpeed);
-        SmartDashboard.putBoolean("Is Intaking", isIntaking);
-        SmartDashboard.putNumber("Intake Actual Speed", intakePIDMotor.getVelocity());
-
-        SmartDashboard.putNumber("Tilt Position Target", tiltPositionAbsolute);
-        SmartDashboard.putNumber("Tilt Actual Position", tiltPIDMotor.getPosition());
-
-        // isIntaking = SmartDashboard.getBoolean("Is Intaking", isIntaking);
-
         if (isIntaking) {
-            // intakePIDMotor.setVelocityTarget(intakeMotorSpeed);
             intakePIDMotor.setPercentOutput(1);
-        }
-        else {
+        } else {
             intakePIDMotor.setPercentOutput(0);
         }
-
     }
 
 }

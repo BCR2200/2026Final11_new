@@ -4,20 +4,21 @@
 
 package frc.robot;
 
+import edu.wpi.first.epilogue.Epilogue;
+import edu.wpi.first.epilogue.Logged;
+import edu.wpi.first.epilogue.NotLogged;
+import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.LimelightHelpers.PoseEstimate;
 
-import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Meters;
 
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.units.DistanceUnit;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
@@ -29,19 +30,25 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
  * the TimedRobot documentation. If you change the name of this class or the package after creating
  * this project, you must also update the Main.java file in the project.
  */
+@Logged
 public class Robot extends TimedRobot {
-  /**
-   * do not modify
-   */
+  @NotLogged
   public static final String[] LIMELIGHTS = {"limelight"};
-  
+
+  @NotLogged
   private Command m_autonomousCommand;
+
+  @Logged
   private final RobotContainer m_robotContainer;
+
+  @NotLogged
   private final Field2d m_botField;
+  @NotLogged
   private final Field2d m_objectField;
+  @NotLogged
   private final Field2d m_limelightField;
 
-  // Default to blue alliance
+  // Logged - current alliance
   public static Alliance alliance = Alliance.Red;
 
   /**
@@ -49,6 +56,9 @@ public class Robot extends TimedRobot {
    * initialization code.
    */
   public Robot() {
+    // Start data logging to USB drive (if present)
+    DataLogManager.start();
+
     // Instantiate our RobotContainer.  This will perform all our button bindings, and put our
     // autonomous chooser on the dashboard.
     m_robotContainer = new RobotContainer();
@@ -56,6 +66,20 @@ public class Robot extends TimedRobot {
     this.m_botField = new Field2d();
     this.m_limelightField = new Field2d();
     this.m_objectField = new Field2d();
+
+    // Configure Epilogue
+    Epilogue.configure(config -> {
+      config.minimumImportance = Logged.Importance.DEBUG;
+      config.root = "Telemetry";
+    });
+
+    // Bind Epilogue logger - runs at robot frequency, offset by half phase
+    Epilogue.bind(this);
+
+    // Example of periodic task. Calls this.updateTargetHub() every 0.5 seconds
+    addPeriodic(this::updateTargetHub, 0.5);
+    addPeriodic(this::sendFields, 0.080); // 80ms is every 4 loops
+    addPeriodic(Robot::updateAlliance, 0.5);
   }
 
   /**
@@ -64,14 +88,27 @@ public class Robot extends TimedRobot {
   public static void updateAlliance() {
     alliance = DriverStation.getAlliance().orElse(Alliance.Red);
   }
+
+  public final Pose2d BLUE_HUB = new Pose2d(
+    Distance.ofBaseUnits(4.512294, Meters),
+    Distance.ofBaseUnits(4.03479, Meters),
+    Rotation2d.kZero
+  );
+  public final Pose2d RED_HUB = new Pose2d(
+    Distance.ofBaseUnits(12.512294, Meters),
+    Distance.ofBaseUnits(4.03479, Meters),
+    Rotation2d.kZero
+  );
+  public Pose2d targetHub = RED_HUB;
+
+  private void updateTargetHub() {
+    targetHub = alliance == Alliance.Red ? RED_HUB : BLUE_HUB;
+    m_objectField.setRobotPose(targetHub);
+    SmartDashboard.putData("Object Field", this.m_objectField);
+  }
+
   @Override
   public void robotInit() {
-    m_objectField.setRobotPose(new Pose2d(
-      Distance.ofBaseUnits(12.512294, Meters),
-      Distance.ofBaseUnits(4.03479, Meters),
-      Rotation2d.kZero
-    ));
-    SmartDashboard.putData("Object Field", this.m_objectField);
   }
 
   /**
@@ -88,13 +125,14 @@ public class Robot extends TimedRobot {
     // and running subsystem periodic() methods.  This must be called from the robot's periodic
     // block in order for anything in the Command-based framework to work.
     CommandScheduler.getInstance().run();
-    SmartDashboard.putBoolean("Is Manual Mode", m_robotContainer.isManualMode);
+
     var botState = m_robotContainer.drivetrain.getState();
     double omegarps = Units.radiansToRotations(botState.Speeds.omegaRadiansPerSecond);
 
     for (int i = 0; i < LIMELIGHTS.length; ++i) {
-      LimelightHelpers.SetRobotOrientation(LIMELIGHTS[i], botState.Pose.getRotation().getDegrees(), 0, 0, 0, 0,
-          0);
+      // Use NoFlush variant to avoid blocking on NetworkTables sync
+      LimelightHelpers.SetRobotOrientation_NoFlush(LIMELIGHTS[i],
+          botState.Pose.getRotation().getDegrees(), 0, 0, 0, 0, 0);
       PoseEstimate poseEstimate = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(LIMELIGHTS[i]);
       if (poseEstimate != null && poseEstimate.pose != null) {
         m_limelightField.setRobotPose(poseEstimate.pose);
@@ -106,9 +144,11 @@ public class Robot extends TimedRobot {
         }
       }
     }
-    
-    m_botField.setRobotPose(botState.Pose);
 
+    m_botField.setRobotPose(botState.Pose);
+  }
+
+  public void sendFields() {
     SmartDashboard.putData("Bot Field", m_botField);
     SmartDashboard.putData("Limelight Field", m_limelightField);
   }

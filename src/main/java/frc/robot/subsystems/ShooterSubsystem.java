@@ -2,6 +2,8 @@ package frc.robot.subsystems;
 
 import com.ctre.phoenix6.signals.InvertedValue;
 
+import edu.wpi.first.epilogue.Logged;
+import edu.wpi.first.epilogue.NotLogged;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -10,41 +12,51 @@ import frc.robot.PIDMotor;
 import frc.robot.Interpolator;
 import frc.robot.LinearActuator;
 
+@Logged
 public class ShooterSubsystem extends SubsystemBase {
-    
-    private static final double PRELOAD_SPEED = 0.5;
 
-    private String name;
-    
+    @NotLogged
+    private static final double PRELOAD_SPEED_PERCENT = 0.5;
+
+    @NotLogged
+    private static final double RPS_STEP = 4.0; // rps
+    @NotLogged
+    private static final double MAX_RPS = 140.0; // 5000 rpm in rps is 84. Max the motors can go is ~140 rps
+
+    // Logged automatically by Epilogue
+    private final String name;
     private boolean isShooting = false;
-    public double shooterSpeed = 42; // in rps
-    
+    private double shooterSpeed = 42; // in rps. TODO: remove and use the shooterVelocityInterpolator instead
+    private boolean isPassing = false;
+    private static final double PASSING_SHOOTER_SPEED = 42; // in rps
     private boolean isFeeding = false;
-    public double feederSpeed = 100; // in rps
-    
+    private double feederSpeed = 100; // in rps
+
+    // Logged via PIDMotorLogger
+    @Logged(name = "ShootMotor")
     public PIDMotor shootPIDMotor;
+    @Logged(name = "FeedMotor")
     public PIDMotor feedPIDMotor;
+
+    @NotLogged
     public LinearActuator linearActuator;
 
     /**
      * Sensor for the beam break.
      * Returns {@code true} if the beam is unbroken, {@code false} if something is present.
      */
-    private DigitalInput beamBreak;
-    
+    @NotLogged
+    private final DigitalInput breamBake; // 🐟🧑‍🍳
+
+    @NotLogged
     private final Interpolator shooterAngleInterpolator;
+    @NotLogged
     private final Interpolator shooterVelocityInterpolator;
-    private final Interpolator passAngleInterpolator;
-    private final Interpolator passVelocityInterpolator;
-    
-    private static final double RPS_STEP = 4.0; // rps
-    private static final double MAX_RPS = 140.0; // 5000 rpm in rps is 84. Max the motors can go is ~140 rps
-    
+
     public ShooterSubsystem(String name, int shooterMotorID, int feederMotorID, int beambreakChannel, int actuatorChannel, int shootCurrentLimit, int feedCurrentLimit, 
-                            Interpolator shooterAngleInterpolator, Interpolator shooterVelocityInterpolator,
-                            Interpolator passAngleInterpolator, Interpolator passVelocityInterpolator, boolean isMountedIncorrectly) {
+                            Interpolator shooterAngleInterpolator, Interpolator shooterVelocityInterpolator, boolean isMountedIncorrectly) {
         this.name = name;
-        beamBreak = new DigitalInput(beambreakChannel);
+        breamBake = new DigitalInput(beambreakChannel);
         
                                 // These numbers are placeholders, we don't actually know what they should be yet
         shootPIDMotor = PIDMotor.makeMotor(shooterMotorID, name + " shooter", 0.0, 0.0, 0.0,
@@ -54,16 +66,14 @@ public class ShooterSubsystem extends SubsystemBase {
         shootPIDMotor.setIdleCoastMode();
 
         feedPIDMotor = PIDMotor.makeMotor(feederMotorID, name + " feeder", 0.11, 0.0, 0.0,
-                0.25, 1.2, 0.01, MAX_RPS, MAX_RPS / 5, 0.00);
+                0.25, 0.1, 100.0, MAX_RPS, MAX_RPS*10, 0.00);
         feedPIDMotor.setCurrentLimit(feedCurrentLimit);
         feedPIDMotor.setIdleBrakeMode();
 
         this.shooterAngleInterpolator = shooterAngleInterpolator;
         this.shooterVelocityInterpolator = shooterVelocityInterpolator;
         this.linearActuator = new LinearActuator(actuatorChannel, name + " linear actuator");
-        setActuatorPosition(1);
-        this.passAngleInterpolator = passAngleInterpolator;
-        this.passVelocityInterpolator = passVelocityInterpolator;
+        setActuatorTargetPosition(1);
         shootPIDMotor.putPIDF();
     }
 
@@ -73,24 +83,17 @@ public class ShooterSubsystem extends SubsystemBase {
     public void setIsShooting(boolean shooting) {
         isShooting = shooting;
     }
-    public double getShooterSpeed() {
-        return shooterSpeed;
+    public boolean getIsPassing() {
+        return isPassing;
     }
-    public void setShooterSpeed(double speed) {
-        shooterSpeed = speed;
+    public void setIsPassing(boolean passing) {
+        isPassing = passing;
     }
-
     public boolean getIsFeeding() {
         return isFeeding;
     }
     public void setIsFeeding(boolean feeding) {
         isFeeding = feeding;
-    }
-    public double getFeederSpeed() {
-        return feederSpeed;
-    }
-    public void setFeederSpeed(double speed) {
-        feederSpeed = speed;
     }
 
     /**
@@ -119,11 +122,11 @@ public class ShooterSubsystem extends SubsystemBase {
         feederSpeed = ExtraMath.clamp(feederSpeed - RPS_STEP, -MAX_RPS, MAX_RPS);
     }
 
-    public void setActuatorPosition(double position) {
-        linearActuator.setPosition(ExtraMath.clamp(position, 0.15, 1));
+    public void setActuatorTargetPosition(double position) {
+        linearActuator.setTargetPosition(position);
     }
     public double getActuatorPosition() {
-        return linearActuator.getPosition();
+        return linearActuator.getTargetPosition();
     }
     
     public void updateParameters(){
@@ -140,8 +143,7 @@ public class ShooterSubsystem extends SubsystemBase {
      * @param distance the distance from the driver station to the robot
      */
     public void setActuatorToPassPosition(double distance) {
-        linearActuator.setPosition(passAngleInterpolator.interpolate(distance));
-        shootPIDMotor.setVelocityTarget(passVelocityInterpolator.interpolate(distance));
+        setActuatorTargetPosition(1);
     }
 
     /**
@@ -150,49 +152,43 @@ public class ShooterSubsystem extends SubsystemBase {
      * @return if the shooter motor is at or above the expected speed
      */
     public boolean isShooterAtSpeed() {
-        return shootPIDMotor.getVelocity() >= shooterSpeed - 5;
+        return shootPIDMotor.atVelocity(5);
     }
 
     public boolean needsFloorFeed() {
-        return isFeeding || beamBreak.get();
+        return isFeeding || !isBeamBroken();
+    }
+
+    /**
+     * Returns true if beam is broken (ball present).
+     * Logged by Epilogue.
+     */
+    @Logged(name = "BeamBroken")
+    public boolean isBeamBroken() {
+        return !breamBake.get();
     }
 
     @Override
     public void periodic() {
-        SmartDashboard.putNumber(name + " Shooter Speed Target", shooterSpeed);
-        SmartDashboard.putBoolean(name + " Is Shooting", isShooting);
-        shootPIDMotor.putPV();
-        shootPIDMotor.putCurrent();
-
-        SmartDashboard.putNumber(name + " Feeder Speed Target", feederSpeed);
-        SmartDashboard.putBoolean(name + " Is Feeding", isFeeding);
-        feedPIDMotor.putPV();
-        feedPIDMotor.putCurrent();
-
-        SmartDashboard.putBoolean(name + " Beambreak", beamBreak.get());
-
-        // isShooting = SmartDashboard.getBoolean("Is Shooting", isShooting);
-        // isFeeding = SmartDashboard.getBoolean("Is Feeding", isFeeding);
+        // Control logic only - telemetry handled by Epilogue
 
         if (isShooting) {
-            shootPIDMotor.setVelocityTarget(shooterSpeed);
-        }
-        else {
+            shootPIDMotor.setVelocityTarget(shooterSpeed); // TODO: use shooterVelocityInterpolator
+        } else if (isPassing) {
+            shootPIDMotor.setVelocityTarget(PASSING_SHOOTER_SPEED);
+        } else {
             shootPIDMotor.setPercentOutput(0);
         }
 
-        // feed at full speed first,
+        // Feed at full speed first,
         // then try to preload (until beam break is broken),
         // then stop
         if (isFeeding) {
             feedPIDMotor.setVelocityTarget(feederSpeed);
-        }
-        else if (beamBreak.get()) {
-            feedPIDMotor.setPercentOutput(PRELOAD_SPEED);
-        }
-        else {
+        } else if (!isBeamBroken()) {
+            feedPIDMotor.setPercentOutput(PRELOAD_SPEED_PERCENT);
+        } else {
             feedPIDMotor.setPercentOutput(0);
         }
-
     }
 }

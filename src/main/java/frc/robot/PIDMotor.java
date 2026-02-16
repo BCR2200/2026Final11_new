@@ -1,5 +1,6 @@
 package frc.robot;
 
+import com.ctre.phoenix6.CANBus;
 import com.ctre.phoenix6.StatusCode;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
@@ -43,7 +44,6 @@ public class PIDMotor {
 
     // This can be used as both position and velocity target
     double target = 0.0;
-    double currentVelocity = 0.0;
 
     private final DutyCycleOut dutyCycleOut = new DutyCycleOut(0);
     private final MotionMagicVoltage motionMagicVoltage = new MotionMagicVoltage(0);
@@ -67,12 +67,12 @@ public class PIDMotor {
         this.maxA = maxA;
         this.maxJerk = maxJerk;
 
-        dutyCycleOut.withEnableFOC(true);
+        dutyCycleOut.withEnableFOC(enableFOC);
         motionMagicVoltage.withEnableFOC(enableFOC);
         motionMagicVelocityVoltage.withEnableFOC(enableFOC);
-        dynamicMotionMagicVoltage.withEnableFOC(true);
+        dynamicMotionMagicVoltage.withEnableFOC(enableFOC);
 
-        motor = new TalonFX(deviceID, "*");
+        motor = new TalonFX(deviceID, new CANBus("*"));
         talonFXConfigs = new TalonFXConfiguration();
     }
 
@@ -101,7 +101,7 @@ public class PIDMotor {
 
     public static PIDMotor makeMotor(int deviceID, String name, double p, double i, double d, double s, double v,
                                      double a, double g, double maxV, double maxA, double maxJerk) {
-        return makeMotor(deviceID, name, p, i, d, s, v, a, 0, maxV, maxA, maxJerk, false);
+        return makeMotor(deviceID, name, p, i, d, s, v, a, g, maxV, maxA, maxJerk, false);
     }
 
     public static PIDMotor makeMotor(int deviceID, String name, double p, double i, double d, double s, double v,
@@ -136,6 +136,15 @@ public class PIDMotor {
             updatePIDF();
             sleep();
             setIdleCoastMode();
+
+            // Configure signal update frequencies for non-blocking reads
+            motor.getPosition().setUpdateFrequency(50);        // 50 Hz
+            motor.getVelocity().setUpdateFrequency(50);        // 50 Hz
+            motor.getStatorCurrent().setUpdateFrequency(10);   // 10 Hz (less critical)
+
+            // Optimize CAN bus usage - disable unused signals
+            motor.optimizeBusUtilization();
+
             initialized = true;
         }
     }
