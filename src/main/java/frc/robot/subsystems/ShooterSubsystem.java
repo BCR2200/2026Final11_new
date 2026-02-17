@@ -26,11 +26,14 @@ public class ShooterSubsystem extends SubsystemBase {
     // Logged automatically by Epilogue
     private final String name;
     private boolean isShooting = false;
-    private double shooterSpeed = 42; // in rps. TODO: remove and use the shooterVelocityInterpolator instead
+    private double shooterSpeed = 54; // in rps. TODO: remove and use the shooterVelocityInterpolator instead
     private boolean isPassing = false;
     private static final double PASSING_SHOOTER_SPEED = 42; // in rps
     private boolean isFeeding = false;
-    private double feederSpeed = 100; // in rps
+    private double feederSpeed = 100; //in rps
+    private double preloadFeederSpeed = 10; // in rps
+
+    private double preloadDebounceCounter = 0;
 
     // Logged via PIDMotorLogger
     @Logged(name = "ShootMotor")
@@ -46,7 +49,7 @@ public class ShooterSubsystem extends SubsystemBase {
      * Returns {@code true} if the beam is unbroken, {@code false} if something is present.
      */
     @NotLogged
-    private final DigitalInput breamBake; // 🐟🧑‍🍳
+    private final DigitalInput breamBake; // No emojis (encoding errors)
 
     @NotLogged
     private final Interpolator shooterAngleInterpolator;
@@ -59,13 +62,13 @@ public class ShooterSubsystem extends SubsystemBase {
         breamBake = new DigitalInput(beambreakChannel);
         
                                 // These numbers are placeholders, we don't actually know what they should be yet
-        shootPIDMotor = PIDMotor.makeMotor(shooterMotorID, name + " shooter", 0.0, 0.0, 0.0,
+        shootPIDMotor = PIDMotor.makeMotor(shooterMotorID, name + " shooter", 1, 0.0, 0.0,
                 0.2, 0.0988, 100.0, MAX_RPS, MAX_RPS*2, 0.00);
         shootPIDMotor.setInverted(isMountedIncorrectly ? InvertedValue.Clockwise_Positive : InvertedValue.CounterClockwise_Positive);
         shootPIDMotor.setCurrentLimit(shootCurrentLimit);
         shootPIDMotor.setIdleCoastMode();
 
-        feedPIDMotor = PIDMotor.makeMotor(feederMotorID, name + " feeder", 0.11, 0.0, 0.0,
+        feedPIDMotor = PIDMotor.makeMotor(feederMotorID, name + " feeder", 0.10, 0.0, 0.0,
                 0.25, 0.1, 100.0, MAX_RPS, MAX_RPS*10, 0.00);
         feedPIDMotor.setCurrentLimit(feedCurrentLimit);
         feedPIDMotor.setIdleBrakeMode();
@@ -73,7 +76,7 @@ public class ShooterSubsystem extends SubsystemBase {
         this.shooterAngleInterpolator = shooterAngleInterpolator;
         this.shooterVelocityInterpolator = shooterVelocityInterpolator;
         this.linearActuator = new LinearActuator(actuatorChannel, name + " linear actuator");
-        setActuatorTargetPosition(1);
+        setActuatorTargetPosition(0.35d);
         shootPIDMotor.putPIDF();
     }
 
@@ -125,6 +128,7 @@ public class ShooterSubsystem extends SubsystemBase {
     public void setActuatorTargetPosition(double position) {
         linearActuator.setTargetPosition(position);
     }
+    @Logged
     public double getActuatorPosition() {
         return linearActuator.getTargetPosition();
     }
@@ -152,7 +156,7 @@ public class ShooterSubsystem extends SubsystemBase {
      * @return if the shooter motor is at or above the expected speed
      */
     public boolean isShooterAtSpeed() {
-        return shootPIDMotor.atVelocity(5);
+        return shootPIDMotor.atVelocity(3);
     }
 
     public boolean needsFloorFeed() {
@@ -186,9 +190,21 @@ public class ShooterSubsystem extends SubsystemBase {
         if (isFeeding) {
             feedPIDMotor.setVelocityTarget(feederSpeed);
         } else if (!isBeamBroken()) {
-            feedPIDMotor.setPercentOutput(PRELOAD_SPEED_PERCENT);
+            if (preloadDebounceCounter == 0)
+                preloadDebounceCounter = 50;
         } else {
             feedPIDMotor.setPercentOutput(0);
         }
+
+        if (preloadDebounceCounter != 0) {
+
+            preloadDebounceCounter--;
+            feedPIDMotor.setVelocityTarget(preloadFeederSpeed);
+
+            if (preloadDebounceCounter == 0) {
+                feedPIDMotor.setPercentOutput(0);
+            }
+        }
+
     }
 }

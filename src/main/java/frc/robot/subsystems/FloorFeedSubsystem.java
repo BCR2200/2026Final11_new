@@ -13,8 +13,12 @@ import frc.robot.PIDMotor;
 public class FloorFeedSubsystem extends SubsystemBase {
 
     // Logged automatically by Epilogue
-    private double motorSpeedCentre = 20; // in rps
+    private double motorSpeedTop = 100; // in rps
+    private double motorSpeedBottom = 70;
     private boolean isFeeding = false;
+    private double secondsToHighPoint = 0.001;
+    private double secondsToLowPoint = 1.25;
+    private double speedChangeFactor = 1.0;
     @Logged
     private boolean needsToRun = false;
 
@@ -26,13 +30,7 @@ public class FloorFeedSubsystem extends SubsystemBase {
     @NotLogged
     private static final double RPS_STEP = 4.0;
     @NotLogged
-    private static final double SECONDS_TO_HIGH_POINT = 0.2;
-    @NotLogged
-    private static final double TIME_FACTOR_TO_LOW_POINT = 4;
-    @NotLogged
-    private static final double SPEED_CHANGE_FACTOR = 1.0;
-    @NotLogged
-    private static final double PARAM_P = 0.11;
+    private static final double PARAM_P = 0.2;
     @NotLogged
     private static final double PARAM_I = 0.0;
     @NotLogged
@@ -40,7 +38,7 @@ public class FloorFeedSubsystem extends SubsystemBase {
     @NotLogged
     private static final double PARAM_S = 0.25;
     @NotLogged
-    private static final double PARAM_V = 1.2;
+    private static final double PARAM_V = 0.13;
     @NotLogged
     private static final double PARAM_A = 0.01;
     @NotLogged
@@ -69,47 +67,72 @@ public class FloorFeedSubsystem extends SubsystemBase {
         isFeeding = feeding;
     }
 
-    public double getMotorSpeedCentre() {
-        return motorSpeedCentre;
+    public double getMotorSpeedTop() {
+        return motorSpeedTop;
     }
-    public void setMotorSpeedCentre(double speed) {
-        motorSpeedCentre = speed;
+    public void setMotorSpeedTop(double speed) {
+        motorSpeedTop = speed;
     }
 
-    public void incrementMotorSpeed() {
-        motorSpeedCentre += RPS_STEP;
-        motorSpeedCentre = Math.min(motorSpeedCentre, MAX_RPS);
+    public void incrementMotorSpeedTop() {
+        motorSpeedTop += RPS_STEP;
+        motorSpeedTop = Math.min(motorSpeedTop, MAX_RPS);
     }
-    public void decrementMotorSpeed() {
-        motorSpeedCentre -= RPS_STEP;
-        motorSpeedCentre = Math.max(motorSpeedCentre, -MAX_RPS);
+    public void decrementMotorSpeedTop() {
+        motorSpeedTop -= RPS_STEP;
+        motorSpeedTop = Math.max(motorSpeedTop, -MAX_RPS);
+    }
+
+    public double getMotorSpeedBottom() {
+        return motorSpeedTop;
+    }
+    public void setMotorSpeedBottom(double speed) {
+        motorSpeedBottom = speed;
+    }
+
+    public void incrementMotorSpeedBottom() {
+        motorSpeedBottom += RPS_STEP;
+        motorSpeedBottom = Math.min(motorSpeedBottom, MAX_RPS);
+    }
+    public void decrementMotorSpeedBottom() {
+        motorSpeedBottom -= RPS_STEP;
+        motorSpeedBottom = Math.max(motorSpeedBottom, -MAX_RPS);
+    }
+
+    public boolean getNeedToRun() {
+        return needsToRun;
+    }
+
+    public double getCurrentSpeed() {
+        return motor.getVelocity();
     }
 
     public void updateParameters(){
-        motorSpeedCentre = SmartDashboard.getNumber("Floor Feed motor speed centre", motorSpeedCentre);
+        motorSpeedBottom = SmartDashboard.getNumber("motorSpeedBottom", motorSpeedBottom);
+        motorSpeedTop = SmartDashboard.getNumber("motorSpeedTop", motorSpeedTop);
         motor.fetchPIDFFromDashboard();
+        this.secondsToHighPoint = SmartDashboard.getNumber("secondsToHighPoint", secondsToHighPoint);
+        this.secondsToLowPoint = SmartDashboard.getNumber("secondsToLowPoint", secondsToLowPoint);
+        this.speedChangeFactor = SmartDashboard.getNumber("speedChangeFactor", speedChangeFactor);
     }
 
     private double getVelocityAtTime(double t) {
-        double highSlope, lowSlope, highPoint, lowPoint, speedDelta;
+        double highSlope, lowSlope, speedDelta;
 
         // find parameters
-        highPoint = motorSpeedCentre * (1 + (SPEED_CHANGE_FACTOR / 2));
-        lowPoint = motorSpeedCentre * (1 - (SPEED_CHANGE_FACTOR / 2));
-        speedDelta = highPoint - lowPoint;
+        speedDelta = motorSpeedTop - motorSpeedBottom;
 
-        highSlope = speedDelta / SECONDS_TO_HIGH_POINT;
-        lowSlope = -(speedDelta / (SECONDS_TO_HIGH_POINT * TIME_FACTOR_TO_LOW_POINT));
+        highSlope = speedDelta / secondsToHighPoint;
+        lowSlope = -(speedDelta / secondsToLowPoint);
 
-        // low-high takes SECONDS_TO_HIGH_POINT, high-low takes SECONDS_TO_HIGH_POINT * TIME_FACTOR_TO_LOW_POINT
-        double x = t % (SECONDS_TO_HIGH_POINT + SECONDS_TO_HIGH_POINT * TIME_FACTOR_TO_LOW_POINT);
+        double x = t % (secondsToHighPoint + secondsToLowPoint);
         // find value
-        if (x < SECONDS_TO_HIGH_POINT) {
+        if (x < secondsToHighPoint) {
             // upwards slope
-            return highSlope * x + lowPoint;
+            return highSlope * x + motorSpeedBottom;
         } else {
             // downwards slope
-            return lowSlope * (x - SECONDS_TO_HIGH_POINT) + highPoint;
+            return lowSlope * (x - secondsToHighPoint) + motorSpeedTop;
         }
 
     }
@@ -119,11 +142,12 @@ public class FloorFeedSubsystem extends SubsystemBase {
         // Control logic only - telemetry handled by Epilogue
 
         // Check if any shooter needs the floor to run (or if isFeeding is manually set to true)
-        needsToRun = false;
+        boolean tmpNeedsToRun = false;
         for (ShooterSubsystem shooter : shooters) {
-            needsToRun |= shooter.needsFloorFeed();
-            if (needsToRun) break;
+            tmpNeedsToRun |= shooter.needsFloorFeed();
+            if (tmpNeedsToRun) break;
         }
+        this.needsToRun = tmpNeedsToRun;
 
         if (needsToRun) {
             // Use FPGA timestamp for consistent timing

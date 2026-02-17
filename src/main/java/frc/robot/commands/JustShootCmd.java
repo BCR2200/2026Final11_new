@@ -5,24 +5,53 @@ import com.ctre.phoenix6.swerve.SwerveRequest.FieldCentricFacingAngle;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.Constants;
 import frc.robot.LimelightHelpers;
 import frc.robot.Robot;
 import frc.robot.subsystems.ShooterSubsystem;
 
 public class JustShootCmd extends Command{
-    ShooterSubsystem johnShooterSubsystem;
-    ShooterSubsystem jawbreakerShooterSubsystem;
-    ShooterSubsystem taylorShooterSubsystem;
+  ShooterSubsystem johnShooterSubsystem;
+  ShooterSubsystem jawbreakerShooterSubsystem;
+  ShooterSubsystem taylorShooterSubsystem;
 
-    public JustShootCmd (ShooterSubsystem johnShooterSubsystem, ShooterSubsystem jawbreakerShooterSubsystem, ShooterSubsystem taylorShooterSubsystem){
-        this.johnShooterSubsystem = johnShooterSubsystem;
-        this.jawbreakerShooterSubsystem = jawbreakerShooterSubsystem;
-        this.taylorShooterSubsystem = taylorShooterSubsystem;
-    }
+  public JustShootCmd (ShooterSubsystem johnShooterSubsystem, ShooterSubsystem jawbreakerShooterSubsystem, ShooterSubsystem taylorShooterSubsystem){
+    this.johnShooterSubsystem = johnShooterSubsystem;
+    this.jawbreakerShooterSubsystem = jawbreakerShooterSubsystem;
+    this.taylorShooterSubsystem = taylorShooterSubsystem;
+  }
 
-    @Override
+  @Override
   public void initialize() {
+  }
+
+  public static Command getStartCommand(ShooterSubsystem johnShooterSubsystem, ShooterSubsystem jawbreakerShooterSubsystem, ShooterSubsystem taylorShooterSubsystem) {
+    return new SequentialCommandGroup(
+      new InstantCommand(() -> {
+        johnShooterSubsystem.setIsShooting(true);
+        jawbreakerShooterSubsystem.setIsShooting(true);
+        taylorShooterSubsystem.setIsShooting(true);
+      }),
+      new WaitCommand(1.0),
+      new InstantCommand(() -> {
+        johnShooterSubsystem.setIsFeeding(true);
+        jawbreakerShooterSubsystem.setIsFeeding(true);
+        taylorShooterSubsystem.setIsFeeding(true);
+      })
+    );
+  }
+  public static Command getStopCommand(ShooterSubsystem johnShooterSubsystem, ShooterSubsystem jawbreakerShooterSubsystem, ShooterSubsystem taylorShooterSubsystem) {
+    return new InstantCommand(() -> {
+      johnShooterSubsystem.setIsShooting(false);
+      jawbreakerShooterSubsystem.setIsShooting(false);
+      taylorShooterSubsystem.setIsShooting(false);
+      johnShooterSubsystem.setIsFeeding(false);
+      jawbreakerShooterSubsystem.setIsFeeding(false);
+      taylorShooterSubsystem.setIsFeeding(false);
+    });
   }
 
   // Called every time the scheduler runs while the command is scheduled.
@@ -31,12 +60,17 @@ public class JustShootCmd extends Command{
     johnShooterSubsystem.setIsShooting(true);
     jawbreakerShooterSubsystem.setIsShooting(true);
     taylorShooterSubsystem.setIsShooting(true);
+
     if (johnShooterSubsystem.isShooterAtSpeed()) {
       johnShooterSubsystem.setIsFeeding(true);
+    }
+    if (jawbreakerShooterSubsystem.isShooterAtSpeed()) {
       jawbreakerShooterSubsystem.setIsFeeding(true);
+    }
+    if (taylorShooterSubsystem.isShooterAtSpeed()) {
       taylorShooterSubsystem.setIsFeeding(true);
     }
-
+    
   }
 
   // Called once the command ends or is interrupted.

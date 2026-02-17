@@ -110,14 +110,7 @@ public class RobotContainer {
                   new double[] {2, 4, 10, 20},
                   new double[] {30, 50, 80, 110}
           ),
-          false
-  );
-
-  @Logged(name = "Intake")
-  private final IntakeSubsystem m_intakeSubsystem = new IntakeSubsystem(
-          Constants.INTAKE_MOTOR_ID,
-          Constants.TILT_MOTOR_ID,
-          intakeCurrentLimit, tiltCurrentLimit
+          true
   );
 
   @Logged(name = "FloorFeed")
@@ -125,6 +118,14 @@ public class RobotContainer {
 
   @Logged(name = "Climber")
   private final ClimbSubsystem m_climberSubsystem = new ClimbSubsystem(climbCurrentLimit);
+
+  @Logged(name = "Intake")
+  private final IntakeSubsystem m_intakeSubsystem = new IntakeSubsystem(
+          Constants.INTAKE_MOTOR_ID,
+          Constants.TILT_MOTOR_ID,
+          intakeCurrentLimit, tiltCurrentLimit,
+          m_floorFeedSubsystem
+  );
 
   @NotLogged
   private final CommandXboxController m_driverController =
@@ -165,7 +166,8 @@ public class RobotContainer {
               m_intakeSubsystem.setIsIntaking(false);
             }));
     m_driverController.rightBumper().whileTrue(new PassCmd(drivetrain, m_shooterSubsystemJohn, m_shooterSubsystemJawbreaker, m_shooterSubsystemTaylor, m_floorFeedSubsystem)); // TODONE
-    m_driverController.rightTrigger().whileTrue(new JustShootCmd(m_shooterSubsystemJohn, m_shooterSubsystemJawbreaker, m_shooterSubsystemTaylor)); // TODO: implement shoot-to-goal
+    m_driverController.rightTrigger().onTrue(JustShootCmd.getStartCommand(m_shooterSubsystemJohn, m_shooterSubsystemJawbreaker, m_shooterSubsystemTaylor))
+                                     .onFalse(JustShootCmd.getStopCommand(m_shooterSubsystemJohn, m_shooterSubsystemJawbreaker, m_shooterSubsystemTaylor)); // TODO: implement shoot-to-goal
 
 
     m_driverController.b().whileTrue(new InstantCommand(() -> {})); // TODO: implement right climb
