@@ -30,8 +30,12 @@ public class DetectFuelCmd extends Command {
   }
 
   // Called every time the scheduler runs while the command is scheduled.
-  @Override
-  public void execute() {
+  /**
+   * Attempts to track a piece of fuel using yellow percentages
+   * Drives forward if there is a target, and turns proportionally to its angle error.
+   */
+  @SuppressWarnings("unused")
+  public void executeAlt() {
     driveSubsystem.applyRequest(() -> new RobotCentric().withVelocityX(0).withVelocityY(0).withRotationalRate(0));
 
     johnJawbreakerTaylorPercentages = OURLimelightHelpers.getJohnJawbreakerTaylorPercentages();
@@ -64,31 +68,31 @@ public class DetectFuelCmd extends Command {
 
   }
 
-  // TODO: Integrate (rename to execute()) and tune
 
   /**
    * Attempts to track a piece of fuel using its detected contour.
    * Drives forward if there is a target, and turns proportionally to its angle error.
    */
-  @SuppressWarnings("unused")
-  public void executeAlt() {
+  public void execute() {
 
     // get contour from limelight
-    // has centre X/Y, detection flag
-    OURLimelightHelpers.LimelightContour contour = OURLimelightHelpers.getContour();
+    // has detection flag, x offset from center and y offset from center in pixels
+    // TODO: use correct limelight key
+    OURLimelightHelpers.LimelightContour contour = OURLimelightHelpers.getLargestFuelContour("limelight"); 
 
     // if there are no targets, don't do anything
     if (!contour.hasTarget()) {
       driveSubsystem.applyRequest(SwerveRequest.Idle::new);
     } else {
-      // otherwise, drive towards it
+      // otherwise, drive towards the contour center
       // do not rotate tiny amounts (deadzone), otherwise rotate at a speed that achieves the correct angle in 1/3s
-      double rotationalRate = -3 * Math.toRadians(ExtraMath.naiveDeadzone(contour.offsetX(), 5 /* deg */));
+      // the 54/160 converts the pixels to degrees (assuming 320x240 resolution and 54 degree FOV)
+      double rotationalRate = -3 * Math.toRadians(ExtraMath.naiveDeadzone(contour.offsetX() - 160, 10)*54/320);
 
       // turn proportional to angle, drive forward
       driveSubsystem.applyRequest(() ->
               new SwerveRequest.RobotCentric()
-                      .withVelocityX(1) // TODO: tune values (is 1 reasonable?)
+                      .withVelocityX(1) // TODO: tune values (is 1 reasonable? does the rotation work sense?)
                       .withRotationalRate(rotationalRate) // negative for clockwise
       );
     }
