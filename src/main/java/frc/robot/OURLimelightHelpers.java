@@ -16,6 +16,14 @@ public class OURLimelightHelpers {
         return Arrays.copyOfRange(dataFromLimelight, 3, 6);
     }
 
+    public static LimelightContour getLargestFuelContour(String limelightKey) {
+        double[] limelightData = NetworkTableInstance.getDefault().getTable(limelightKey).getEntry("largest_conntour").getDoubleArray(new double[5]);
+        boolean hasTarget = limelightData[0] == 1;
+        double offsetX = limelightData[1]+limelightData[3]/2; // Calculating center x by adding half the width to the left x
+        double offsetY = limelightData[2]+limelightData[4]/2; // Calculating center y by adding half the height to the top y
+        return new LimelightContour(hasTarget, offsetX, offsetY);
+    }
+
     public static LimelightContour getContour() {
         // stored as int, we want bool
         boolean tv = LimelightHelpers.getLimelightNTTableEntry("limelight", "tv").getInteger(0) == 1;
