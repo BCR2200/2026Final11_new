@@ -89,12 +89,12 @@ public class Robot extends TimedRobot {
     alliance = DriverStation.getAlliance().orElse(Alliance.Red);
   }
 
-  public final Pose2d BLUE_HUB = new Pose2d(
+  public static final Pose2d BLUE_HUB = new Pose2d(
     Distance.ofBaseUnits(4.512294, Meters),
     Distance.ofBaseUnits(4.03479, Meters),
     Rotation2d.kZero
   );
-  public final Pose2d RED_HUB = new Pose2d(
+  public static final Pose2d RED_HUB = new Pose2d(
     Distance.ofBaseUnits(12.512294, Meters),
     Distance.ofBaseUnits(4.03479, Meters),
     Rotation2d.kZero
