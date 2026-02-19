@@ -1,6 +1,8 @@
 package frc.robot.commands;
+
 import java.util.List;
 
+import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 import com.pathplanner.lib.path.GoalEndState;
 import com.pathplanner.lib.path.PathConstraints;
@@ -9,15 +11,22 @@ import com.pathplanner.lib.path.Waypoint;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.units.Units;
+import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Constants;
+import frc.robot.ExtraMath;
 import frc.robot.LimelightHelpers;
+import frc.robot.OURLimelightHelpers;
 import frc.robot.RobotContainer;
 import frc.robot.commands.auto.AutoBuildingBlocks;
 import frc.robot.drive.CommandSwerveDrivetrain;
 
 public class BlendAdamModeCmd extends Command {
-    private static enum BlenderWalls {BLUE_HUB, WALL_LEFT_FROM_BLUE, RED_HUB, WALL_RIGHT_FROM_BLUE};
+    private static enum BlenderWalls {
+        BLUE_HUB, WALL_LEFT_FROM_BLUE, RED_HUB, WALL_RIGHT_FROM_BLUE
+    };
 
     private final PathPlannerPath blueHub;
     private final PathPlannerPath wallLeftFromBlue;
@@ -40,10 +49,25 @@ public class BlendAdamModeCmd extends Command {
     List<Pose2d> wallRFromBPoints;
 
     private boolean doneFirstPath = false;
-    private Pose2d currenPose2d;
+    private Pose2d currentPose2d;
 
-    public BlendAdamModeCmd(RobotContainer robot, CommandSwerveDrivetrain drivetrain, SwerveRequest.RobotCentric swerve) {
+    private double MaxSpeed = RobotContainer.MaxSpeed;
+    private double MaxAngularRate = RobotContainer.MaxAngularRate;
+
+    private final SwerveRequest.FieldCentric drive = new SwerveRequest.FieldCentric()
+            .withDeadband(MaxSpeed * 0.1).withRotationalDeadband(MaxAngularRate * 0.1)
+            .withDriveRequestType(DriveRequestType.OpenLoopVoltage);
+    private CommandXboxController m_driverController;
+
+    private Distance blueHUBBYLine = Distance.ofBaseUnits(245, Units.Inches);
+    private Distance redHUBBYLine = Distance.ofBaseUnits(457, Units.Inches);
+    private Distance wallLFromBXLine = Distance.ofBaseUnits(30, Units.Inches);
+    private Distance wallRFromBXLine = Distance.ofBaseUnits(287.69, Units.Inches);
+
+    public BlendAdamModeCmd(RobotContainer robot, CommandSwerveDrivetrain drivetrain, SwerveRequest.RobotCentric swerve,
+            CommandXboxController m_driverController) {
         this.drivetrain = drivetrain;
+        this.m_driverController = m_driverController;
 
         blueHub = AutoBuildingBlocks.loadPathOrThrow("Blue Hub");
         wallLeftFromBlue = AutoBuildingBlocks.loadPathOrThrow("WallLeftFromBlue");
@@ -65,18 +89,18 @@ public class BlendAdamModeCmd extends Command {
         setClosestWallAndPoint(wallRFromBPoints, BlenderWalls.WALL_RIGHT_FROM_BLUE);
 
         // switch (closestWall) {
-        //     case BLUE_HUB:
-        //         endPoint = blueHubWaypoints.get(blueHubWaypoints.size() - 1);
-        //         break;
-        //     case WALL_LEFT_FROM_BLUE:
-        //         endPoint = wallLFromBPoints.get(wallLFromBPoints.size() - 1);
-        //         break;
-        //     case RED_HUB:
-        //         endPoint = redHubWaypoints.get(redHubWaypoints.size() - 1);
-        //         break;
-        //     case WALL_RIGHT_FROM_BLUE:
-        //         endPoint = wallRFromBPoints.get(wallRFromBPoints.size() - 1);
-        //         break;
+        // case BLUE_HUB:
+        // endPoint = blueHubWaypoints.get(blueHubWaypoints.size() - 1);
+        // break;
+        // case WALL_LEFT_FROM_BLUE:
+        // endPoint = wallLFromBPoints.get(wallLFromBPoints.size() - 1);
+        // break;
+        // case RED_HUB:
+        // endPoint = redHubWaypoints.get(redHubWaypoints.size() - 1);
+        // break;
+        // case WALL_RIGHT_FROM_BLUE:
+        // endPoint = wallRFromBPoints.get(wallRFromBPoints.size() - 1);
+        // break;
         // }
 
         // Create a list of waypoints from poses. Each pose represents one waypoint.
@@ -114,8 +138,21 @@ public class BlendAdamModeCmd extends Command {
     // Called every time the scheduler runs while the command is scheduled.
     @Override
     public void execute() {
-        if (doneFirstPath){
+        if (doneFirstPath) {
+            currentPose2d = OURLimelightHelpers.betterGetPose2d(Constants.FEEDER_LIMELIGHT_NAME,
+                    Constants.SHOOTER_LIMELIGHT_NAME);
 
+            if(ExtraMath.within(currentPose2d.getY(), redHUBBYLine.in(Units.Meters), 0.5)
+                || ExtraMath.within(currentPose2d.getY(), blueHUBBYLine.in(Units.Meters), 0.5)){
+                    drivetrain.applyRequest(() -> drive.withVelocityY(-m_driverController.getLeftX() * MaxSpeed));
+            }
+            else if(ExtraMath.within(currentPose2d.getX(), wallLFromBXLine.in(Units.Meters), 0.5) 
+                || ExtraMath.within(currentPose2d.getX(), wallRFromBXLine.in(Units.Meters), 0.5)){
+                    drivetrain.applyRequest(() -> drive.withVelocityX(-m_driverController.getLeftY() * MaxSpeed));
+            } else {
+                drivetrain.applyRequest(() -> drive.withVelocityX(-m_driverController.getLeftY() * MaxSpeed)
+                    .withVelocityY(-m_driverController.getLeftX() * MaxSpeed));
+            } 
         }
     }
 
@@ -130,7 +167,7 @@ public class BlendAdamModeCmd extends Command {
         return false;
     }
 
-    public void setClosestWallAndPoint (List<Pose2d> wallPath, BlenderWalls WallName){
+    public void setClosestWallAndPoint(List<Pose2d> wallPath, BlenderWalls WallName) {
         for (int x = 0; x < wallPath.size(); x++) {
             comparedPointX = wallPath.get(x).getX();
             comparedPointY = wallPath.get(x).getY();

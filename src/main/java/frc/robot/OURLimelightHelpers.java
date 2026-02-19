@@ -38,13 +38,9 @@ public class OURLimelightHelpers {
     public static boolean hasAprilTag(String limelightKey) {
         // Get the network table entry for "tv" (target valid)
         // The second argument (0.0 here) is the default value if the key is missing
-        double tv = NetworkTableInstance.getDefault().getTable(limelightKey).getEntry("tv").getDouble(0.0);
+        long tv = NetworkTableInstance.getDefault().getTable(limelightKey).getEntry("tv").getInteger(0);
 
         // If 'tv' is 0.0, no valid target is found. Otherwise, one or more are found.
-        if (tv == 0.0) {
-            return false;
-        } else {
-            return true;
-        }
+        return tv == 1;
     }
 }

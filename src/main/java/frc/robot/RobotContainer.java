@@ -38,9 +38,9 @@ import frc.robot.subsystems.*;
 public class RobotContainer {
 
   @NotLogged
-  private final double MaxSpeed = TunerConstantsComp.kSpeedAt12Volts.in(MetersPerSecond) * 0.2;
+  public final static double MaxSpeed = TunerConstantsComp.kSpeedAt12Volts.in(MetersPerSecond) * 0.2;
   @NotLogged
-  private final double MaxAngularRate = RotationsPerSecond.of(0.75).in(RadiansPerSecond);
+  public final static double MaxAngularRate = RotationsPerSecond.of(0.75).in(RadiansPerSecond);
 
   // Logged automatically
   public boolean isManualMode = false;
