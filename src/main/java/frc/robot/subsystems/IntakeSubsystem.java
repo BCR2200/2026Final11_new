@@ -2,9 +2,8 @@ package frc.robot.subsystems;
 
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.epilogue.NotLogged;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+// import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.ExtraMath;
 import frc.robot.PIDMotor;
 
 @Logged
@@ -13,6 +12,7 @@ public class IntakeSubsystem extends SubsystemBase {
     // Logged automatically by Epilogue
     private boolean isIntaking = false;
     private double tiltPositionAbsolute = 0.0; // 0.0 to 1.0
+    private boolean isJiggling = false;
 
     @Logged(name = "IntakeMotor")
     public PIDMotor intakePIDMotor;
@@ -55,6 +55,28 @@ public class IntakeSubsystem extends SubsystemBase {
                 0.25, 1.2, 0.01, TILT_ABSOLUTE_MAX_RPS, TILT_ABSOLUTE_MAX_ACCEL, 0.00);
         tiltPIDMotor.setCurrentLimit(tiltCurrentLimit);
         tiltPIDMotor.setIdleCoastMode();
+    }
+
+
+    /**
+     * Set the movement of the intake tilt, where true means the intake 
+     * constantly moves/tilts between two points following a sine wave
+     * and false means no intake tilt movement.
+     * 
+     * @param intaking true to move the intake up and down to promote feeding, false to stop running it
+     */
+    public void setIsJiggling(boolean jiggling) {
+        isJiggling = jiggling;
+    }
+
+    /**
+     * Queries whether the intake is currently being jiggled in order to 
+     * promote fuel/ball consumption/ingestion/feeding.
+     * 
+     * @return true if the intake is moving up and down to promote feeding, false otherwise
+     */
+    public boolean getIsJiggling() {
+        return isJiggling;
     }
 
     /**
@@ -104,11 +126,37 @@ public class IntakeSubsystem extends SubsystemBase {
     public void periodic() {
         if (isIntaking) {
             intakePIDMotor.setPercentOutput(1);
-        } else if(floorSubsystem.getNeedToRun()){
+        } else if (floorSubsystem.getNeedToRun()) {
             intakePIDMotor.setVelocityTarget(floorSubsystem.getCurrentSpeed());
         } else {
             intakePIDMotor.setPercentOutput(0);
         }
+
+
+        //horrible untested garbage jiggle function
+        /*
+        if (isJiggling) {
+            double positionDown = 0.10; // Placeholder for Intake Down Position (idfk what the number will actually be or anything at all really)
+            double positionUp = 0.35; // Placeholder for Intake Up Position
+            double speed = 8.0; // How fast it cycles
+
+            // Find midpoint and the range (amplitude)
+            double midpoint = (positionUp + positionDown) / 2.0;
+            double range = (positionUp - positionDown) / 2.0;
+
+            // This moves the target smoothly between Up and Down
+            double targetPos = midpoint + (Math.sin(Timer.getFPGATimestamp() * speed) * range); //should clamp or smth to prevent crushing intake
+
+            // If too violent, lower TILT_ABSOLUTE_MAX_ACCEL
+            tiltPIDMotor.setTarget(targetPos, TILT_ABSOLUTE_MAX_RPS, TILT_ABSOLUTE_MAX_ACCEL);
+
+        } else {
+            // Return to and stay in down position when jiggle is turned off (still no idea how positions work)
+            //probably doesn't need to continuously target the down pos but meh
+            tiltPIDMotor.setTarget(positionDown, TILT_ABSOLUTE_MAX_RPS, TILT_ABSOLUTE_MAX_ACCEL);
+        }
+        */
+        
     }
 
 }
