@@ -13,10 +13,10 @@ public class OURLimelightHelpers {
      * @return LimelightContour which hasTarget, offsetX, offsetY
      */
     public static LimelightContour getContour() {
-        double[] limelightData = NetworkTableInstance.getDefault().getTable(Constants.FEEDER_LIMELIGHT_NAME).getEntry("largest_contour").getDoubleArray(new double[5]);
+        double[] limelightData = NetworkTableInstance.getDefault().getTable(Constants.FEEDER_LIMELIGHT_NAME).getEntry("llpython").getDoubleArray(new double[8]);
         boolean hasTarget = limelightData[0] == 1;
-        double offsetX = limelightData[1] + (limelightData[3] / 2); // Calculating center x by adding half the width to the left x
-        double offsetY = limelightData[2] + (limelightData[4] / 2); // Calculating center y by adding half the height to the top y
+        double offsetX = limelightData[1];
+        double offsetY = limelightData[2];
         return new LimelightContour(hasTarget, offsetX, offsetY);
     }
 
