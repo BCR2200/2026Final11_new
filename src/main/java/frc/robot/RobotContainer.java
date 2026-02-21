@@ -66,7 +66,7 @@ public class RobotContainer {
   @NotLogged
   private static final int intakeCurrentLimit = 60;
   @NotLogged
-  private static final int tiltCurrentLimit = 25;
+  private static final int tiltCurrentLimit = 10; // Normally 25
   @NotLogged
   private static final int shooterCurrentLimit = 60;
   @NotLogged
@@ -170,8 +170,7 @@ public class RobotContainer {
     m_driverController.rightBumper().whileTrue(new PassCmd(drivetrain, m_shooterSubsystemJohn, m_shooterSubsystemJawbreaker, m_shooterSubsystemTaylor, m_floorFeedSubsystem)); // TODONE
     // m_driverController.rightTrigger().onTrue(new SnapTowardsGoalCmd(drivetrain).andThen(JustShootCmd.getStartCommand(m_shooterSubsystemJohn, m_shooterSubsystemJawbreaker, m_shooterSubsystemTaylor)))
     //                                  .onFalse(JustShootCmd.getStopCommand(m_shooterSubsystemJohn, m_shooterSubsystemJawbreaker, m_shooterSubsystemTaylor)); // TODO: implement shoot-to-goal
-    m_driverController.rightTrigger().onTrue(JustShootCmd.getStartCommand(m_shooterSubsystemJohn, m_shooterSubsystemJawbreaker, m_shooterSubsystemTaylor))
-                                         .onFalse(JustShootCmd.getStopCommand(m_shooterSubsystemJohn, m_shooterSubsystemJawbreaker, m_shooterSubsystemTaylor)); // TODO: implement shoot-to-goal
+    m_driverController.rightTrigger().whileTrue(new JustShootCmd(m_shooterSubsystemJohn, m_shooterSubsystemJawbreaker, m_shooterSubsystemTaylor)); // TODO: implement shoot-to-goal
 
 
     m_driverController.b().whileTrue(new InstantCommand(() -> {})); // TODO: implement right climb

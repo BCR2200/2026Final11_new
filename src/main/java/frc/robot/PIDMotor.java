@@ -170,6 +170,10 @@ public class PIDMotor {
         }
     }
 
+    public double getTarget() {
+        return target;
+    }
+
     /**
      * Puts this motor's PIDF values to the SmartDashboard.
      */

@@ -31,9 +31,6 @@ public class ShooterSubsystem extends SubsystemBase {
     private static final double PASSING_SHOOTER_SPEED = 42; // in rps
     private boolean isFeeding = false;
     private double feederSpeed = 100; //in rps
-    private double preloadFeederSpeed = 10; // in rps
-
-    private double preloadDebounceCounter = 0;
 
     // Logged via PIDMotorLogger
     @Logged(name = "ShootMotor")
@@ -156,7 +153,9 @@ public class ShooterSubsystem extends SubsystemBase {
      * @return if the shooter motor is at or above the expected speed
      */
     public boolean isShooterAtSpeed() {
-        return shootPIDMotor.atVelocity(3);
+        // Why >5? Because we only set a velocity target in periodic, but isShooterAtSpeed is called when target is still 0,
+        // atVelocity() can return true unexpectedly, because its velocity is really 0. 
+        return shootPIDMotor.getVelocity() > 5 && shootPIDMotor.atVelocity(3);
     }
 
     public boolean needsFloorFeed() {
@@ -188,23 +187,12 @@ public class ShooterSubsystem extends SubsystemBase {
         // then try to preload (until beam break is broken),
         // then stop
         if (isFeeding) {
-            feedPIDMotor.setVelocityTarget(feederSpeed);
+            feedPIDMotor.setPercentOutput(1);
         } else if (!isBeamBroken()) {
-            if (preloadDebounceCounter == 0)
-                preloadDebounceCounter = 50;
+            feedPIDMotor.setPercentOutput(PRELOAD_SPEED_PERCENT);
+
         } else {
             feedPIDMotor.setPercentOutput(0);
         }
-
-        if (preloadDebounceCounter != 0) {
-
-            preloadDebounceCounter--;
-            feedPIDMotor.setVelocityTarget(preloadFeederSpeed);
-
-            if (preloadDebounceCounter == 0) {
-                feedPIDMotor.setPercentOutput(0);
-            }
-        }
-
     }
 }

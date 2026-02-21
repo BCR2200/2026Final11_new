@@ -14,7 +14,8 @@ public class FloorFeedSubsystem extends SubsystemBase {
 
     // Logged automatically by Epilogue
     private double motorSpeedTop = 100; // in rps
-    private double motorSpeedBottom = 70;
+    // If you want sawtooth, top and bottom speeds need to be different. ex: 100 and 70. Currently disabled.
+    private double motorSpeedBottom = 100; 
     private boolean isFeeding = false;
     private double secondsToHighPoint = 0.001;
     private double secondsToLowPoint = 1.25;

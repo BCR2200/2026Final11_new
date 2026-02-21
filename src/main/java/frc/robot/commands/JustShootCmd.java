@@ -21,31 +21,31 @@ public class JustShootCmd extends Command{
   public void initialize() {
   }
 
-  public static Command getStartCommand(ShooterSubsystem johnShooterSubsystem, ShooterSubsystem jawbreakerShooterSubsystem, ShooterSubsystem taylorShooterSubsystem) {
-    return new SequentialCommandGroup(
-      new InstantCommand(() -> {
-        johnShooterSubsystem.setIsShooting(true);
-        jawbreakerShooterSubsystem.setIsShooting(true);
-        taylorShooterSubsystem.setIsShooting(true);
-      }),
-      new WaitCommand(1.0),
-      new InstantCommand(() -> {
-        johnShooterSubsystem.setIsFeeding(true);
-        jawbreakerShooterSubsystem.setIsFeeding(true);
-        taylorShooterSubsystem.setIsFeeding(true);
-      })
-    );
-  }
-  public static Command getStopCommand(ShooterSubsystem johnShooterSubsystem, ShooterSubsystem jawbreakerShooterSubsystem, ShooterSubsystem taylorShooterSubsystem) {
-    return new InstantCommand(() -> {
-      johnShooterSubsystem.setIsShooting(false);
-      jawbreakerShooterSubsystem.setIsShooting(false);
-      taylorShooterSubsystem.setIsShooting(false);
-      johnShooterSubsystem.setIsFeeding(false);
-      jawbreakerShooterSubsystem.setIsFeeding(false);
-      taylorShooterSubsystem.setIsFeeding(false);
-    });
-  }
+  // public static Command getStartCommand(ShooterSubsystem johnShooterSubsystem, ShooterSubsystem jawbreakerShooterSubsystem, ShooterSubsystem taylorShooterSubsystem) {
+  //   return new SequentialCommandGroup(
+  //     new InstantCommand(() -> {
+  //       johnShooterSubsystem.setIsShooting(true);
+  //       jawbreakerShooterSubsystem.setIsShooting(true);
+  //       taylorShooterSubsystem.setIsShooting(true);
+  //     }),
+  //     new WaitCommand(1.0),
+  //     new InstantCommand(() -> {
+  //       johnShooterSubsystem.setIsFeeding(true);
+  //       jawbreakerShooterSubsystem.setIsFeeding(true);
+  //       taylorShooterSubsystem.setIsFeeding(true);
+  //     })
+  //   );
+  // }
+  // public static Command getStopCommand(ShooterSubsystem johnShooterSubsystem, ShooterSubsystem jawbreakerShooterSubsystem, ShooterSubsystem taylorShooterSubsystem) {
+  //   return new InstantCommand(() -> {
+  //     johnShooterSubsystem.setIsShooting(false);
+  //     jawbreakerShooterSubsystem.setIsShooting(false);
+  //     taylorShooterSubsystem.setIsShooting(false);
+  //     johnShooterSubsystem.setIsFeeding(false);
+  //     jawbreakerShooterSubsystem.setIsFeeding(false);
+  //     taylorShooterSubsystem.setIsFeeding(false);
+  //   });
+  // }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
@@ -55,6 +55,9 @@ public class JustShootCmd extends Command{
     taylorShooterSubsystem.setIsShooting(true);
 
     if (johnShooterSubsystem.isShooterAtSpeed()) {
+      // TODO: should we stop feeding later if no longer at speed? 
+      // Maybe... but each ball will probably reduce the shooter speed enough to stop the feeder.
+      // Maybe it should only stop if it is not at speed for X time. 
       johnShooterSubsystem.setIsFeeding(true);
     }
     if (jawbreakerShooterSubsystem.isShooterAtSpeed()) {
