@@ -73,7 +73,7 @@ public class RobotContainer {
 
   // Subsystems - logged via their @Logged annotations
   @Logged(name = "John")
-  private final ShooterSubsystem m_shooterSubsystemJohn = new ShooterSubsystem( "John",
+  private final ShooterSubsystem shooterSubsystemJohn = new ShooterSubsystem( "John",
           Constants.JOHN_SHOOTER_MOTOR_ID, Constants.JOHN_FEEDER_MOTOR_ID, Constants.JOHN_BEAMBREAK_CHANNEL, Constants.JOHN_LINEAR_ACTUATOR_CHANNEL, shooterCurrentLimit, feederCurrentLimit,
           new Interpolator( // Placeholders for shoot hood angles
                   new double[] {2, 4, 10, 20},
@@ -87,7 +87,7 @@ public class RobotContainer {
   );
 
   @Logged(name = "Jawbreaker")
-  private final ShooterSubsystem m_shooterSubsystemJawbreaker = new ShooterSubsystem( "Jawbreaker",
+  private final ShooterSubsystem shooterSubsystemJawbreaker = new ShooterSubsystem( "Jawbreaker",
           Constants.JAWBREAKER_SHOOTER_MOTOR_ID, Constants.JAWBREAKER_FEEDER_MOTOR_ID, Constants.JAWBREAKER_BEAMBREAK_CHANNEL, Constants.JAWBREAKER_LINEAR_ACTUATOR_CHANNEL, shooterCurrentLimit, feederCurrentLimit,
           new Interpolator( // Placeholders for shoot hood angles
                   new double[] {2, 4, 10, 20},
@@ -101,7 +101,7 @@ public class RobotContainer {
   );
 
   @Logged(name = "Taylor")
-  private final ShooterSubsystem m_shooterSubsystemTaylor = new ShooterSubsystem( "Taylor",
+  private final ShooterSubsystem shooterSubsystemTaylor = new ShooterSubsystem( "Taylor",
           Constants.TAYLOR_SHOOTER_MOTOR_ID, Constants.TAYLOR_FEEDER_MOTOR_ID, Constants.TAYLOR_BEAMBREAK_CHANNEL, Constants.TAYLOR_LINEAR_ACTUATOR_CHANNEL, shooterCurrentLimit, feederCurrentLimit,
           new Interpolator( // Placeholders for shoot hood angles
                   new double[] {2, 4, 10, 20},
@@ -115,21 +115,21 @@ public class RobotContainer {
   );
 
   @Logged(name = "FloorFeed")
-  private final FloorFeedSubsystem m_floorFeedSubsystem = new FloorFeedSubsystem(floorCurrentLimit, m_shooterSubsystemJohn, m_shooterSubsystemJawbreaker, m_shooterSubsystemTaylor);
+  private final FloorFeedSubsystem floorFeedSubsystem = new FloorFeedSubsystem(floorCurrentLimit, shooterSubsystemJohn, shooterSubsystemJawbreaker, shooterSubsystemTaylor);
 
   @Logged(name = "Climber")
-  private final ClimbSubsystem m_climberSubsystem = new ClimbSubsystem(climbCurrentLimit);
+  private final ClimbSubsystem climberSubsystem = new ClimbSubsystem(climbCurrentLimit);
 
   @Logged(name = "Intake")
-  private final IntakeSubsystem m_intakeSubsystem = new IntakeSubsystem(
+  private final IntakeSubsystem intakeSubsystem = new IntakeSubsystem(
           Constants.INTAKE_MOTOR_ID,
           Constants.TILT_MOTOR_ID,
           intakeCurrentLimit, tiltCurrentLimit,
-          m_floorFeedSubsystem
+          floorFeedSubsystem
   );
 
   @NotLogged
-  private final CommandXboxController m_driverController =
+  private final CommandXboxController driverController =
           new CommandXboxController(OperatorConstants.kDriverControllerPort);
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
@@ -140,8 +140,8 @@ public class RobotContainer {
   }
 
   public void disableMotors() {
-    m_shooterSubsystemJawbreaker.setIsShooting(false);
-    m_shooterSubsystemJawbreaker.setIsFeeding(false);
+    shooterSubsystemJawbreaker.setIsShooting(false);
+    shooterSubsystemJawbreaker.setIsFeeding(false);
   }
 
   /**
@@ -158,51 +158,52 @@ public class RobotContainer {
     // Start button is 3 horizontal lines
     // POV is the D-pad
 
-    m_driverController.leftBumper().whileTrue(new DetectFuelCmd(drivetrain));
-    m_driverController.leftTrigger()
+    driverController.leftBumper().whileTrue(new DetectFuelCmd(drivetrain));
+    driverController.leftTrigger()
             .whileTrue(new InstantCommand(() -> {
-              m_intakeSubsystem.setIsIntaking(true);
+              intakeSubsystem.setIsIntaking(true);
+              intakeSubsystem.setTiltPosition(IntakeSubsystem.tiltMaxExtensionPos);
             }))
             .whileFalse(new InstantCommand(() -> {
-              m_intakeSubsystem.setIsIntaking(false);
+              intakeSubsystem.setIsIntaking(false);
             }));
-    m_driverController.rightBumper().whileTrue(new PassCmd(drivetrain, m_shooterSubsystemJohn, m_shooterSubsystemJawbreaker, m_shooterSubsystemTaylor, m_floorFeedSubsystem)); // TODONE
+    driverController.rightBumper().whileTrue(new PassCmd(drivetrain, shooterSubsystemJohn, shooterSubsystemJawbreaker, shooterSubsystemTaylor, floorFeedSubsystem)); // TODONE
     // m_driverController.rightTrigger().onTrue(new SnapTowardsGoalCmd(drivetrain).andThen(JustShootCmd.getStartCommand(m_shooterSubsystemJohn, m_shooterSubsystemJawbreaker, m_shooterSubsystemTaylor)))
     //                                  .onFalse(JustShootCmd.getStopCommand(m_shooterSubsystemJohn, m_shooterSubsystemJawbreaker, m_shooterSubsystemTaylor)); // TODO: implement shoot-to-goal
-    m_driverController.rightTrigger().whileTrue(new JustShootCmd(m_shooterSubsystemJohn, m_shooterSubsystemJawbreaker, m_shooterSubsystemTaylor)); // TODO: implement shoot-to-goal
+    driverController.rightTrigger().whileTrue(new JustShootCmd(shooterSubsystemJohn, shooterSubsystemJawbreaker, shooterSubsystemTaylor)); // TODO: implement shoot-to-goal
 
 
-    m_driverController.b().whileTrue(new InstantCommand(() -> {})); // TODO: implement right climb
-    m_driverController.a().whileTrue(new InstantCommand(() -> {
-      m_shooterSubsystemJohn.updateParameters();
-      m_shooterSubsystemJawbreaker.updateParameters();
-      m_shooterSubsystemTaylor.updateParameters();
-      m_climberSubsystem.updateParameters();
-      m_floorFeedSubsystem.updateParameters();
-      m_intakeSubsystem.updateParameters();
+    driverController.b().whileTrue(new InstantCommand(() -> {})); // TODO: implement right climb
+    driverController.a().whileTrue(new InstantCommand(() -> {
+      shooterSubsystemJohn.updateParameters();
+      shooterSubsystemJawbreaker.updateParameters();
+      shooterSubsystemTaylor.updateParameters();
+      climberSubsystem.updateParameters();
+      floorFeedSubsystem.updateParameters();
+      intakeSubsystem.updateParameters();
     }));
-    m_driverController.x().whileTrue(new InstantCommand(() -> {})); // TODO: implement left climb
-    m_driverController.y().onTrue(new InstantCommand(() -> updateDrivetrainRobotPerspective()));
+    driverController.x().whileTrue(new InstantCommand(() -> {})); // TODO: implement left climb
+    driverController.y().onTrue(new InstantCommand(() -> updateDrivetrainRobotPerspective()));
 
-    m_driverController.povLeft().onTrue(new InstantCommand(() -> {m_intakeSubsystem.setTiltPosition(m_intakeSubsystem.getTiltPosition() + 4);})); // TODO: implement reset alliance - possibly reseed field-centric?
-    m_driverController.povRight().onTrue(new InstantCommand(() -> {m_intakeSubsystem.setTiltPosition(m_intakeSubsystem.getTiltPosition() - 3);})); // TODO: implement reset facing angle
-    m_driverController.povUp().whileTrue(new InstantCommand(() -> {
+    driverController.povLeft().onTrue(new InstantCommand(() -> {intakeSubsystem.setTiltPosition(intakeSubsystem.getTiltPosition() + 4);})); // TODO: implement reset alliance - possibly reseed field-centric?
+    driverController.povRight().onTrue(new InstantCommand(() -> {intakeSubsystem.setTiltPosition(intakeSubsystem.getTiltPosition() - 3);})); // TODO: implement reset facing angle
+    driverController.povUp().whileTrue(new InstantCommand(() -> {
       if (isManualMode) {
-        m_shooterSubsystemJohn.setActuatorTargetPosition(m_shooterSubsystemJohn.getActuatorPosition() + ACTUATOR_STEP);
-        m_shooterSubsystemJawbreaker.setActuatorTargetPosition(m_shooterSubsystemJawbreaker.getActuatorPosition() + ACTUATOR_STEP);
-        m_shooterSubsystemTaylor.setActuatorTargetPosition(m_shooterSubsystemTaylor.getActuatorPosition() + ACTUATOR_STEP);
+        shooterSubsystemJohn.setActuatorTargetPosition(shooterSubsystemJohn.getActuatorPosition() + ACTUATOR_STEP);
+        shooterSubsystemJawbreaker.setActuatorTargetPosition(shooterSubsystemJawbreaker.getActuatorPosition() + ACTUATOR_STEP);
+        shooterSubsystemTaylor.setActuatorTargetPosition(shooterSubsystemTaylor.getActuatorPosition() + ACTUATOR_STEP);
       }
     }));
-    m_driverController.povDown().whileTrue(new InstantCommand(() -> {
+    driverController.povDown().whileTrue(new InstantCommand(() -> {
       if (isManualMode) {
-        m_shooterSubsystemJohn.setActuatorTargetPosition(m_shooterSubsystemJohn.getActuatorPosition() - ACTUATOR_STEP);
-        m_shooterSubsystemJawbreaker.setActuatorTargetPosition(m_shooterSubsystemJawbreaker.getActuatorPosition() - ACTUATOR_STEP);
-        m_shooterSubsystemTaylor.setActuatorTargetPosition(m_shooterSubsystemTaylor.getActuatorPosition() - ACTUATOR_STEP);
+        shooterSubsystemJohn.setActuatorTargetPosition(shooterSubsystemJohn.getActuatorPosition() - ACTUATOR_STEP);
+        shooterSubsystemJawbreaker.setActuatorTargetPosition(shooterSubsystemJawbreaker.getActuatorPosition() - ACTUATOR_STEP);
+        shooterSubsystemTaylor.setActuatorTargetPosition(shooterSubsystemTaylor.getActuatorPosition() - ACTUATOR_STEP);
       }
     }));
 
-    m_driverController.start().whileTrue(new InstantCommand(() -> {})); // TODO: implement unjam
-    m_driverController.back().whileTrue(new InstantCommand(() -> this.isManualMode = !this.isManualMode));
+    driverController.start().whileTrue(new InstantCommand(() -> {})); // TODO: implement unjam
+    driverController.back().whileTrue(new InstantCommand(() -> this.isManualMode = !this.isManualMode));
 
   }
 
@@ -211,9 +212,9 @@ public class RobotContainer {
     // and Y is defined as to the left according to WPILib convention.
     drivetrain.setDefaultCommand(
             // Drivetrain will execute this command periodically
-            drivetrain.applyRequest(() -> drive.withVelocityX(-m_driverController.getLeftY() * MaxSpeed) // Drive forward with negative Y
-                    .withVelocityY(-m_driverController.getLeftX() * MaxSpeed) // Drive left with negative X
-                    .withRotationalRate(-m_driverController.getRightX() * MaxAngularRate) // Drive counterclockwise with negative X
+            drivetrain.applyRequest(() -> drive.withVelocityX(-driverController.getLeftY() * MaxSpeed) // Drive forward with negative Y
+                    .withVelocityY(-driverController.getLeftX() * MaxSpeed) // Drive left with negative X
+                    .withRotationalRate(-driverController.getRightX() * MaxAngularRate) // Drive counterclockwise with negative X
             )
     );
 
@@ -224,7 +225,7 @@ public class RobotContainer {
             drivetrain.applyRequest(() -> idle).ignoringDisable(true));
 
     // reset the field-centric heading on back button press
-    m_driverController.back().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
+    driverController.back().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
 
     // Note: leftBumper DetectFuelCmd is bound in configureBindings()
 
