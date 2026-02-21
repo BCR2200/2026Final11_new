@@ -5,7 +5,7 @@ import edu.wpi.first.networktables.NetworkTableInstance;
 
 public class OURLimelightHelpers {
 
-    public record LimelightContour(boolean hasTarget, double offsetX, double offsetY) {
+    public record LimelightContour(boolean hasTarget, double degreesX, double degreesY) {
     }
 
     /**
@@ -15,9 +15,9 @@ public class OURLimelightHelpers {
     public static LimelightContour getContour() {
         double[] limelightData = NetworkTableInstance.getDefault().getTable(Constants.FEEDER_LIMELIGHT_NAME).getEntry("llpython").getDoubleArray(new double[8]);
         boolean hasTarget = limelightData[0] == 1;
-        double offsetX = limelightData[1];
-        double offsetY = limelightData[2];
-        return new LimelightContour(hasTarget, offsetX, offsetY);
+        double degreesX = limelightData[1];
+        double degreesY = limelightData[2];
+        return new LimelightContour(hasTarget, degreesX, degreesY);
     }
 
     public static Pose2d betterGetPose2d(String primaryCam, String fallBackCam) {

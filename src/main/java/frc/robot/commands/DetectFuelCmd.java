@@ -36,7 +36,7 @@ public class DetectFuelCmd extends Command {
   public void execute() {
 
     // get contour from limelight
-    // has detection flag, x offset from center and y offset from center in pixels
+    // has detection flag, x offset in degrees from center and y offset from center
     OURLimelightHelpers.LimelightContour contour = OURLimelightHelpers.getContour();
 
     // if there are no targets, don't do anything
@@ -45,15 +45,23 @@ public class DetectFuelCmd extends Command {
     } 
     else {
       // otherwise, drive towards the contour center
-      // do not rotate tiny amounts (deadzone), otherwise rotate at a speed that achieves the correct angle in 1/3s
-      // the 54/160 converts the pixels to degrees (assuming 320x240 resolution and 54 degree FOV)
-      double rotationalRate = -3 * Math.toRadians(ExtraMath.naiveDeadzone(contour.offsetX() - 160, 10)*54/320);
+      // do not rotate tiny amounts (deadzone of 1 degree), 
+      // otherwise rotate at a speed that achieves the correct angle in 1/3s
+      // 
+
+      double rotationalRadsWithDeadzone = Math.toRadians(ExtraMath.naiveDeadzone(contour.degreesX(), 1));
+      // P constant to convert from relative offset to rotations per second. 
+      // 1 means... will rotate X offset rads in 1 second. 
+      var radsPerSecond = rotationalRadsWithDeadzone / 1.0; 
+      // var forwardSpeed = 0.15; // TODO: how fast should it drive forward?
+
+      // TODO: Maybe add a minimum rotational rate (rads/second)
 
       // turn proportional to angle, drive forward
       driveSubsystem.applyRequest(() ->
               new SwerveRequest.RobotCentric()
-                      .withVelocityX(1) // TODO: tune values (is 1 reasonable? does the rotation work sense?)
-                      .withRotationalRate(rotationalRate) // negative for clockwise
+                      // .withVelocityX(forwardSpeed) 
+                      .withRotationalRate(-radsPerSecond) // negative for clockwise
       );
     }
   }
