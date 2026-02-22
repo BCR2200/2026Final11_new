@@ -93,12 +93,12 @@ public class Robot extends TimedRobot {
   }
 
   public static final Pose2d BLUE_HUB = new Pose2d(
-    Distance.ofBaseUnits(4.512294, Meters),
+    Distance.ofBaseUnits(4.629, Meters),
     Distance.ofBaseUnits(4.03479, Meters),
     Rotation2d.kZero
   );
   public static final Pose2d RED_HUB = new Pose2d(
-    Distance.ofBaseUnits(12.512294, Meters),
+    Distance.ofBaseUnits(11.919, Meters),
     Distance.ofBaseUnits(4.03479, Meters),
     Rotation2d.kZero
   );
