@@ -6,12 +6,15 @@ package frc.robot;
 
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
+import com.ctre.phoenix6.swerve.SwerveRequest.ForwardPerspectiveValue;
 
 import static edu.wpi.first.units.Units.*;
 
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.epilogue.NotLogged;
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -22,6 +25,7 @@ import frc.robot.Constants.OperatorConstants;
 import frc.robot.commands.DetectFuelCmd;
 import frc.robot.commands.JustShootCmd;
 import frc.robot.commands.PassCmd;
+import frc.robot.commands.SnapTowardsGoalCmd;
 import frc.robot.drive.CommandSwerveDrivetrain;
 import frc.robot.drive.Telemetry;
 import frc.robot.drive.TunerConstantsComp;
@@ -38,6 +42,19 @@ import frc.robot.subsystems.*;
 @Logged
 public class RobotContainer {
 
+  public boolean shootingAtHub = false;
+  public static final Pose2d BLUE_HUB = new Pose2d(
+    Distance.ofBaseUnits(4.629, Meters),
+    Distance.ofBaseUnits(4.03479, Meters),
+    Rotation2d.kZero
+  );
+  public static final Pose2d RED_HUB = new Pose2d(
+    Distance.ofBaseUnits(11.919, Meters),
+    Distance.ofBaseUnits(4.03479, Meters),
+    Rotation2d.kZero
+  );
+  public Pose2d targetHub = RED_HUB;
+
   @NotLogged
   public final static double MaxSpeed = TunerConstantsComp.kSpeedAt12Volts.in(MetersPerSecond) * 0.2;
   @NotLogged
@@ -47,6 +64,12 @@ public class RobotContainer {
   private final SwerveRequest.FieldCentric drive = new SwerveRequest.FieldCentric()
           .withDeadband(MaxSpeed * 0.1).withRotationalDeadband(MaxAngularRate * 0.1)
           .withDriveRequestType(DriveRequestType.OpenLoopVoltage);
+
+  @NotLogged
+  private final SwerveRequest.FieldCentricFacingAngle driveFacingAngle = new SwerveRequest.FieldCentricFacingAngle()
+    .withDeadband(MaxSpeed * 0.1)
+    .withDriveRequestType(DriveRequestType.OpenLoopVoltage);
+
   @NotLogged
   private final Telemetry logger = new Telemetry(MaxSpeed);
 
@@ -143,6 +166,20 @@ public class RobotContainer {
     shooterSubsystemJawbreaker.setIsFeeding(false);
   }
 
+  
+  public double getDistanceToTarget(Pose2d targetPose) {
+      Pose2d robotPose = drivetrain.getState().Pose;
+      return robotPose.getTranslation().getDistance(targetPose.getTranslation()); 
+  }
+
+  public double getDegreesToTarget(Pose2d targetPose){
+      Pose2d robotPose2d = drivetrain.getState().Pose;
+      
+      // TRIGONOMETRY BABY!!!!!!
+      double angleToTarget = Math.atan2(targetPose.getY() - robotPose2d.getY(), targetPose.getX() - robotPose2d.getX());
+      return Math.toDegrees(angleToTarget);
+  }
+
   /**
    * Use this method to define your trigger->command mappings. Triggers can be created via the
    * {@link Trigger#Trigger(java.util.function.BooleanSupplier)} constructor with an arbitrary
@@ -169,7 +206,7 @@ public class RobotContainer {
     driverController.rightBumper().whileTrue(new PassCmd(drivetrain, shooterSubsystemJohn, shooterSubsystemJawbreaker, shooterSubsystemTaylor, floorFeedSubsystem)); // TODONE
     // m_driverController.rightTrigger().onTrue(new SnapTowardsGoalCmd(drivetrain).andThen(JustShootCmd.getStartCommand(m_shooterSubsystemJohn, m_shooterSubsystemJawbreaker, m_shooterSubsystemTaylor)))
     //                                  .onFalse(JustShootCmd.getStopCommand(m_shooterSubsystemJohn, m_shooterSubsystemJawbreaker, m_shooterSubsystemTaylor)); // TODO: implement shoot-to-goal
-    driverController.rightTrigger().whileTrue(new JustShootCmd(shooterSubsystemJohn, shooterSubsystemJawbreaker, shooterSubsystemTaylor)); // TODO: implement shoot-to-goal
+    driverController.rightTrigger().whileTrue(new SnapTowardsGoalCmd(this)); // TODO: implement shoot-to-goal
 
     // Preload
     driverController.rightStick().onTrue(new InstantCommand(() -> {
@@ -217,13 +254,26 @@ public class RobotContainer {
   private void configureDrivetrainBindings() {
     // Note that X is defined as forward according to WPILib convention,
     // and Y is defined as to the left according to WPILib convention.
+
+    driveFacingAngle.HeadingController.setPID(7, 0, 0);
+
     drivetrain.setDefaultCommand(
-            // Drivetrain will execute this command periodically
-            drivetrain.applyRequest(() -> drive.withVelocityX(-driverController.getLeftY() * MaxSpeed) // Drive forward with negative Y
-                    .withVelocityY(-driverController.getLeftX() * MaxSpeed) // Drive left with negative X
-                    .withRotationalRate(-driverController.getRightX() * MaxAngularRate) // Drive counterclockwise with negative X
-            )
+      // Drivetrain will execute this command periodically
+      drivetrain.applyRequest(() -> {
+        
+        if (shootingAtHub) {
+          return driveFacingAngle.withTargetDirection(Rotation2d.fromDegrees(getDegreesToTarget(targetHub)))
+          .withVelocityX(-driverController.getLeftY() * MaxSpeed) // Drive forward with negative Y
+          .withVelocityY(-driverController.getLeftX() * MaxSpeed); // Drive left with negative X
+        }
+
+        return drive.withVelocityX(-driverController.getLeftY() * MaxSpeed) // Drive forward with negative Y
+          .withVelocityY(-driverController.getLeftX() * MaxSpeed) // Drive left with negative X
+          .withRotationalRate(-driverController.getRightX() * MaxAngularRate); // Drive counterclockwise with negative X
+        }
+      )
     );
+
 
     // Idle while the robot is disabled. This ensures the configured
     // neutral mode is applied to the drive motors while disabled.

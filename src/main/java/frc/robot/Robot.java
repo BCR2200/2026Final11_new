@@ -59,6 +59,7 @@ public class Robot extends TimedRobot {
 
     // Instantiate our RobotContainer.  This will perform all our button bindings, and put our
     // autonomous chooser on the dashboard.
+
     m_robotContainer = new RobotContainer();
     updateAlliance();
     this.m_botField = new Field2d();
@@ -79,9 +80,9 @@ public class Robot extends TimedRobot {
     addPeriodic(this::sendFields, 0.080); // 80ms is every 4 loops
     addPeriodic(Robot::updateAlliance, 0.5);
     addPeriodic(() -> SmartDashboard.putNumber("Distance to Target", 
-      getDistanceToTarget(targetHub)), 0.1);
+      m_robotContainer.getDistanceToTarget(m_robotContainer.targetHub)), 0.1);
     addPeriodic(() -> SmartDashboard.putNumber("Degrees to Target", 
-      getDegreesToTarget(targetHub)), 0.1);
+      m_robotContainer.getDegreesToTarget(m_robotContainer.targetHub)), 0.1);
     addPeriodic(() -> updateRobotPose(), 0.02);
   }
 
@@ -92,27 +93,16 @@ public class Robot extends TimedRobot {
     alliance = DriverStation.getAlliance().orElse(Alliance.Red);
   }
 
-  public static final Pose2d BLUE_HUB = new Pose2d(
-    Distance.ofBaseUnits(4.629, Meters),
-    Distance.ofBaseUnits(4.03479, Meters),
-    Rotation2d.kZero
-  );
-  public static final Pose2d RED_HUB = new Pose2d(
-    Distance.ofBaseUnits(11.919, Meters),
-    Distance.ofBaseUnits(4.03479, Meters),
-    Rotation2d.kZero
-  );
-  public Pose2d targetHub = RED_HUB;
 
   private void updateTargetHub() {
-    targetHub = alliance == Alliance.Red ? RED_HUB : BLUE_HUB;
-    m_objectField.setRobotPose(targetHub);
+    m_robotContainer.targetHub = alliance == Alliance.Red ? m_robotContainer.RED_HUB : m_robotContainer.BLUE_HUB;
+    m_objectField.setRobotPose(m_robotContainer.targetHub);
     SmartDashboard.putData("Object Field", this.m_objectField);
   }
 
   public void updateRobotPose(){
     var botState = m_robotContainer.drivetrain.getState();
-    LimelightHelpers.SetRobotOrientation(Constants.SHOOTER_LIMELIGHT_NAME, 
+    LimelightHelpers.SetRobotOrientation_NoFlush(Constants.SHOOTER_LIMELIGHT_NAME, 
         botState.Pose.getRotation().getDegrees(), 0, 0, 0, 0, 0);
     
 
@@ -131,18 +121,6 @@ public class Robot extends TimedRobot {
     m_botField.setRobotPose(botState.Pose);
   }
 
-  public double getDistanceToTarget(Pose2d targetPose) {
-      Pose2d robotPose = m_robotContainer.drivetrain.getState().Pose;
-      return robotPose.getTranslation().getDistance(targetPose.getTranslation()); 
-  }
-
-  public double getDegreesToTarget(Pose2d targetPose){
-      Pose2d robotPose2d = m_robotContainer.drivetrain.getState().Pose;
-      
-      // TRIGONOMETRY BABY!!!!!!
-      double angleToTarget = Math.atan2(targetPose.getY() - robotPose2d.getY(), targetPose.getX() - robotPose2d.getX());
-      return Math.toDegrees(angleToTarget);
-  }
 
   @Override
   public void robotInit() {
