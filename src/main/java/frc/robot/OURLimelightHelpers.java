@@ -48,4 +48,9 @@ public class OURLimelightHelpers {
         // If 'tv' is 0.0, no valid target is found. Otherwise, one or more are found.
         return tv == 1;
     }
+
+    public static double getDistanceToTarget(Pose2d targetPose) {
+        Pose2d robotPose = betterGetPose2d(Constants.SHOOTER_LIMELIGHT_NAME, Constants.FEEDER_LIMELIGHT_NAME);
+        return robotPose.getTranslation().getDistance(targetPose.getTranslation()); 
+    }
 }
