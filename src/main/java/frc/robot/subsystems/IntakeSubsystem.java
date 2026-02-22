@@ -20,22 +20,18 @@ public class IntakeSubsystem extends SubsystemBase {
     public PIDMotor tiltPIDMotor;
 
     @NotLogged
-    private double tiltMaxSpeed = 140.0;
+    private double tiltMaxSpeed = 50.0;
     @NotLogged
-    private double tiltMaxAccel = 140.0 / 5.0;
+    private double tiltMaxAccel = 50.0 *2;
 
     @NotLogged
-    public static final double tiltMaxExtensionPos = -38;
+    public static final double tiltMaxExtensionPos = -39;
     @NotLogged
     public static final double tiltMinExtensionPos = 0;
 
     @Logged
     private double tiltPos = 0;
 
-    @NotLogged
-    private static final double TILT_ABSOLUTE_MAX_RPS = 140.0;
-    @NotLogged
-    private static final double TILT_ABSOLUTE_MAX_ACCEL = TILT_ABSOLUTE_MAX_RPS * 2;
     @NotLogged
     private FloorFeedSubsystem floorSubsystem;
 
@@ -60,8 +56,8 @@ public class IntakeSubsystem extends SubsystemBase {
         intakePIDMotor.setCurrentLimit(intakeCurrentLimit);
         intakePIDMotor.setIdleCoastMode();
 
-        tiltPIDMotor = PIDMotor.makeMotor(tiltMotorID, "tilt", 0.6, 0.0, 0.0,
-                0.25, 0.3, 0.01, TILT_ABSOLUTE_MAX_RPS, TILT_ABSOLUTE_MAX_ACCEL, 0.00);
+        tiltPIDMotor = PIDMotor.makeMotor(tiltMotorID, "tilt", 0.1, 0.0, 0.0,
+                0.25, 0.12, 0.00, tiltMaxSpeed, tiltMaxAccel, 0.00);
         tiltPIDMotor.setCurrentLimit(tiltCurrentLimit);
         tiltPIDMotor.setIdleCoastMode();
     }
@@ -72,7 +68,7 @@ public class IntakeSubsystem extends SubsystemBase {
      * constantly moves/tilts between two points following a sine wave
      * and false means no intake tilt movement.
      * 
-     * @param intaking true to move the intake up and down to promote feeding, false to stop running it
+     * @param jiggling true to move the intake up and down to promote feeding, false to stop running it
      */
     public void setIsJiggling(boolean jiggling) {
         isJiggling = jiggling;
