@@ -23,7 +23,7 @@ import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.commands.DetectFuelCmd;
-import frc.robot.commands.JustShootCmd;
+import frc.robot.commands.ShootAtHub;
 import frc.robot.commands.PassCmd;
 import frc.robot.commands.SnapTowardsGoalCmd;
 import frc.robot.drive.CommandSwerveDrivetrain;
@@ -95,7 +95,7 @@ public class RobotContainer {
 
   // Subsystems - logged via their @Logged annotations
   @Logged(name = "John")
-  private final ShooterSubsystem shooterSubsystemJohn = new ShooterSubsystem( "John",
+  public final ShooterSubsystem shooterSubsystemJohn = new ShooterSubsystem( "John",
           Constants.JOHN_SHOOTER_MOTOR_ID, Constants.JOHN_FEEDER_MOTOR_ID, Constants.JOHN_BEAMBREAK_CHANNEL, Constants.JOHN_LINEAR_ACTUATOR_CHANNEL, shooterCurrentLimit, feederCurrentLimit,
           new Interpolator( // Placeholders for shoot hood angles
                   new double[] {2, 4, 10, 20},
@@ -109,7 +109,7 @@ public class RobotContainer {
   );
 
   @Logged(name = "Jawbreaker")
-  private final ShooterSubsystem shooterSubsystemJawbreaker = new ShooterSubsystem( "Jawbreaker",
+  public final ShooterSubsystem shooterSubsystemJawbreaker = new ShooterSubsystem( "Jawbreaker",
           Constants.JAWBREAKER_SHOOTER_MOTOR_ID, Constants.JAWBREAKER_FEEDER_MOTOR_ID, Constants.JAWBREAKER_BEAMBREAK_CHANNEL, Constants.JAWBREAKER_LINEAR_ACTUATOR_CHANNEL, shooterCurrentLimit, feederCurrentLimit,
           new Interpolator( // Placeholders for shoot hood angles
                   new double[] {2, 4, 10, 20},
@@ -123,7 +123,7 @@ public class RobotContainer {
   );
 
   @Logged(name = "Taylor")
-  private final ShooterSubsystem shooterSubsystemTaylor = new ShooterSubsystem( "Taylor",
+  public final ShooterSubsystem shooterSubsystemTaylor = new ShooterSubsystem( "Taylor",
           Constants.TAYLOR_SHOOTER_MOTOR_ID, Constants.TAYLOR_FEEDER_MOTOR_ID, Constants.TAYLOR_BEAMBREAK_CHANNEL, Constants.TAYLOR_LINEAR_ACTUATOR_CHANNEL, shooterCurrentLimit, feederCurrentLimit,
           new Interpolator( // Placeholders for shoot hood angles
                   new double[] {2, 4, 10, 20},
@@ -206,7 +206,7 @@ public class RobotContainer {
     driverController.rightBumper().whileTrue(new PassCmd(drivetrain, shooterSubsystemJohn, shooterSubsystemJawbreaker, shooterSubsystemTaylor, floorFeedSubsystem)); // TODONE
     // m_driverController.rightTrigger().onTrue(new SnapTowardsGoalCmd(drivetrain).andThen(JustShootCmd.getStartCommand(m_shooterSubsystemJohn, m_shooterSubsystemJawbreaker, m_shooterSubsystemTaylor)))
     //                                  .onFalse(JustShootCmd.getStopCommand(m_shooterSubsystemJohn, m_shooterSubsystemJawbreaker, m_shooterSubsystemTaylor)); // TODO: implement shoot-to-goal
-    driverController.rightTrigger().whileTrue(new SnapTowardsGoalCmd(this)); // TODO: implement shoot-to-goal
+    driverController.rightTrigger().whileTrue(new ShootAtHub(this));
 
     // Preload
     driverController.rightStick().onTrue(new InstantCommand(() -> {
