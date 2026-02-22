@@ -33,7 +33,7 @@ public class IntakeSubsystem extends SubsystemBase {
     private double tiltPos = 0;
 
     @NotLogged
-    private static final double TILT_ABSOLUTE_MAX_RPS = 140.0;
+    private static final double TILT_ABSOLUTE_MAX_RPS = 50.0;
     @NotLogged
     private static final double TILT_ABSOLUTE_MAX_ACCEL = TILT_ABSOLUTE_MAX_RPS * 2;
     @NotLogged
@@ -60,8 +60,8 @@ public class IntakeSubsystem extends SubsystemBase {
         intakePIDMotor.setCurrentLimit(intakeCurrentLimit);
         intakePIDMotor.setIdleCoastMode();
 
-        tiltPIDMotor = PIDMotor.makeMotor(tiltMotorID, "tilt", 0.6, 0.0, 0.0,
-                0.25, 0.3, 0.01, TILT_ABSOLUTE_MAX_RPS, TILT_ABSOLUTE_MAX_ACCEL, 0.00);
+        tiltPIDMotor = PIDMotor.makeMotor(tiltMotorID, "tilt", 0.0, 0.0, 0.0,
+                0.25, 0.15, 0.00, TILT_ABSOLUTE_MAX_RPS, TILT_ABSOLUTE_MAX_ACCEL, 0.00);
         tiltPIDMotor.setCurrentLimit(tiltCurrentLimit);
         tiltPIDMotor.setIdleCoastMode();
     }
