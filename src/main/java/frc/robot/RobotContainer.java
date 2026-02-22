@@ -56,7 +56,9 @@ public class RobotContainer {
   @NotLogged
   private static final double ACTUATOR_STEP = 0.05;
   @NotLogged
-  private static final int climbCurrentLimit = 30;
+  private static final int climbFinalCurrentLimit = 20;
+  @NotLogged
+  private static final int climbInitialCurrentLimit = 5;
   @NotLogged
   private static final int floorCurrentLimit = 30;
   @NotLogged
@@ -115,7 +117,7 @@ public class RobotContainer {
   private final FloorFeedSubsystem floorFeedSubsystem = new FloorFeedSubsystem(floorCurrentLimit, shooterSubsystemJohn, shooterSubsystemJawbreaker, shooterSubsystemTaylor);
 
   @Logged(name = "Climber")
-  private final ClimbSubsystem climberSubsystem = new ClimbSubsystem(climbCurrentLimit);
+  private final ClimbSubsystem climberSubsystem = new ClimbSubsystem(climbInitialCurrentLimit, climbFinalCurrentLimit);
 
   @Logged(name = "Intake")
   private final IntakeSubsystem intakeSubsystem = new IntakeSubsystem(
@@ -181,7 +183,9 @@ public class RobotContainer {
       shooterSubsystemTaylor.setCanPreload(false);
     }));
 
-    driverController.b().whileTrue(new InstantCommand(() -> {})); // TODO: implement right climb
+    driverController.b().onTrue(new InstantCommand(() -> {climberSubsystem.climb();})); // TODO: implement right climb
+    driverController.x().onTrue(new InstantCommand(() -> {climberSubsystem.goHome();})); // TODO: implement left climb
+
     driverController.a().whileTrue(new InstantCommand(() -> {
       shooterSubsystemJohn.updateParameters();
       shooterSubsystemJawbreaker.updateParameters();
@@ -190,7 +194,6 @@ public class RobotContainer {
       floorFeedSubsystem.updateParameters();
       intakeSubsystem.updateParameters();
     }));
-    driverController.x().whileTrue(new InstantCommand(() -> {})); // TODO: implement left climb
     driverController.y().onTrue(new InstantCommand(() -> updateDrivetrainRobotPerspective()));
 
     driverController.povLeft().onTrue(new InstantCommand(() -> {intakeSubsystem.setTiltPosition(intakeSubsystem.getTiltPosition() + 4);})); // TODO: implement reset alliance - possibly reseed field-centric?
