@@ -131,6 +131,19 @@ public class Robot extends TimedRobot {
     m_botField.setRobotPose(botState.Pose);
   }
 
+  public double getDistanceToTarget(Pose2d targetPose) {
+      Pose2d robotPose = m_robotContainer.drivetrain.getState().Pose;
+      return robotPose.getTranslation().getDistance(targetPose.getTranslation()); 
+  }
+
+  public double getDegreesToTarget(Pose2d targetPose){
+      Pose2d robotPose2d = m_robotContainer.drivetrain.getState().Pose;
+      
+      // TRIGONOMETRY BABY!!!!!!
+      double angleToTarget = Math.atan2(targetPose.getY() - robotPose2d.getY(), targetPose.getX() - robotPose2d.getX());
+      return Math.toDegrees(angleToTarget);
+  }
+
   @Override
   public void robotInit() {
   }

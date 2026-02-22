@@ -1,14 +1,10 @@
 package frc.robot;
 
-import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableBuilder;
-import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.smartdashboard.Field2d;
-import frc.robot.LimelightHelpers.PoseEstimate;
+
 
 public class OURLimelightHelpers {
 
@@ -54,16 +50,5 @@ public class OURLimelightHelpers {
         return tv == 1;
     }
 
-    public static double getDistanceToTarget(Pose2d targetPose) {
-        Pose2d robotPose = LimelightHelpers.getBotPose2d(Constants.SHOOTER_LIMELIGHT_NAME);
-        return robotPose.getTranslation().getDistance(targetPose.getTranslation()); 
-    }
-
-    public static double getDegreesToTarget(Pose2d targetPose){
-        Pose2d robotPose2d = LimelightHelpers.getBotPose2d(Constants.SHOOTER_LIMELIGHT_NAME);
-        
-        // TRIGONOMETRY BABY!!!!!!
-        double angleToTarget = Math.atan2(targetPose.getY() - robotPose2d.getY(), targetPose.getX() - robotPose2d.getX());
-        return Math.toDegrees(angleToTarget);
-    }
+    
 }
