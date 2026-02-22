@@ -178,6 +178,11 @@ public class RobotContainer {
       shooterSubsystemJawbreaker.setCanPreload(true);
       shooterSubsystemTaylor.setCanPreload(true);
     }));
+    driverController.rightStick().onFalse(new InstantCommand(() -> {
+      shooterSubsystemJohn.setCanPreload(false);
+      shooterSubsystemJawbreaker.setCanPreload(false);
+      shooterSubsystemTaylor.setCanPreload(false);
+    }));
 
     driverController.b().whileTrue(new InstantCommand(() -> {})); // TODO: implement right climb
     driverController.a().whileTrue(new InstantCommand(() -> {

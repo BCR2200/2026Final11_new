@@ -170,7 +170,11 @@ public class ShooterSubsystem extends SubsystemBase {
     }
 
     public boolean needsFloorFeed() {
-        return isFeeding || (!isBeamBroken() && canPreload);
+        return isFeeding || wantsToPreload();
+    }
+
+    public boolean wantsToPreload() {
+        return !isBeamBroken() && canPreload;
     }
 
     /**
@@ -188,9 +192,11 @@ public class ShooterSubsystem extends SubsystemBase {
 
         if (isShooting) {
             shootPIDMotor.setVelocityTarget(shooterSpeed); // TODO: use shooterVelocityInterpolator
-        } else if (isPassing) {
+        } 
+        else if (isPassing) {
             shootPIDMotor.setVelocityTarget(passingSpeed);
-        } else {
+        } 
+        else {
             shootPIDMotor.setPercentOutput(0);
         }
 
@@ -199,10 +205,11 @@ public class ShooterSubsystem extends SubsystemBase {
         // then stop
         if (isFeeding) {
             feedPIDMotor.setPercentOutput(1);
-        } else if (!isBeamBroken()) {
+        } 
+        else if (wantsToPreload()) {
             feedPIDMotor.setPercentOutput(PRELOAD_SPEED_PERCENT);
-
-        } else {
+        } 
+        else {
             feedPIDMotor.setPercentOutput(0);
         }
     }
