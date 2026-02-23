@@ -146,6 +146,7 @@ public class IntakeSubsystem extends SubsystemBase {
                 break;
             }
         }
+        isJiggling = false; // TODO: FOR NOW MUST NOT JIGGLE
 
         // Slightly less Horrible untested garbage jiggle function
         // This can be graphed as: tiltPos + amplitude * sin(speed * time)
