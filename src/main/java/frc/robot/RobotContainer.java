@@ -243,7 +243,7 @@ public class RobotContainer {
    * @return if robot is at the targetPos
    */
   public boolean atTargetPos(Pose2d targetPos, double threashold) {
-    return getDistanceToTarget(targetPos) < 0.1;
+    return getDistanceToTarget(targetPos) < threashold;
   }
 
   /**
