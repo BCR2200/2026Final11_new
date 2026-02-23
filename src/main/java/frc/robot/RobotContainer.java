@@ -43,6 +43,8 @@ import frc.robot.subsystems.*;
 public class RobotContainer {
 
   public boolean shootingAtHub = false;
+  public boolean fuelTracking = false;
+
   public static final Pose2d BLUE_HUB = new Pose2d(
     Distance.ofBaseUnits(4.629, Meters),
     Distance.ofBaseUnits(4.03479, Meters),
@@ -61,12 +63,12 @@ public class RobotContainer {
   public final static double MaxAngularRate = RotationsPerSecond.of(0.75).in(RadiansPerSecond);
 
   @NotLogged
-  private final SwerveRequest.FieldCentric drive = new SwerveRequest.FieldCentric()
+  private final SwerveRequest.FieldCentric driveFC = new SwerveRequest.FieldCentric()
           .withDeadband(MaxSpeed * 0.1).withRotationalDeadband(MaxAngularRate * 0.1)
           .withDriveRequestType(DriveRequestType.OpenLoopVoltage);
 
   @NotLogged
-  private final SwerveRequest.FieldCentricFacingAngle driveFacingAngle = new SwerveRequest.FieldCentricFacingAngle()
+  private final SwerveRequest.FieldCentricFacingAngle driveFCFA = new SwerveRequest.FieldCentricFacingAngle()
     .withDeadband(MaxSpeed * 0.1)
     .withDriveRequestType(DriveRequestType.OpenLoopVoltage);
 
@@ -194,7 +196,7 @@ public class RobotContainer {
     // Start button is 3 horizontal lines
     // POV is the D-pad
 
-    driverController.leftBumper().whileTrue(new DetectFuelCmd(drivetrain));
+    driverController.leftBumper().whileTrue(new DetectFuelCmd(this));
     driverController.leftTrigger()
             .whileTrue(new InstantCommand(() -> {
               intakeSubsystem.setIsIntaking(true);
@@ -257,23 +259,28 @@ public class RobotContainer {
     // Note that X is defined as forward according to WPILib convention,
     // and Y is defined as to the left according to WPILib convention.
 
-    driveFacingAngle.HeadingController.setPID(7, 0, 0);
+    driveFCFA.HeadingController.setPID(7, 0, 0);
 
     drivetrain.setDefaultCommand(
       // Drivetrain will execute this command periodically
       drivetrain.applyRequest(() -> {
         
         if (shootingAtHub) {
-          return driveFacingAngle.withTargetDirection(Rotation2d.fromDegrees(getDegreesToTarget(targetHub)))
+          return driveFCFA.withTargetDirection(Rotation2d.fromDegrees(getDegreesToTarget(targetHub)))
           .withVelocityX(-driverController.getLeftY() * MaxSpeed) // Drive forward with negative Y
           .withVelocityY(-driverController.getLeftX() * MaxSpeed); // Drive left with negative X
         }
-
-        return drive.withVelocityX(-driverController.getLeftY() * MaxSpeed) // Drive forward with negative Y
+        else if (fuelTracking) {
+          // TODO determine velocity x and y
+          return driveFC.withRotationalRate(DetectFuelCmd.radsPerSecond);
+        }
+        else {
+          return driveFC.withVelocityX(-driverController.getLeftY() * MaxSpeed) // Drive forward with negative Y
           .withVelocityY(-driverController.getLeftX() * MaxSpeed) // Drive left with negative X
           .withRotationalRate(-driverController.getRightX() * MaxAngularRate); // Drive counterclockwise with negative X
         }
-      )
+        
+      })
     );
 
 
