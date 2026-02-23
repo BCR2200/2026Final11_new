@@ -38,6 +38,7 @@ public class ShooterSubsystem extends SubsystemBase {
 
     private boolean canPreload = false;
 
+    @NotLogged
     private RobotContainer rc;
 
     // Logged via PIDMotorLogger
