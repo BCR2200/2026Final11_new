@@ -291,7 +291,7 @@ public class RobotContainer {
       }
       else {
         targetClimbFinal = BLUE_R_CLIMB_FINAL;
-        targetClimbFinal = BLUE_R_CLIMB_INITIAL;
+        targetClimbInitial = BLUE_R_CLIMB_INITIAL;
       }
     })).onFalse(new InstantCommand(() -> {climbing = false; climberSubsystem.goHome();})); // TODO: implement right climb
 
@@ -303,7 +303,7 @@ public class RobotContainer {
       }
       else {
         targetClimbFinal = BLUE_L_CLIMB_FINAL;
-        targetClimbFinal = BLUE_L_CLIMB_INITIAL;
+        targetClimbInitial = BLUE_L_CLIMB_INITIAL;
       }
 
     })).onFalse(new InstantCommand(() -> {climbing = false; climberSubsystem.goHome();})); // TODO: implement left climb
