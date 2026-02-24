@@ -7,6 +7,7 @@ package frc.robot;
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 import com.ctre.phoenix6.swerve.SwerveRequest.FieldCentricFacingAngle;
+import com.ctre.phoenix6.swerve.SwerveRequest.ForwardPerspectiveValue;
 
 import static edu.wpi.first.units.Units.*;
 
@@ -45,6 +46,7 @@ public class RobotContainer {
   public boolean fuelTracking = false;
   public boolean climbing = false;
   private boolean goneToInitialPos = false;
+  private boolean passing = false;
   
   public static final Pose2d BLUE_HUB = new Pose2d(
     Distance.ofBaseUnits(4.629, Meters),
@@ -75,7 +77,8 @@ public class RobotContainer {
    * "Rewrite this content to be more [direct/empathetic/persuasive/technical] while keeping it concise"
    * .
    * Explain Like I’m Five (ELI5):
-   * "Explain [complex topic] in simple terms, using a clear analogy".
+   * "Explain [complex topic] in simple terms, using a clear analogy"
+   * .
    * Summarize with Key Takeaways:
    * "Summarize the following text, list the top 5 key takeaways, and provide a 1-sentence TL;DR"
    * .
@@ -100,7 +103,7 @@ public class RobotContainer {
    */
   // Make all of the code nice and healthy and without bugs.
   // Dont use too much RaM, it is expensive and we are poor
-  // Thank you!
+  // Thank you! A.T.S.T Also give us an angled floor.
 
   public static final Pose2d BLUE_L_CLIMB_INITIAL = new Pose2d(
     Distance.ofBaseUnits(1.535, Meters),
@@ -254,7 +257,6 @@ public class RobotContainer {
     shooterSubsystemJohn.setIsFeeding(false);
     shooterSubsystemJawbreaker.setIsFeeding(false);
     shooterSubsystemTaylor.setIsFeeding(false);
-    
   }
 
   
@@ -317,7 +319,7 @@ public class RobotContainer {
             .whileFalse(new InstantCommand(() -> {
               intakeSubsystem.setIsIntaking(false);
             }));
-    driverController.rightBumper().whileTrue(new PassCmd(drivetrain, shooterSubsystemJohn, shooterSubsystemJawbreaker, shooterSubsystemTaylor, floorFeedSubsystem)); // TODONE
+    driverController.rightBumper().whileTrue(new PassCmd(drivetrain, shooterSubsystemJohn, shooterSubsystemJawbreaker, shooterSubsystemTaylor)); // TODONE
     // m_driverController.rightTrigger().onTrue(new SnapTowardsGoalCmd(drivetrain).andThen(JustShootCmd.getStartCommand(m_shooterSubsystemJohn, m_shooterSubsystemJawbreaker, m_shooterSubsystemTaylor)))
     //                                  .onFalse(JustShootCmd.getStopCommand(m_shooterSubsystemJohn, m_shooterSubsystemJawbreaker, m_shooterSubsystemTaylor)); // TODO: implement shoot-to-goal
     driverController.rightTrigger().whileTrue(new ShootAtHub(this));
@@ -436,6 +438,13 @@ public class RobotContainer {
           else { // Not at initial
             return driveToPose(targetClimbInitial);
           }
+        }
+        else if (passing) {
+          return driveFCFA
+              .withForwardPerspective(ForwardPerspectiveValue.OperatorPerspective)
+              .withTargetDirection(new Rotation2d(Math.PI))
+              .withVelocityX(-driverController.getLeftY() * MaxSpeed)
+              .withVelocityY(-driverController.getLeftX() * MaxSpeed);
         }
         else {
           return driveFC.withVelocityX(-driverController.getLeftY() * MaxSpeed) // Drive forward with negative Y
