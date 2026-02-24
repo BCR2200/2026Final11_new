@@ -6,7 +6,6 @@ package frc.robot;
 
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
-import com.ctre.phoenix6.swerve.SwerveRequest.ForwardPerspectiveValue;
 
 import static edu.wpi.first.units.Units.*;
 
@@ -25,7 +24,6 @@ import frc.robot.Constants.OperatorConstants;
 import frc.robot.commands.DetectFuelCmd;
 import frc.robot.commands.ShootAtHub;
 import frc.robot.commands.PassCmd;
-import frc.robot.commands.SnapTowardsGoalCmd;
 import frc.robot.drive.CommandSwerveDrivetrain;
 import frc.robot.drive.Telemetry;
 import frc.robot.drive.TunerConstantsComp;
