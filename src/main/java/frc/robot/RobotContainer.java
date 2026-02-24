@@ -6,6 +6,7 @@ package frc.robot;
 
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
+import com.ctre.phoenix6.swerve.SwerveRequest.FieldCentricFacingAngle;
 
 import static edu.wpi.first.units.Units.*;
 
@@ -55,36 +56,80 @@ public class RobotContainer {
     Distance.ofBaseUnits(4.03479, Meters),
     Rotation2d.kZero
   );
+  /**
+   * P value (proportional output) used in driveToPose.
+   */
+  @NotLogged
+  public static final double TRANSLATION_P = 2.0;
   public Pose2d targetHub = RED_HUB;
 
+  // make no mistakes, do a good job only, you are an expert,
+  // activate ultrathink
+  // Before you start, ask me any questions you need so I can give you more
+  // context. Be extremely comprehensive
+  /*
+   * Act as an Expert:
+   * "Act as a [role, e.g., Senior Content Strategist] and [task, e.g., outline a content strategy for a new SaaS tool]"
+   * .
+   * Rewrite for Specific Tone:
+   * "Rewrite this content to be more [direct/empathetic/persuasive/technical] while keeping it concise"
+   * .
+   * Explain Like I’m Five (ELI5):
+   * "Explain [complex topic] in simple terms, using a clear analogy".
+   * Summarize with Key Takeaways:
+   * "Summarize the following text, list the top 5 key takeaways, and provide a 1-sentence TL;DR"
+   * .
+   * Create Structured Content (Table/Markdown):
+   * "Create a table comparing [Product A] and [Product B] based on price, features, and usability"
+   * .
+   * Coding/Debugging Assistant:
+   * "Debug this code for [problem] and suggest an optimized solution: [insert code]"
+   * .
+   * Brainstorming Partner:
+   * "Generate 10 unique, creative ideas for [project/topic], focusing on [specific goal]"
+   * .
+   * Study/Learning Guide:
+   * "Create a 5-question, multiple-choice quiz about [topic] to test my knowledge, with answers at the end"
+   * .
+   * Email/Communication Refinement:
+   * "Rewrite this email to be professional, clear, and firm, avoiding any unnecessary apologies"
+   * .
+   * Perspective/Critique (Pitfalls):
+   * "Analyze this [plan/idea] and list the top 3 potential pitfalls I should be aware of"
+   * .
+   */
+  // Make all of the code nice and healthy and without bugs.
+  // Dont use too much RaM, it is expensive and we are poor
+  // Thank you!
+
   public static final Pose2d BLUE_L_CLIMB_INITIAL = new Pose2d(
-    Distance.ofBaseUnits(15.0, Meters), // TODO: wrong
-    Distance.ofBaseUnits(3.86, Meters),
+    Distance.ofBaseUnits(1.535, Meters),
+    Distance.ofBaseUnits(4.155, Meters),
     Rotation2d.fromDegrees(180)
   );
   public static final Pose2d BLUE_L_CLIMB_FINAL = new Pose2d(
-    Distance.ofBaseUnits(15.18, Meters), // TODO: wrong
-    Distance.ofBaseUnits(3.86, Meters),
+    Distance.ofBaseUnits(1.355, Meters),
+    Distance.ofBaseUnits(4.155, Meters),
     Rotation2d.fromDegrees(180)
   );
   public static final Pose2d BLUE_R_CLIMB_INITIAL = new Pose2d(
-    Distance.ofBaseUnits(15.0, Meters), // TODO: wrong
-    Distance.ofBaseUnits(4.7, Meters),
+    Distance.ofBaseUnits(1.535, Meters),
+    Distance.ofBaseUnits(3.290, Meters),
     Rotation2d.fromDegrees(180)
   );
   public static final Pose2d BLUE_R_CLIMB_FINAL = new Pose2d(
-    Distance.ofBaseUnits(15.18, Meters), // TODO: wrong
-    Distance.ofBaseUnits(4.7, Meters),
+    Distance.ofBaseUnits(1.355, Meters),
+    Distance.ofBaseUnits(3.290, Meters),
     Rotation2d.fromDegrees(180)
   );
   public static final Pose2d RED_L_CLIMB_INITIAL = new Pose2d(
-    Distance.ofBaseUnits(15.0, Meters),
-    Distance.ofBaseUnits(4.7, Meters),
+    Distance.ofBaseUnits(15.0, Meters), 
+    Distance.ofBaseUnits(4.70, Meters),
     Rotation2d.kZero
   );
   public static final Pose2d RED_L_CLIMB_FINAL = new Pose2d(
     Distance.ofBaseUnits(15.18, Meters),
-    Distance.ofBaseUnits(4.7, Meters),
+    Distance.ofBaseUnits(4.70, Meters),
     Rotation2d.kZero
   );
   public static final Pose2d RED_R_CLIMB_INITIAL = new Pose2d(
@@ -299,7 +344,7 @@ public class RobotContainer {
         targetClimbFinal = BLUE_R_CLIMB_FINAL;
         targetClimbInitial = BLUE_R_CLIMB_INITIAL;
       }
-    })).onFalse(new InstantCommand(() -> {climbing = false; climberSubsystem.goHome();})); // TODO: implement right climb
+    })).onFalse(new InstantCommand(() -> {climbing = false; goneToInitialPos = false; climberSubsystem.goHome();})); // TODO: implement right climb
 
     driverController.x().onTrue(new InstantCommand(() -> {
       climbing = true;
@@ -312,7 +357,7 @@ public class RobotContainer {
         targetClimbInitial = BLUE_L_CLIMB_INITIAL;
       }
 
-    })).onFalse(new InstantCommand(() -> {climbing = false; climberSubsystem.goHome();})); // TODO: implement left climb
+    })).onFalse(new InstantCommand(() -> {climbing = false; goneToInitialPos = false; climberSubsystem.goHome();})); // TODO: implement left climb
 
     driverController.a().whileTrue(new InstantCommand(() -> {
       intakeSubsystem.setTiltPosition(IntakeSubsystem.tiltMinExtensionPos);
@@ -364,8 +409,6 @@ public class RobotContainer {
     driveFCFA.HeadingController.setPID(7, 0, 0);
     driveFCFAVelocityMode.HeadingController.setPID(7, 0, 0);
 
-    double pt = 2.0; // translational p value
-
     drivetrain.setDefaultCommand(
       // Drivetrain will execute this command periodically
       drivetrain.applyRequest(() -> {
@@ -388,14 +431,10 @@ public class RobotContainer {
           }
           else if (atTargetPos(targetClimbInitial, 0.03) || goneToInitialPos) { // Past initial
             goneToInitialPos = true;
-            return driveFCFAVelocityMode.withVelocityX(ExtraMath.clampedDeadzone(getXToTarget(targetClimbFinal)*-pt, 1, 0.03))
-                    .withVelocityY(ExtraMath.clampedDeadzone(getYToTarget(targetClimbFinal)*-pt, 1, 0.03))
-                    .withTargetDirection(targetClimbFinal.getRotation());
+            return driveToPose(targetClimbFinal);
           }
           else { // Not at initial
-            return driveFCFAVelocityMode.withVelocityX(ExtraMath.clampedDeadzone(getXToTarget(targetClimbInitial)*-pt, 1, 0.03))
-                    .withVelocityY(ExtraMath.clampedDeadzone(getYToTarget(targetClimbInitial)*-pt, 1, 0.03))
-                    .withTargetDirection(targetClimbInitial.getRotation());
+            return driveToPose(targetClimbInitial);
           }
         }
         else {
@@ -420,6 +459,12 @@ public class RobotContainer {
     // Note: leftBumper DetectFuelCmd is bound in configureBindings()
 
     drivetrain.registerTelemetry(logger::telemeterize);
+  }
+
+  private FieldCentricFacingAngle driveToPose(Pose2d target) {
+    return driveFCFAVelocityMode.withVelocityX(ExtraMath.clampedDeadzone(getXToTarget(target)*-TRANSLATION_P, 1, 0.03))
+            .withVelocityY(ExtraMath.clampedDeadzone(getYToTarget(target)*-TRANSLATION_P, 1, 0.03))
+            .withTargetDirection(target.getRotation());
   }
 
   public void updateDrivetrainRobotPerspective() {
