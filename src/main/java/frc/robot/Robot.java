@@ -79,6 +79,7 @@ public class Robot extends TimedRobot {
     addPeriodic(() -> SmartDashboard.putNumber("Degrees to Target", 
       m_robotContainer.getDegreesToTarget(m_robotContainer.targetHub)), 0.1);
     addPeriodic(() -> updateRobotPose(), 0.02);
+    addPeriodic(() -> updateTargetPassingZone(), 0.04);
   }
 
   /**
@@ -88,10 +89,31 @@ public class Robot extends TimedRobot {
     alliance = DriverStation.getAlliance().orElse(Alliance.Red);
   }
 
-
   private void updateTargetHub() {
     m_robotContainer.targetHub = alliance == Alliance.Red ? RobotContainer.RED_HUB : RobotContainer.BLUE_HUB;
-    m_objectField.setRobotPose(m_robotContainer.targetHub);
+  }
+
+  /**
+   * Updates the target passing zone
+   */
+  private void updateTargetPassingZone() {
+    if (alliance == Alliance.Red) {
+      if (m_robotContainer.drivetrain.getState().Pose.getY() > 4.035) {
+        m_robotContainer.passTarget = RobotContainer.RED_ZONE_R;
+      }
+      else {
+        m_robotContainer.passTarget = RobotContainer.RED_ZONE_L;
+      }
+    }
+    else {
+      if (m_robotContainer.drivetrain.getState().Pose.getY() > 4.035) {
+        m_robotContainer.passTarget = RobotContainer.BLUE_ZONE_L;
+      }
+      else {
+        m_robotContainer.passTarget = RobotContainer.BLUE_ZONE_R;
+      }
+    }
+    m_objectField.setRobotPose(m_robotContainer.passTarget);
     SmartDashboard.putData("Object Field", this.m_objectField);
   }
 

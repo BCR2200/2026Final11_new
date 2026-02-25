@@ -25,13 +25,8 @@ public class ShooterSubsystem extends SubsystemBase {
     private static final double MAX_RPS = 140.0; // 5000 rpm in rps is 84. Max the motors can go is ~140 rps
 
     // Logged automatically by Epilogue
-    private final String name;
-
     private boolean isShooting = false;
     private double shooterSpeed = 54; // in rps. TODO: remove and use the shooterVelocityInterpolator instead
-
-    private boolean isPassing = false;
-    private double passingSpeed = 42; // in rps
 
     private boolean isFeeding = false;
     private double feederSpeed = 100; //in rps
@@ -64,7 +59,6 @@ public class ShooterSubsystem extends SubsystemBase {
 
     public ShooterSubsystem(String name, int shooterMotorID, int feederMotorID, int beambreakChannel, int actuatorChannel, int shootCurrentLimit, int feedCurrentLimit, 
                             Interpolator shooterAngleInterpolator, Interpolator shooterVelocityInterpolator, boolean isMountedIncorrectly, RobotContainer rc) {
-        this.name = name;
         breamBake = new DigitalInput(beambreakChannel);
         
                                 // These numbers are placeholders, we don't actually know what they should be yet
@@ -92,12 +86,6 @@ public class ShooterSubsystem extends SubsystemBase {
     }
     public void setIsShooting(boolean shooting) {
         isShooting = shooting;
-    }
-    public boolean getIsPassing() {
-        return isPassing;
-    }
-    public void setIsPassing(boolean passing) {
-        isPassing = passing;
     }
     public boolean getIsFeeding() {
         return isFeeding;
@@ -206,15 +194,21 @@ public class ShooterSubsystem extends SubsystemBase {
 
     @Override
     public void periodic() {
-        // Control logic only - telemetry handled by Epilogue
-        setActuatorPositionViaInterpolatedValue(rc.getDistanceToTarget(rc.targetHub));
+        if (rc.passing) {
+            setActuatorPositionViaInterpolatedValue(rc.getDistanceToTarget(rc.passTarget));
+        }
+        else {
+            setActuatorPositionViaInterpolatedValue(rc.getDistanceToTarget(rc.targetHub));
+        }
 
         if (isShooting) {
-            setShooterSpeedViaInterpolatedValue(rc.getDistanceToTarget(rc.targetHub));
+            if (rc.passing) {
+                setShooterSpeedViaInterpolatedValue(rc.getDistanceToTarget(rc.passTarget));
+            }
+            else {
+                setShooterSpeedViaInterpolatedValue(rc.getDistanceToTarget(rc.targetHub));
+            }
             shootPIDMotor.setVelocityTarget(shooterSpeed);
-        } 
-        else if (isPassing) {
-            shootPIDMotor.setVelocityTarget(passingSpeed);
         } 
         else {
             shootPIDMotor.setPercentOutput(0);

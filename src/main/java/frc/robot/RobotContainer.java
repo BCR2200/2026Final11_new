@@ -24,8 +24,7 @@ import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.commands.DetectFuelCmd;
-import frc.robot.commands.ShootAtHub;
-import frc.robot.commands.PassCmd;
+import frc.robot.commands.ShootAt;
 import frc.robot.drive.CommandSwerveDrivetrain;
 import frc.robot.drive.Telemetry;
 import frc.robot.drive.TunerConstantsComp;
@@ -46,7 +45,7 @@ public class RobotContainer {
   public boolean fuelTracking = false;
   public boolean climbing = false;
   private boolean goneToInitialPos = false;
-  public static boolean passing = false;
+  public boolean passing = false;
   
   public static final Pose2d BLUE_HUB = new Pose2d(
     Distance.ofBaseUnits(4.629, Meters),
@@ -64,6 +63,28 @@ public class RobotContainer {
   @NotLogged
   public static final double TRANSLATION_P = 3.0;
   public Pose2d targetHub = RED_HUB;
+
+  public static final Pose2d RED_ZONE_L = new Pose2d(
+    Distance.ofBaseUnits(10.0, Meters), // TODO get real
+    Distance.ofBaseUnits(3.0, Meters), // TODO get real
+    Rotation2d.kZero
+  );
+  public static final Pose2d RED_ZONE_R = new Pose2d(
+    Distance.ofBaseUnits(10.0, Meters), // TODO get real
+    Distance.ofBaseUnits(6.0, Meters), // TODO get real
+    Rotation2d.kZero
+  );
+  public static final Pose2d BLUE_ZONE_L = new Pose2d(
+    Distance.ofBaseUnits(3.00, Meters), // TODO get real
+    Distance.ofBaseUnits(6.0, Meters), // TODO get real
+    Rotation2d.kZero
+  );
+  public static final Pose2d BLUE_ZONE_R = new Pose2d(
+    Distance.ofBaseUnits(3.00, Meters), // TODO get real
+    Distance.ofBaseUnits(3.0, Meters), // TODO get real
+    Rotation2d.kZero
+  );
+  public Pose2d passTarget = RED_ZONE_R;
 
   // make no mistakes, do a good job only, you are an expert,
   // activate ultrathink
@@ -319,10 +340,10 @@ public class RobotContainer {
             .whileFalse(new InstantCommand(() -> {
               intakeSubsystem.setIsIntaking(false);
             }));
-    driverController.rightBumper().whileTrue(new PassCmd(drivetrain, shooterSubsystemJohn, shooterSubsystemJawbreaker, shooterSubsystemTaylor)); // TODONE
+    driverController.rightBumper().whileTrue(new InstantCommand()); // No longer TODONE
     // m_driverController.rightTrigger().onTrue(new SnapTowardsGoalCmd(drivetrain).andThen(JustShootCmd.getStartCommand(m_shooterSubsystemJohn, m_shooterSubsystemJawbreaker, m_shooterSubsystemTaylor)))
     //                                  .onFalse(JustShootCmd.getStopCommand(m_shooterSubsystemJohn, m_shooterSubsystemJawbreaker, m_shooterSubsystemTaylor)); // TODO: implement shoot-to-goal
-    driverController.rightTrigger().whileTrue(new ShootAtHub(this));
+    driverController.rightTrigger().whileTrue(new ShootAt(this));
 
     // Preload
     driverController.rightStick().onTrue(new InstantCommand(() -> {
@@ -420,9 +441,17 @@ public class RobotContainer {
           .withVelocityX(-driverController.getLeftY() * MaxSpeed) // Drive forward with negative Y
           .withVelocityY(-driverController.getLeftX() * MaxSpeed); // Drive left with negative X
         }
+        else if (passing) {
+          return driveFCFA
+              .withTargetDirection(Rotation2d.fromDegrees(getDegreesToTarget(passTarget)))
+              .withVelocityX(-driverController.getLeftY() * MaxSpeed)
+              .withVelocityY(-driverController.getLeftX() * MaxSpeed);
+        }
         else if (fuelTracking) {
           // TODO determine velocity x and y
-          return driveFC.withRotationalRate(DetectFuelCmd.radsPerSecond);
+          return driveFC.withRotationalRate(DetectFuelCmd.radsPerSecond)
+            .withVelocityX(0)
+            .withVelocityY(0);
         }
         else if (climbing) {
           if (atTargetPos(targetClimbFinal, 0.03)) { // At final
@@ -438,13 +467,6 @@ public class RobotContainer {
           else { // Not at initial
             return driveToPose(targetClimbInitial);
           }
-        }
-        else if (passing) {
-          return driveFCFA
-              .withForwardPerspective(ForwardPerspectiveValue.OperatorPerspective)
-              .withTargetDirection(new Rotation2d(Math.PI))
-              .withVelocityX(-driverController.getLeftY() * MaxSpeed)
-              .withVelocityY(-driverController.getLeftX() * MaxSpeed);
         }
         else {
           return driveFC.withVelocityX(-driverController.getLeftY() * MaxSpeed) // Drive forward with negative Y
