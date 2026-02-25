@@ -46,7 +46,7 @@ public class RobotContainer {
   public boolean fuelTracking = false;
   public boolean climbing = false;
   private boolean goneToInitialPos = false;
-  private boolean passing = false;
+  public static boolean passing = false;
   
   public static final Pose2d BLUE_HUB = new Pose2d(
     Distance.ofBaseUnits(4.629, Meters),

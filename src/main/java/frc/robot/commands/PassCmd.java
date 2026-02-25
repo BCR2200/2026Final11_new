@@ -4,11 +4,8 @@
 
 package frc.robot.commands;
 
-import com.ctre.phoenix6.swerve.SwerveRequest.FieldCentricFacingAngle;
-import com.ctre.phoenix6.swerve.SwerveRequest.ForwardPerspectiveValue;
-
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.RobotContainer;
 import frc.robot.drive.CommandSwerveDrivetrain;
 import frc.robot.subsystems.ShooterSubsystem;
 
@@ -44,9 +41,7 @@ public class PassCmd extends Command {
 
     if (distance > 4.625 && distance < 11.916) { // Neutral zone
 
-      driveSubsystem.applyRequest(() -> new FieldCentricFacingAngle()
-          .withForwardPerspective(ForwardPerspectiveValue.OperatorPerspective)
-          .withTargetDirection(new Rotation2d(Math.PI)));
+      RobotContainer.passing = true;
 
       johnShooterSubsystem.setActuatorToPassPosition(distance);
       jawbreakerShooterSubsystem.setActuatorToPassPosition(distance);
@@ -66,6 +61,9 @@ public class PassCmd extends Command {
       }
 
     }
+    else {
+      RobotContainer.passing = false;
+    }
   }
 
   // Called once the command ends or is interrupted.
@@ -77,6 +75,7 @@ public class PassCmd extends Command {
     jawbreakerShooterSubsystem.setIsFeeding(false);
     taylorShooterSubsystem.setIsShooting(false);
     taylorShooterSubsystem.setIsFeeding(false);
+    RobotContainer.passing = false;
   }
 
   // Returns true when the command should end.
