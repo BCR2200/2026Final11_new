@@ -7,7 +7,6 @@ package frc.robot;
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 import com.ctre.phoenix6.swerve.SwerveRequest.FieldCentricFacingAngle;
-import com.ctre.phoenix6.swerve.SwerveRequest.ForwardPerspectiveValue;
 
 import static edu.wpi.first.units.Units.*;
 
@@ -382,8 +381,10 @@ public class RobotContainer {
 
     })).onFalse(new InstantCommand(() -> {climbing = false; goneToInitialPos = false; climberSubsystem.goHome();})); // TODO: implement left climb
 
-    driverController.a().whileTrue(new InstantCommand(() -> {
-      intakeSubsystem.setTiltPosition(IntakeSubsystem.tiltMinExtensionPos);
+    driverController.a().onTrue(new InstantCommand(() -> {
+      intakeSubsystem.setIsGoingUp(true);
+    })).onFalse(new InstantCommand(() -> {
+      intakeSubsystem.setIsGoingUp(false);
     }));
     driverController.y().onTrue(new InstantCommand(() -> {
       shooterSubsystemJohn.updateParameters();
