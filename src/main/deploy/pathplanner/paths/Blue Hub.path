@@ -61,7 +61,7 @@
     "rotation": 90.65106038022952
   },
   "reversed": false,
-  "folder": null,
+  "folder": "BlendModePaths",
   "idealStartingState": {
     "velocity": 0,
     "rotation": 89.07595464722732

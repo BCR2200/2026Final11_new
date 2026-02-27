@@ -8,6 +8,7 @@ import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 import com.ctre.phoenix6.swerve.SwerveRequest.FieldCentricFacingAngle;
 import com.ctre.phoenix6.swerve.SwerveRequest.ForwardPerspectiveValue;
+import com.pathplanner.lib.events.EventTrigger;
 
 import static edu.wpi.first.units.Units.*;
 
@@ -266,6 +267,17 @@ public class RobotContainer {
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
+    new EventTrigger("IntakeRun").whileTrue(new InstantCommand(() -> {
+              intakeSubsystem.setIsIntaking(true);})).onFalse(new InstantCommand(() -> {
+                intakeSubsystem.setIsIntaking(false);
+              }));
+    new EventTrigger("SpinUp").whileTrue(new InstantCommand(() -> {
+              shooterSubsystemJohn.setIsShooting(true);
+              shooterSubsystemJawbreaker.setIsShooting(true);
+              shooterSubsystemTaylor.setIsShooting(true);
+              }));
+    new EventTrigger("Shoot").whileTrue(new ShootAt(this));
+
     // Configure the trigger bindings
     configureBindings();
     configureDrivetrainBindings();
