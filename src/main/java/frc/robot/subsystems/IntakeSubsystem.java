@@ -13,6 +13,7 @@ public class IntakeSubsystem extends SubsystemBase {
     // Logged automatically by Epilogue
     private boolean isIntaking = false;
     private boolean isJiggling = false;
+    private boolean isGoingUp = false;
 
     @Logged(name = "IntakeMotor")
     public PIDMotor intakePIDMotor;
@@ -125,6 +126,10 @@ public class IntakeSubsystem extends SubsystemBase {
         tiltPIDMotor.setTarget(tiltPos, tiltMaxSpeed, tiltMaxAccel);
     }
 
+    public void setIsGoingUp(boolean isGoingUp) {
+        this.isGoingUp = isGoingUp;
+    }
+
     public void updateParameters() {
         // TODO: tilt motor
     }
@@ -147,6 +152,11 @@ public class IntakeSubsystem extends SubsystemBase {
         }
         isJiggling = false; // TODO: FOR NOW MUST NOT JIGGLE
 
+        if (isGoingUp) {
+            tiltPos += 0.5; // TODO: tune this value
+            setTiltPosition(tiltPos);
+        }
+        
         // Slightly less Horrible untested garbage jiggle function
         // This can be graphed as: tiltPos + amplitude * sin(speed * time)
         if (isJiggling) {
