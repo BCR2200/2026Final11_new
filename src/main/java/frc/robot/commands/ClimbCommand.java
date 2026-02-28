@@ -132,19 +132,17 @@ public class ClimbCommand extends Command {
 
     @Override
     public void execute() {
-        drivetrain.applyRequest(() -> {
-            if (atTargetPos(targetClimbFinal, 0.03)) { // At final
-                climberSubsystem.climb();
-                return driveFC.withVelocityX(0)
-                        .withVelocityY(0)
-                        .withRotationalRate(0);
-            } else if (atTargetPos(targetClimbInitial, 0.06) || goneToInitialPos) { // Past initial
-                goneToInitialPos = true;
-                return driveToPose(targetClimbFinal);
-            } else { // Not at initial
-                return driveToPose(targetClimbInitial);
-            }
-        });
+        if (atTargetPos(targetClimbFinal, 0.03)) { // At final
+            climberSubsystem.climb();
+            drivetrain.setControl(driveFC.withVelocityX(0)
+                    .withVelocityY(0)
+                    .withRotationalRate(0));
+        } else if (atTargetPos(targetClimbInitial, 0.06) || goneToInitialPos) { // Past initial
+            goneToInitialPos = true;
+            drivetrain.setControl(driveToPose(targetClimbFinal));
+        } else { // Not at initial
+            drivetrain.setControl(driveToPose(targetClimbInitial));
+        }
     }
 
     @Override
