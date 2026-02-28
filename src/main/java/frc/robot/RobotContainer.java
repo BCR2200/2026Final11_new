@@ -27,8 +27,7 @@ import frc.robot.commands.DetectFuelCmd;
 import frc.robot.commands.ShootAt;
 import frc.robot.drive.CommandSwerveDrivetrain;
 import frc.robot.drive.Telemetry;
-import frc.robot.drive.TunerConstantsComp;
-import frc.robot.drive.TunerConstantsPrac;
+import frc.robot.drive.TunerConstants;
 import frc.robot.subsystems.*;
 
 
@@ -170,7 +169,7 @@ public class RobotContainer {
   public Pose2d targetClimbFinal = RED_R_CLIMB_FINAL;
 
   @NotLogged
-  public final static double MaxSpeed = TunerConstantsComp.kSpeedAt12Volts.in(MetersPerSecond) * 0.2;
+  public final static double MaxSpeed = TunerConstants.kSpeedAt12Volts.in(MetersPerSecond) * 0.2;
   @NotLogged
   public final static double MaxAngularRate = RotationsPerSecond.of(0.75).in(RadiansPerSecond);
 
@@ -193,7 +192,7 @@ public class RobotContainer {
   private final Telemetry logger = new Telemetry(MaxSpeed);
 
   @NotLogged
-  public final CommandSwerveDrivetrain drivetrain = TunerConstantsPrac.createDrivetrain();
+  public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
 
   @NotLogged
   private static final double ACTUATOR_STEP = 0.05;

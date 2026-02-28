@@ -47,28 +47,6 @@ public final class Constants {
   // climb motor ID
   public static final int CLIMB_MOTOR_ID = 10;
 
-  // left front drive motor IDs
-  public static final int LEFT_FRONT_DRIVE = 11;
-  public static final int LEFT_FRONT_STEER = 13;
-  
-  // left rear drive motor IDs
-  public static final int LEFT_REAR_STEER = 12;
-  public static final int LEFT_REAR_DRIVE = 14;
-
-  // right rear drive motor IDs
-  public static final int RIGHT_REAR_STEER = 15;
-  public static final int RIGHT_REAR_DRIVE = 17;
-  
-  // right front drive motor IDs
-  public static final int RIGHT_FRONT_STEER = 16;
-  public static final int RIGHT_FRONT_DRIVE = 18;
-
-  // encoder IDs
-  public static final int FRONT_LEFT_ENC = 19;
-  public static final int BACK_LEFT_ENC = 20;
-  public static final int FRONT_RIGHT_ENC = 21;
-  public static final int BACK_RIGHT_ENC = 22;
-
   // pigeon ID
   public static final int PIGEON = 23;
 
