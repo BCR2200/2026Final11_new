@@ -11,6 +11,7 @@ import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.epilogue.NotLogged;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.LimelightHelpers.PoseEstimate;
@@ -45,6 +46,11 @@ public class Robot extends TimedRobot {
 
   // Logged - current alliance
   public static Alliance alliance = Alliance.Red;
+
+  @NotLogged
+  private final Timer teleopTimer = new Timer();
+
+  private boolean forceActiveHub = false;
 
   /**
    * This function is run when the robot is first started up and should be used for any
@@ -151,7 +157,16 @@ public class Robot extends TimedRobot {
 
     m_botField.setRobotPose(botState.Pose);
   }
+  
+    /**
+   * Determines if the hub is active based on the current shift
+   * @return true if the hub is active, false otherwise
+   */
   public boolean isHubActive() {
+    if (forceActiveHub) {
+      return true;
+    }
+
     Optional<Alliance> alliance = DriverStation.getAlliance();
     // If we have no alliance, we cannot be enabled, therefore no hub.
     if (alliance.isEmpty()) {
@@ -167,7 +182,7 @@ public class Robot extends TimedRobot {
     }
 
     // We're teleop enabled, compute.
-    double matchTime = DriverStation.getMatchTime();
+    double matchTime = teleopTimer.get();
     String gameData = DriverStation.getGameSpecificMessage();
     // If we have no game data, we cannot compute, assume hub is active, as its likely early in teleop.
     if (gameData.isEmpty()) {
@@ -178,7 +193,7 @@ public class Robot extends TimedRobot {
       case 'R' -> redInactiveFirst = true;
       case 'B' -> redInactiveFirst = false;
       default -> {
-        // If we have invalid game data, assume hub is active.
+        // If we have invalid game data, assume hub is active. Should add manual check.
         return true;
       }
     }
@@ -187,27 +202,50 @@ public class Robot extends TimedRobot {
     boolean shift1Active = switch (alliance.get()) {
       case Red -> !redInactiveFirst;
       case Blue -> redInactiveFirst;
+      default -> false;
     };
 
-    if (matchTime > 130) {
-      // Transition shift, hub is active.
-      return true;
-    } else if (matchTime > 105) {
-      // Shift 1
-      return shift1Active;
-    } else if (matchTime > 80) {
-      // Shift 2
-      return !shift1Active;
-    } else if (matchTime > 55) {
-      // Shift 3
-      return shift1Active;
-    } else if (matchTime > 30) {
-      // Shift 4
-      return !shift1Active;
-    } else {
-      // End game, hub always active.
-      return true;
+    boolean wonAuto = !shift1Active;
+
+    double timeOfFlight = RobotContainer.TIME_OF_FLIGHT_INTERPOLATOR.interpolate(m_robotContainer.getDistanceToTarget(m_robotContainer.compensatedTargetHub));
+    double minProcessingTime = 1.0; //seconds
+    double maxProcessingTime = 2.0; //seconds
+    double processingTime = 3.0; //seconds
+
+    if (wonAuto) {
+      if (matchTime < 10.0) {
+        return true;
+      } else if (matchTime < 35.0 - timeOfFlight - maxProcessingTime) { // substract timeOfFlight and (1s) processing time
+        return false;
+      } else if (matchTime < 60.0 - timeOfFlight - minProcessingTime + processingTime) { //minus time of flight minus (2s) processing time plus 3 seconds
+        return true;
+      } else if (matchTime < 85.0 - timeOfFlight - maxProcessingTime) { // substract timeOfFlight and (1s) processing time
+        return false;
+      } else if (matchTime < 110.0 - timeOfFlight - minProcessingTime + processingTime) { //minus time of flight minus (2s) processing time plus 3 seconds
+        return true;
+      } else if (matchTime >= 110.0 - timeOfFlight - maxProcessingTime) {
+        return true;
+      }
     }
+    
+
+    if (!wonAuto) {
+      if (matchTime < 10.0) {
+        return true;
+      } else if (matchTime < 35.0 - timeOfFlight - minProcessingTime + processingTime) { // substract timeOfFlight and (2s) processing time plus 3 seconds
+        return true;
+      } else if (matchTime < 60.0 - timeOfFlight - maxProcessingTime) { //minus time of flight minus (1s) processing time 
+        return false;
+      } else if (matchTime < 85.0 - timeOfFlight - minProcessingTime + processingTime) { // substract timeOfFlight and (2s) processing time plus 3 seconds
+        return true;
+      } else if (matchTime < 110.0 - timeOfFlight - maxProcessingTime) { //minus time of flight minus (1s) processing time 
+        return false;
+      } else if (matchTime >= 110.0 - timeOfFlight - maxProcessingTime) {
+        return true;
+      }
+    }
+
+    return true; //idk error fix
   }
 
   @Override
@@ -275,6 +313,8 @@ public class Robot extends TimedRobot {
     if (m_autonomousCommand != null) {
       m_autonomousCommand.cancel();
     }
+
+    teleopTimer.start();
   }
 
   /** This function is called periodically during operator control. */
