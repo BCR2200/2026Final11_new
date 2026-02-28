@@ -126,7 +126,7 @@ public class RobotContainer {
   public final static double MaxAngularRate = RotationsPerSecond.of(0.75).in(RadiansPerSecond);
 
   @NotLogged
-  private final SwerveRequest.FieldCentric driveFC = new SwerveRequest.FieldCentric()
+  public final SwerveRequest.FieldCentric driveFC = new SwerveRequest.FieldCentric()
           .withDeadband(MaxSpeed * 0.1).withRotationalDeadband(MaxAngularRate * 0.1)
           .withDriveRequestType(DriveRequestType.OpenLoopVoltage);
 
@@ -136,7 +136,7 @@ public class RobotContainer {
     .withDriveRequestType(DriveRequestType.OpenLoopVoltage);
 
   @NotLogged
-  private final SwerveRequest.FieldCentricFacingAngle driveFCFAVelocityMode = new SwerveRequest.FieldCentricFacingAngle()
+  public final SwerveRequest.FieldCentricFacingAngle driveFCFAVelocityMode = new SwerveRequest.FieldCentricFacingAngle()
     .withDeadband(MaxSpeed * 0.1)
     .withDriveRequestType(DriveRequestType.Velocity);
 

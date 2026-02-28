@@ -24,15 +24,6 @@ public class ClimbCommand extends Command {
     @NotLogged
     public static final double TRANSLATION_P = 3.0;
 
-    @NotLogged
-    private final SwerveRequest.FieldCentric driveFC = new SwerveRequest.FieldCentric()
-            .withDeadband(RobotContainer.MaxSpeed * 0.1).withRotationalDeadband(RobotContainer.MaxAngularRate * 0.1)
-            .withDriveRequestType(SwerveModule.DriveRequestType.OpenLoopVoltage);
-    @NotLogged
-    private final SwerveRequest.FieldCentricFacingAngle driveFCFAVelocityMode = new SwerveRequest.FieldCentricFacingAngle()
-            .withDeadband(RobotContainer.MaxSpeed * 0.1)
-            .withDriveRequestType(SwerveModule.DriveRequestType.Velocity);
-
     public static final Pose2d BLUE_L_CLIMB_INITIAL = new Pose2d(
             Distance.ofBaseUnits(1.535, Meters),
             Distance.ofBaseUnits(4.155, Meters),
@@ -79,10 +70,12 @@ public class ClimbCommand extends Command {
 
     private final CommandSwerveDrivetrain drivetrain;
     private final ClimbSubsystem climberSubsystem;
+    private final RobotContainer robot;
     private final boolean isOnRight;
     private boolean goneToInitialPos = false;
 
     public ClimbCommand(RobotContainer robot, boolean isRight) {
+        this.robot = robot;
         this.drivetrain = robot.drivetrain;
         this.climberSubsystem = robot.climberSubsystem;
         this.isOnRight = isRight;
@@ -115,7 +108,7 @@ public class ClimbCommand extends Command {
     }
 
     private SwerveRequest.FieldCentricFacingAngle driveToPose(Pose2d target) {
-        return driveFCFAVelocityMode.withVelocityX(ExtraMath.clampedDeadzone(getXToTarget(target)*-TRANSLATION_P, 1, 0.03))
+        return robot.driveFCFAVelocityMode.withVelocityX(ExtraMath.clampedDeadzone(getXToTarget(target)*-TRANSLATION_P, 1, 0.03))
                 .withVelocityY(ExtraMath.clampedDeadzone(getYToTarget(target)*-TRANSLATION_P, 1, 0.03))
                 .withTargetDirection(target.getRotation());
     }
@@ -134,7 +127,7 @@ public class ClimbCommand extends Command {
     public void execute() {
         if (atTargetPos(targetClimbFinal, 0.03)) { // At final
             climberSubsystem.climb();
-            drivetrain.setControl(driveFC.withVelocityX(0)
+            drivetrain.setControl(robot.driveFC.withVelocityX(0)
                     .withVelocityY(0)
                     .withRotationalRate(0));
         } else if (atTargetPos(targetClimbInitial, 0.06) || goneToInitialPos) { // Past initial
