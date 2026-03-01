@@ -1,5 +1,6 @@
 package frc.robot.commands;
 
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.RobotContainer;
 import frc.robot.subsystems.ShooterSubsystem;
@@ -9,6 +10,7 @@ public class ShootAt extends Command {
   ShooterSubsystem johnShooterSubsystem;
   ShooterSubsystem jawbreakerShooterSubsystem;
   ShooterSubsystem taylorShooterSubsystem;
+  Timer timer;
 
   public ShootAt (RobotContainer rc){
     this.rc = rc;
@@ -16,10 +18,12 @@ public class ShootAt extends Command {
     this.jawbreakerShooterSubsystem = rc.shooterSubsystemJawbreaker;
     this.taylorShooterSubsystem = rc.shooterSubsystemTaylor;
     addRequirements(johnShooterSubsystem, jawbreakerShooterSubsystem, taylorShooterSubsystem);
+    timer = new Timer();
   }
 
   @Override
   public void initialize() {
+    timer.restart();
   }
 
   // Called every time the scheduler runs while the command is scheduled.
@@ -48,8 +52,12 @@ public class ShootAt extends Command {
 
   private void activateShooters() {
     johnShooterSubsystem.setIsShooting(true);
-    jawbreakerShooterSubsystem.setIsShooting(true);
-    taylorShooterSubsystem.setIsShooting(true);
+    if (timer.hasElapsed(0.2)) {
+      jawbreakerShooterSubsystem.setIsShooting(true);
+    }
+    if (timer.hasElapsed(0.4)) {
+      taylorShooterSubsystem.setIsShooting(true);
+    }
 
     if (johnShooterSubsystem.isShooterAtSpeed()) {
       // TODO: should we stop feeding later if no longer at speed?
