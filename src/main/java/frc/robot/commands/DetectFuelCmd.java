@@ -4,6 +4,8 @@
 
 package frc.robot.commands;
 
+import com.ctre.phoenix6.swerve.SwerveRequest;
+import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.ExtraMath;
@@ -14,6 +16,8 @@ import frc.robot.RobotContainer;
 public class DetectFuelCmd extends Command {
   /** Creates a new Drive. */
   private RobotContainer robotContainer;
+  @Logged
+  private OURLimelightHelpers.LimelightContour contour;
 
   public DetectFuelCmd(RobotContainer robotContainer) {
     // Use addRequirements() here to declare subsystem dependencies.
@@ -28,16 +32,16 @@ public class DetectFuelCmd extends Command {
   @Override
   public void execute() {
 
-    OURLimelightHelpers.LimelightContour contour = OURLimelightHelpers.getContour();
-    SmartDashboard.putData("contour", contour);
+    contour = OURLimelightHelpers.getContour();
 
     // if there are no targets, don't do anything
     if (!contour.hasTarget()) {
       robotContainer.drivetrain.setControl(
           robotContainer.driveFC
-              .withRotationalRate(RobotContainer.driverRot * RobotContainer.MaxAngularRate)
+              .withRotationalRate(-RobotContainer.driverRot * RobotContainer.MaxAngularRate)
               .withVelocityX(-RobotContainer.driverY * RobotContainer.MaxSpeed)
               .withVelocityY(-RobotContainer.driverX * RobotContainer.MaxSpeed)
+              .withForwardPerspective(SwerveRequest.ForwardPerspectiveValue.OperatorPerspective)
       );
     } else {
       // otherwise, drive towards the contour center
