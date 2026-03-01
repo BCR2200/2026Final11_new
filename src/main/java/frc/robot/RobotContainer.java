@@ -399,25 +399,27 @@ public class RobotContainer {
         
         if (shootingAtHub) {
           return driveFCFA.withTargetDirection(Rotation2d.fromDegrees(getDegreesToTarget(targetHub)))
-          .withVelocityX(-driverY * MaxSpeed) // Drive forward with negative Y
-          .withVelocityY(-driverX * MaxSpeed); // Drive left with negative X
+              .withVelocityX(-driverY * MaxSpeed) // Drive forward with negative Y
+              .withVelocityY(-driverX * MaxSpeed) // Drive left with negative X
+              .withForwardPerspective(SwerveRequest.ForwardPerspectiveValue.OperatorPerspective); // preserves operator X/Y input
         }
         else if (passing) {
-          return driveFCFA
-              .withTargetDirection(Rotation2d.fromDegrees(getDegreesToTarget(passTarget)))
+          return driveFCFA.withTargetDirection(Rotation2d.fromDegrees(getDegreesToTarget(passTarget)))
               .withVelocityX(-driverY * MaxSpeed)
-              .withVelocityY(-driverX * MaxSpeed);
+              .withVelocityY(-driverX * MaxSpeed)
+              .withForwardPerspective(SwerveRequest.ForwardPerspectiveValue.OperatorPerspective); // preserves operator X/Y input
         }
         else if (fuelTracking) {
           // TODO determine velocity x and y
           return driveFC.withRotationalRate(DetectFuelCmd.radsPerSecond)
             .withVelocityX(0)
-            .withVelocityY(0);
+            .withVelocityY(0); // forward direction not important here
         }
         else {
           return driveFC.withVelocityX(-driverY * MaxSpeed) // Drive forward with negative Y
                   .withVelocityY(-driverX * MaxSpeed) // Drive left with negative X
-                  .withRotationalRate(-driverRot * MaxAngularRate); // Drive counterclockwise with negative X
+                  .withRotationalRate(-driverRot * MaxAngularRate) // Drive counterclockwise with negative X
+                  .withForwardPerspective(SwerveRequest.ForwardPerspectiveValue.OperatorPerspective); // "Forward" is defined by the driver's perspective
         }
         
       })

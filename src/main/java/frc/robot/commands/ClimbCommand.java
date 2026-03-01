@@ -110,7 +110,8 @@ public class ClimbCommand extends Command {
     private SwerveRequest.FieldCentricFacingAngle driveToPose(Pose2d target) {
         return robot.driveFCFAVelocityMode.withVelocityX(ExtraMath.clampedDeadzone(getXToTarget(target)*-TRANSLATION_P, 1, 0.03))
                 .withVelocityY(ExtraMath.clampedDeadzone(getYToTarget(target)*-TRANSLATION_P, 1, 0.03))
-                .withTargetDirection(target.getRotation());
+                .withTargetDirection(target.getRotation())
+                .withForwardPerspective(SwerveRequest.ForwardPerspectiveValue.OperatorPerspective); // TODO: verify (since others set it to operator, this should work, but not sure)
     }
 
     @Override
@@ -129,7 +130,7 @@ public class ClimbCommand extends Command {
             climberSubsystem.climb();
             drivetrain.setControl(robot.driveFC.withVelocityX(0)
                     .withVelocityY(0)
-                    .withRotationalRate(0));
+                    .withRotationalRate(0)); // no forward direction needed here
         } else if (atTargetPos(targetClimbInitial, 0.06) || goneToInitialPos) { // Past initial
             goneToInitialPos = true;
             drivetrain.setControl(driveToPose(targetClimbFinal));
