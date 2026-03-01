@@ -111,7 +111,7 @@ public class ClimbCommand extends Command {
         return robot.driveFCFAVelocityMode.withVelocityX(ExtraMath.clampedDeadzone(getXToTarget(target)*-TRANSLATION_P, 1, 0.03))
                 .withVelocityY(ExtraMath.clampedDeadzone(getYToTarget(target)*-TRANSLATION_P, 1, 0.03))
                 .withTargetDirection(target.getRotation())
-                .withForwardPerspective(SwerveRequest.ForwardPerspectiveValue.OperatorPerspective); // TODO: verify (since others set it to operator, this should work, but not sure)
+                .withForwardPerspective(SwerveRequest.ForwardPerspectiveValue.BluePerspective); // TODO: verify (makes a bit more sense than operator, since targets are absolute)
     }
 
     @Override
