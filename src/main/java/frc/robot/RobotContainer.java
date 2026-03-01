@@ -63,13 +63,13 @@ public class RobotContainer {
   public Pose2d compensatedTargetHub = RED_HUB;
 
   public static final Pose2d RED_ZONE_L = new Pose2d(
-    Distance.ofBaseUnits(10.0, Meters), // TODO get real
-    Distance.ofBaseUnits(3.0, Meters), // TODO get real
+    Distance.ofBaseUnits(13.8, Meters), 
+    Distance.ofBaseUnits(1.5, Meters), 
     Rotation2d.kZero
   );
   public static final Pose2d RED_ZONE_R = new Pose2d(
-    Distance.ofBaseUnits(10.0, Meters), // TODO get real
-    Distance.ofBaseUnits(6.0, Meters), // TODO get real
+    Distance.ofBaseUnits(13.8, Meters), 
+    Distance.ofBaseUnits(6.0, Meters), 
     Rotation2d.kZero
   );
   public static final Pose2d BLUE_ZONE_L = new Pose2d(
