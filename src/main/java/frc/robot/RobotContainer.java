@@ -193,8 +193,8 @@ public class RobotContainer {
                   new double[] {50, 54, 58, 64, 73}
   );
   public static final Interpolator TIME_OF_FLIGHT_INTERPOLATOR = new Interpolator( // Placeholders for time of flight based on distance to target
-                  new double[] {0.992, 2.01, 3.00, 4.00},
-                  new double[] {0.90, 0.707, 0.866, 1.0}
+                  new double[] {0.992, 2.01, 3.00, 4.00, 5.00},
+                  new double[] {0.90, 0.96, 1.00, 1.02, 1.15}
   );
 
   // Subsystems - logged via their @Logged annotations
