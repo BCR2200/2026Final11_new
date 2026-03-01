@@ -345,16 +345,26 @@ public class RobotContainer {
     // Start button is 3 horizontal lines
     // POV is the D-pad
 
-    driverController.leftBumper().whileTrue(new DetectFuelCmd(this));
+    // outtake
+    driverController.leftBumper().whileTrue(new InstantCommand(() -> {
+      intakeSubsystem.setIsOuttaking(true);
+      floorFeedSubsystem.setIsOuttaking(true);
+      intakeSubsystem.setTiltPosition(IntakeSubsystem.tiltMaxExtensionPos);
+    })).whileFalse(new InstantCommand(() -> {
+      intakeSubsystem.setIsOuttaking(false);
+      floorFeedSubsystem.setIsOuttaking(false);
+    })); // Now TODONE
+
+    // intake
     driverController.leftTrigger()
-            .whileTrue(new InstantCommand(() -> {
-              intakeSubsystem.setIsIntaking(true);
-              intakeSubsystem.setTiltPosition(IntakeSubsystem.tiltMaxExtensionPos);
-            }))
-            .whileFalse(new InstantCommand(() -> {
-              intakeSubsystem.setIsIntaking(false);
-            }));
-    driverController.rightBumper().whileTrue(new InstantCommand()); // No longer TODONE
+    .whileTrue(new InstantCommand(() -> {
+      intakeSubsystem.setIsIntaking(true);
+      intakeSubsystem.setTiltPosition(IntakeSubsystem.tiltMaxExtensionPos);
+    }))
+    .whileFalse(new InstantCommand(() -> {
+      intakeSubsystem.setIsIntaking(false);
+    }));
+    driverController.rightBumper().whileTrue(new DetectFuelCmd(this));
     // m_driverController.rightTrigger().onTrue(new SnapTowardsGoalCmd(drivetrain).andThen(JustShootCmd.getStartCommand(m_shooterSubsystemJohn, m_shooterSubsystemJawbreaker, m_shooterSubsystemTaylor)))
     //                                  .onFalse(JustShootCmd.getStopCommand(m_shooterSubsystemJohn, m_shooterSubsystemJawbreaker, m_shooterSubsystemTaylor)); // TODO: implement shoot-to-goal
     driverController.rightTrigger().whileTrue(new ShootAt(this));

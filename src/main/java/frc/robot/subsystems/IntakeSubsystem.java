@@ -14,6 +14,7 @@ public class IntakeSubsystem extends SubsystemBase {
     private boolean isIntaking = false;
     private boolean isJiggling = false;
     private boolean isGoingUp = false;
+    private boolean isOuttaking = false;
 
     @Logged(name = "IntakeMotor")
     public PIDMotor intakePIDMotor;
@@ -107,6 +108,13 @@ public class IntakeSubsystem extends SubsystemBase {
         isIntaking = intaking;
     }
 
+    public void setIsOuttaking(boolean outtaking) {
+        this.isOuttaking = outtaking;
+    }
+    public boolean getIsOuttaking() {
+        return isOuttaking;
+    }
+
     /**
      * Get the currently requested absolute tilt position, in full rotations.
      * 
@@ -136,7 +144,10 @@ public class IntakeSubsystem extends SubsystemBase {
 
     @Override
     public void periodic() {
-        if (isIntaking || floorSubsystem.getNeedToRun()) {
+        if (isOuttaking) {
+            intakePIDMotor.setPercentOutput(-1);
+        } 
+        else if (isIntaking || floorSubsystem.getNeedToRun()) {
             intakePIDMotor.setPercentOutput(1);
         }
         else {
@@ -159,7 +170,7 @@ public class IntakeSubsystem extends SubsystemBase {
 
         // Slightly less Horrible untested garbage jiggle function
         // This can be graphed as: tiltPos + amplitude * sin(speed * time)
-        if (isJiggling) {
+        if (isJiggling && !isOuttaking) {
             double speed = 1.0; // Number of cycles per second
             double amplitude = 2; // If it goes 2 up 2 down from current pos, then amp is 2
 

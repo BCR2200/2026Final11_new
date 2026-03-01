@@ -17,6 +17,7 @@ public class FloorFeedSubsystem extends SubsystemBase {
     // If you want sawtooth, top and bottom speeds need to be different. ex: 100 and 70. Currently disabled.
     private double motorSpeedBottom = 100; 
     private boolean isFeeding = false;
+    private boolean isOuttaking = false;
     private double secondsToHighPoint = 0.001;
     private double secondsToLowPoint = 1.25;
     private double speedChangeFactor = 1.0;
@@ -66,6 +67,13 @@ public class FloorFeedSubsystem extends SubsystemBase {
     }
     public void setIsFeeding(boolean feeding) {
         isFeeding = feeding;
+    }
+
+    public boolean getIsOuttaking() {
+        return isOuttaking;
+    }
+    public void setIsOuttaking(boolean outtaking) {
+        isOuttaking = outtaking;
     }
 
     public double getMotorSpeedTop() {
@@ -150,7 +158,9 @@ public class FloorFeedSubsystem extends SubsystemBase {
         }
         this.needsToRun = tmpNeedsToRun;
 
-        if (needsToRun) {
+        if (isOuttaking) {
+            motor.setVelocityTarget(-getVelocityAtTime(Timer.getFPGATimestamp()));
+        } else if (needsToRun) {
             // Use FPGA timestamp for consistent timing
             motor.setVelocityTarget(getVelocityAtTime(Timer.getFPGATimestamp()));
         } else {
