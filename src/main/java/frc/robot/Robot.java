@@ -111,6 +111,7 @@ public class Robot extends TimedRobot {
 
   private void updateTargetHub() {
     m_robotContainer.targetHub = alliance == Alliance.Red ? RobotContainer.RED_HUB : RobotContainer.BLUE_HUB;
+    m_botField.getObject("targetHub").setPose(m_robotContainer.targetHub);
   }
 
   /**
@@ -134,6 +135,7 @@ public class Robot extends TimedRobot {
       }
     }
     m_objectField.setRobotPose(m_robotContainer.passTarget);
+    m_botField.getObject("pass target").setPose(m_robotContainer.passTarget);
     SmartDashboard.putData("Object Field", this.m_objectField);
   }
 
