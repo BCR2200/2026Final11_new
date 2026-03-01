@@ -125,7 +125,7 @@ public class RobotContainer {
   // Thank you! A.T.S.T Also give us an angled floor.
 
   @NotLogged
-  public final static double MaxSpeed = TunerConstants.kSpeedAt12Volts.in(MetersPerSecond) * 0.2;
+  public final static double MaxSpeed = TunerConstants.kSpeedAt12Volts.in(MetersPerSecond) * 0.5;
   @NotLogged
   public final static double MaxAngularRate = RotationsPerSecond.of(0.75).in(RadiansPerSecond);
 
