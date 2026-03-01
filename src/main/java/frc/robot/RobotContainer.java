@@ -186,12 +186,12 @@ public class RobotContainer {
   }
 
   private static final Interpolator HOOD_INTERPOLATOR = new Interpolator(
-                  new double[] {0.966, 2.01, 3.00, 4.00},
-                  new double[] {0.050, 0.40, 0.65, 0.90}
+                  new double[] {0.966, 2.01, 3.00, 4.00, 5.00},
+                  new double[] {0.050, 0.40, 0.65, 0.90, 1.0}
   );
   private static final Interpolator SHOTER_WEEL_VELOSITY_INTERPOLATOR = new Interpolator(
-                  new double[] {0.966, 2.01, 3.00, 4.00},
-                  new double[] {50, 54, 58, 64}
+                  new double[] {0.966, 2.01, 3.00, 4.00, 5.00},
+                  new double[] {50, 54, 58, 64, 73}
   );
   public static final Interpolator TIME_OF_FLIGHT_INTERPOLATOR = new Interpolator( // Placeholders for time of flight based on distance to target
                   new double[] {0.966, 2.01, 3.00, 4.00},
