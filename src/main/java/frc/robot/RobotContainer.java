@@ -29,6 +29,7 @@ import frc.robot.commands.ClimbCommand;
 import frc.robot.commands.DetectFuelCmd;
 import frc.robot.commands.ShootAt;
 import frc.robot.commands.auto.AutoCommand;
+import frc.robot.commands.auto.RightOutpost;
 import frc.robot.commands.auto.TestOverrideAuto;
 import frc.robot.drive.CommandSwerveDrivetrain;
 import frc.robot.drive.Telemetry;
@@ -246,6 +247,12 @@ public class RobotContainer {
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
+    new EventTrigger("IntakeDown").whileTrue(new InstantCommand(() -> {
+              intakeSubsystem.setTiltPosition(IntakeSubsystem.tiltMaxExtensionPos);
+            }));
+    new EventTrigger("IntakeUp").whileTrue(new InstantCommand(() -> {
+              intakeSubsystem.setTiltPosition(IntakeSubsystem.tiltMinExtensionPos);
+            }));
     new EventTrigger("IntakeRun").whileTrue(new InstantCommand(() -> {
               intakeSubsystem.setIsIntaking(true);})).onFalse(new InstantCommand(() -> {
                 intakeSubsystem.setIsIntaking(false);
@@ -266,6 +273,7 @@ public class RobotContainer {
     autoChooser = new SendableChooser<>();
     autoChooser.setDefaultOption("None", null);
     autoChooser.addOption("TestOverrideAuto", new TestOverrideAuto(this, drivetrain, driveRC));
+    autoChooser.addOption("RightOutpost", new RightOutpost(this, drivetrain, driveRC));
     SmartDashboard.putData("Auto Chooser", autoChooser);
   }
 

@@ -31,6 +31,9 @@ public class AutoBuildingBlocks {
     });
   }
   
+  /**
+   * Puts the current step of the auto on the SmartDashboard
+   */
   public static Command autoStep(String step) {
     return new InstantCommand(() -> {
       SmartDashboard.putString("Auto Step", step);
