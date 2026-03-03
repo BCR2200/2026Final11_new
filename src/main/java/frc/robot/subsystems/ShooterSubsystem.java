@@ -218,6 +218,9 @@ public class ShooterSubsystem extends SubsystemBase {
         else if (isShooting) {
             setActuatorPositionViaInterpolatedValue(rc.getDistanceToTarget(rc.compensatedTargetHub));
         }
+        else if (!rc.isInNeutralZone()) {
+            setActuatorPositionViaInterpolatedValue(rc.getDistanceToTarget(rc.targetHub));
+        }
 
         // Feed at full speed first,
         // then try to preload (until beam break is broken),
