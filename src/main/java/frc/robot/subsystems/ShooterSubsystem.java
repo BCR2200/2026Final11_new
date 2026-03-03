@@ -215,7 +215,7 @@ public class ShooterSubsystem extends SubsystemBase {
         if (rc.passing) {
             setActuatorPositionViaInterpolatedValue(rc.getDistanceToTarget(rc.passTarget));
         }
-        else {
+        else if (isShooting) {
             setActuatorPositionViaInterpolatedValue(rc.getDistanceToTarget(rc.compensatedTargetHub));
         }
 
