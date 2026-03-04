@@ -9,35 +9,49 @@ import com.ctre.phoenix6.swerve.SwerveRequest;
 import com.pathplanner.lib.path.PathPlannerPath;
 
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.RobotContainer;
+import frc.robot.commands.ClimbCommand;
 import frc.robot.commands.ShootAt;
 import frc.robot.drive.CommandSwerveDrivetrain;
 
-public class RightOutpost extends AutoCommand{
-    private final PathPlannerPath path1;
-    private final PathPlannerPath path2;
-    private final PathPlannerPath path3;
+public class RightOutpost extends AutoCommand {
+  private final PathPlannerPath path1;
+  private final PathPlannerPath path2;
+  private final PathPlannerPath path3;
 
-    public RightOutpost (RobotContainer robot, CommandSwerveDrivetrain drivetrain, SwerveRequest.RobotCentric swerve) {
-        path1 = AutoBuildingBlocks.loadPathOrThrow("RightOutpost.1");
-        path2 = AutoBuildingBlocks.loadPathOrThrow("RightOutpost.2");
-        path3 = AutoBuildingBlocks.loadPathOrThrow("RightOutpost.3");
-        
-        addCommands(
-          new WaitCommand(0.01),
-          AutoBuildingBlocks.autoStep("PATH 1"),
-          AutoBuildingBlocks.followPathCommand(path1, drivetrain),
-          new WaitCommand(5),
-          AutoBuildingBlocks.autoStep("PATH 2"),
-          AutoBuildingBlocks.followPathCommand(path2, drivetrain),
-          AutoBuildingBlocks.autoStep("PATH 3"),
-          AutoBuildingBlocks.followPathCommand(path3, drivetrain),
-          new ShootAt(robot)
-        );
-    }
+  public RightOutpost(RobotContainer robot, CommandSwerveDrivetrain drivetrain, SwerveRequest.RobotCentric swerve) {
+    path1 = AutoBuildingBlocks.loadPathOrThrow("RightOutpost.1");
+    path2 = AutoBuildingBlocks.loadPathOrThrow("RightOutpost.2");
+    path3 = AutoBuildingBlocks.loadPathOrThrow("RightOutpost.3");
 
-    
+    addCommands(
+      new WaitCommand(0.01),
+      AutoBuildingBlocks.autoStep("PATH 1"),
+      AutoBuildingBlocks.followPathCommand(path1, drivetrain),
+      new WaitCommand(1.5),
+      AutoBuildingBlocks.autoStep("PATH 2"),
+      AutoBuildingBlocks.followPathCommand(path2, drivetrain),
+      AutoBuildingBlocks.autoStep("PATH 3"),
+      Commands.parallel(
+        AutoBuildingBlocks.followPathCommand(path3, drivetrain),
+        Commands.sequence(
+          new WaitCommand(1.5), // Wait before starting shooting while driving
+          Commands.race(
+            new ShootAt(robot),
+            Commands.sequence(
+              new WaitCommand(4), // Wait before intake up
+              new InstantCommand(() -> robot.intakeSubsystem.setIsGoingUp(true)),
+              new WaitCommand(2) // Wait to finish shooting
+            )
+          )
+        )
+      ),
+      new ClimbCommand(robot, false));
+  }
+
   @Override
   List<Pose2d> getAllRawPathPoses() {
     return Stream

@@ -135,7 +135,6 @@ public class PIDMotor {
             sleep();
             updatePIDF();
             sleep();
-            setIdleCoastMode();
 
             // Configure signal update frequencies for non-blocking reads
             motor.getPosition().setUpdateFrequency(50);        // 50 Hz
@@ -480,7 +479,7 @@ public class PIDMotor {
         limitConfigs.StatorCurrentLimitEnable = true;
         talonFXConfigs.CurrentLimits = limitConfigs;
 
-        StatusCode code = motor.getConfigurator().apply(talonFXConfigs);
+        StatusCode code = motor.getConfigurator().apply(limitConfigs);
         if (!code.isOK()) {
             System.err.printf("Error setting current limit (%s): %s\n", name, code.getDescription());
         }

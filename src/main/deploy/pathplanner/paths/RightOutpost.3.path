@@ -3,13 +3,13 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 0.507,
-        "y": 7.269602409638554
+        "x": 0.3774179743223962,
+        "y": 6.344550641940086
       },
       "prevControl": null,
       "nextControl": {
-        "x": 2.046700427960057,
-        "y": 7.308418386814018
+        "x": 1.9171184022824534,
+        "y": 6.38336661911555
       },
       "isLocked": false,
       "linkedName": "RightOutpost2-3"
@@ -33,7 +33,7 @@
   "pointTowardsZones": [],
   "eventMarkers": [],
   "globalConstraints": {
-    "maxVelocity": 0.5,
+    "maxVelocity": 1.5,
     "maxAcceleration": 3.0,
     "maxAngularVelocity": 540.0,
     "maxAngularAcceleration": 720.0,
@@ -48,7 +48,7 @@
   "folder": "RightOutpost",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": 90.0
+    "rotation": 103.32453126189078
   },
   "useDefaultConstraints": false
 }

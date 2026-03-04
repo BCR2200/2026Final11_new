@@ -4,11 +4,14 @@
 
 package frc.robot;
 
+import static edu.wpi.first.units.Units.Meters;
+import static edu.wpi.first.units.Units.MetersPerSecond;
+import static edu.wpi.first.units.Units.RadiansPerSecond;
+import static edu.wpi.first.units.Units.RotationsPerSecond;
+
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 import com.pathplanner.lib.events.EventTrigger;
-
-import static edu.wpi.first.units.Units.*;
 
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.epilogue.NotLogged;
@@ -34,7 +37,10 @@ import frc.robot.commands.auto.TestOverrideAuto;
 import frc.robot.drive.CommandSwerveDrivetrain;
 import frc.robot.drive.Telemetry;
 import frc.robot.drive.TunerConstants;
-import frc.robot.subsystems.*;
+import frc.robot.subsystems.ClimbSubsystem;
+import frc.robot.subsystems.FloorFeedSubsystem;
+import frc.robot.subsystems.IntakeSubsystem;
+import frc.robot.subsystems.ShooterSubsystem;
 
 
 /**
@@ -234,7 +240,7 @@ public class RobotContainer {
   public final ClimbSubsystem climberSubsystem = new ClimbSubsystem(climbInitialCurrentLimit, climbFinalCurrentLimit);
 
   @Logged(name = "Intake")
-  private final IntakeSubsystem intakeSubsystem = new IntakeSubsystem(
+  public final IntakeSubsystem intakeSubsystem = new IntakeSubsystem(
           Constants.INTAKE_MOTOR_ID,
           Constants.TILT_MOTOR_ID,
           intakeCurrentLimit, tiltCurrentLimit,
@@ -284,6 +290,8 @@ public class RobotContainer {
     shooterSubsystemJohn.setIsFeeding(false);
     shooterSubsystemJawbreaker.setIsFeeding(false);
     shooterSubsystemTaylor.setIsFeeding(false);
+    intakeSubsystem.setIsIntaking(false);
+    intakeSubsystem.setIsGoingUp(false);
   }
 
   

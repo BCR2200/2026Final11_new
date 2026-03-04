@@ -22,7 +22,7 @@ public class ClimbCommand extends Command {
      * P value (proportional output) used in driveToPose.
      */
     @NotLogged
-    public static final double TRANSLATION_P = 3.0;
+    public static final double TRANSLATION_P = 6.0;
 
     public static final Pose2d BLUE_L_CLIMB_INITIAL = new Pose2d(
             Distance.ofBaseUnits(1.535, Meters),
