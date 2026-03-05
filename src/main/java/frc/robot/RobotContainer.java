@@ -250,6 +250,10 @@ public class RobotContainer {
   @NotLogged
   public final CommandXboxController driverController =
           new CommandXboxController(OperatorConstants.kDriverControllerPort);
+  
+  @NotLogged
+  public final CommandXboxController coDriverController =
+          new CommandXboxController(OperatorConstants.kCoDriverControllerPort);
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
@@ -273,6 +277,7 @@ public class RobotContainer {
 
     // Configure the trigger bindings
     configureBindings();
+    configureCoDriverBindings();
     configureDrivetrainBindings();
     
 
@@ -369,7 +374,7 @@ public class RobotContainer {
     })).whileFalse(new InstantCommand(() -> {
       intakeSubsystem.setIsOuttaking(false);
       floorFeedSubsystem.setIsOuttaking(false);
-    })); // Now TODONE
+    }));
 
     // intake
     driverController.leftTrigger()
@@ -380,9 +385,6 @@ public class RobotContainer {
     .whileFalse(new InstantCommand(() -> {
       intakeSubsystem.setIsIntaking(false);
     }));
-    driverController.rightBumper().whileTrue(new DetectFuelCmd(this));
-    // m_driverController.rightTrigger().onTrue(new SnapTowardsGoalCmd(drivetrain).andThen(JustShootCmd.getStartCommand(m_shooterSubsystemJohn, m_shooterSubsystemJawbreaker, m_shooterSubsystemTaylor)))
-    //                                  .onFalse(JustShootCmd.getStopCommand(m_shooterSubsystemJohn, m_shooterSubsystemJawbreaker, m_shooterSubsystemTaylor)); // TODO: implement shoot-to-goal
     driverController.rightTrigger().whileTrue(new ShootAt(this));
 
     // Preload
@@ -415,20 +417,6 @@ public class RobotContainer {
       intakeSubsystem.updateParameters();
     }));
 
-    // Testing stuff, shooter speed or manual tilting
-    driverController.povLeft().onTrue(new InstantCommand(() -> {
-      // intakeSubsystem.setTiltPosition(intakeSubsystem.getTiltPosition() + 4);
-      shooterSubsystemJohn.decrementShooterSpeed();
-      shooterSubsystemJawbreaker.decrementShooterSpeed();
-      shooterSubsystemTaylor.decrementShooterSpeed();
-    }));
-    driverController.povRight().onTrue(new InstantCommand(() -> {
-      // intakeSubsystem.setTiltPosition(intakeSubsystem.getTiltPosition() - 3);
-      shooterSubsystemJohn.incrementShooterSpeed();
-      shooterSubsystemJawbreaker.incrementShooterSpeed();
-      shooterSubsystemTaylor.incrementShooterSpeed();
-    }));
-
     // Linear actuator
     driverController.povUp().whileTrue(new InstantCommand(() -> {
         shooterSubsystemJohn.setActuatorTargetPosition(shooterSubsystemJohn.getActuatorPosition() + ACTUATOR_STEP);
@@ -443,7 +431,6 @@ public class RobotContainer {
 
     driverController.start().whileTrue(new InstantCommand(() -> {})); // Used in disabled for syncing autos
     driverController.back().whileTrue(new InstantCommand(() -> updateDrivetrainRobotPerspective())); 
-
   }
 
   private void configureDrivetrainBindings() {
@@ -491,6 +478,10 @@ public class RobotContainer {
     // Note: leftBumper DetectFuelCmd is bound in configureBindings()
 
     drivetrain.registerTelemetry(logger::telemeterize);
+  }
+
+  private void configureCoDriverBindings() {
+
   }
 
   public void updateDrivetrainRobotPerspective() {
