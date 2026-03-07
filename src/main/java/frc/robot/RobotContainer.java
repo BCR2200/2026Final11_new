@@ -522,6 +522,19 @@ public class RobotContainer {
 
     // Disable shooter J/J/T
 
+    // John is on the "left", but is bound to dpad right, because if the shooters are the front it's on the right
+    coDriverController.povLeft().and(coDriverController.start())
+        .onTrue(new InstantCommand(() -> this.shooterSubsystemTaylor.setIsDisabled(true)));
+    coDriverController.povDown().and(coDriverController.start())
+        .onTrue(new InstantCommand(() -> this.shooterSubsystemJawbreaker.setIsDisabled(true)));
+    coDriverController.povRight().and(coDriverController.start())
+        .onTrue(new InstantCommand(() -> this.shooterSubsystemJohn.setIsDisabled(true)));
+    coDriverController.povUp().onTrue(new InstantCommand(() -> {
+      this.shooterSubsystemJohn.setIsDisabled(false);
+      this.shooterSubsystemJawbreaker.setIsDisabled(false);
+      this.shooterSubsystemTaylor.setIsDisabled(false);
+    }));
+
     // Reset odometry
     coDriverController.back().and(coDriverController.start()).onTrue(new InstantCommand(() -> {
       updateDrivetrainRobotPerspective();

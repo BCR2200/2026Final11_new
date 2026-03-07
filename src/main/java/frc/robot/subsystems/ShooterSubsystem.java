@@ -30,7 +30,7 @@ public class ShooterSubsystem extends SubsystemBase {
     private double shooterSpeed = 54; // in rps. TODO: remove and use the shooterVelocityInterpolator instead
 
     private boolean isFeeding = false;
-    private double feederSpeed = 100; //in rps
+    private double feederSpeed = 100; // in rps
 
     private boolean canPreload = false;
 
@@ -48,7 +48,8 @@ public class ShooterSubsystem extends SubsystemBase {
 
     /**
      * Sensor for the beam break.
-     * Returns {@code true} if the beam is unbroken, {@code false} if something is present.
+     * Returns {@code true} if the beam is unbroken, {@code false} if something is
+     * present.
      */
     @NotLogged
     private final DigitalInput breamBake; // No emojis (encoding errors)
@@ -63,20 +64,26 @@ public class ShooterSubsystem extends SubsystemBase {
     @NotLogged
     public final EdgeCounter counter = new EdgeCounter(EdgeCounter.EdgeType.FALLING, false);
 
-    public ShooterSubsystem(String name, int shooterMotorID, int feederMotorID, int beambreakChannel, int actuatorChannel, int shootCurrentLimit, int feedCurrentLimit, 
-                            Interpolator shooterAngleInterpolator, Interpolator shooterVelocityInterpolator, Interpolator timeOfFlightInterpolator, 
-                            boolean isMountedIncorrectly, RobotContainer rc) {
+    private boolean isDisabled = false;
+
+    public ShooterSubsystem(String name, int shooterMotorID, int feederMotorID, int beambreakChannel,
+            int actuatorChannel, int shootCurrentLimit, int feedCurrentLimit,
+            Interpolator shooterAngleInterpolator, Interpolator shooterVelocityInterpolator,
+            Interpolator timeOfFlightInterpolator,
+            boolean isMountedIncorrectly, RobotContainer rc) {
         breamBake = new DigitalInput(beambreakChannel);
-        
-                                // These numbers are placeholders, we don't actually know what they should be yet
+
+        // These numbers are placeholders, we don't actually know what they should be
+        // yet
         shootPIDMotor = PIDMotor.makeMotor(shooterMotorID, name + " shooter", 0.1, 0.0, 0.0,
                 0.2, 0.0957, 0.0, MAX_RPS, MAX_RPS, 0.00);
-        shootPIDMotor.setInverted(isMountedIncorrectly ? InvertedValue.Clockwise_Positive : InvertedValue.CounterClockwise_Positive);
+        shootPIDMotor.setInverted(
+                isMountedIncorrectly ? InvertedValue.Clockwise_Positive : InvertedValue.CounterClockwise_Positive);
         shootPIDMotor.setCurrentLimit(shootCurrentLimit);
         shootPIDMotor.setIdleCoastMode();
 
         feedPIDMotor = PIDMotor.makeMotor(feederMotorID, name + " feeder", 0.10, 0.0, 0.0,
-                0.25, 0.1, 100.0, MAX_RPS, MAX_RPS*10, 0.00);
+                0.25, 0.1, 100.0, MAX_RPS, MAX_RPS * 10, 0.00);
         feedPIDMotor.setCurrentLimit(feedCurrentLimit);
         feedPIDMotor.setIdleBrakeMode();
 
@@ -93,24 +100,37 @@ public class ShooterSubsystem extends SubsystemBase {
     public boolean getIsShooting() {
         return isShooting;
     }
+
     public void setIsShooting(boolean shooting) {
         isShooting = shooting;
     }
+
     public boolean getIsFeeding() {
         return isFeeding;
     }
+
     public void setIsFeeding(boolean feeding) {
         isFeeding = feeding;
     }
+
     public boolean getCanPreload() {
         return canPreload;
     }
+
     public void setCanPreload(boolean canPreload) {
         this.canPreload = canPreload;
     }
 
+    public void setIsDisabled(boolean disabled) {
+        this.isDisabled = disabled;
+    }
+    public boolean getIsDisabled() {
+        return this.isDisabled;
+    }
+
     /**
      * Interpolate the shooter speed given a distance from the target
+     * 
      * @param distance in m
      */
     public void setShooterSpeedViaInterpolatedValue(double distance) {
@@ -123,6 +143,7 @@ public class ShooterSubsystem extends SubsystemBase {
     public void incrementShooterSpeed() {
         shooterSpeed = ExtraMath.clamp(shooterSpeed + RPS_STEP, -MAX_RPS, MAX_RPS);
     }
+
     /**
      * will decrease speed by the constant value RPS_STEP up to max of MAX_RPS
      */
@@ -136,6 +157,7 @@ public class ShooterSubsystem extends SubsystemBase {
     public void incrementFeederSpeed() {
         feederSpeed = ExtraMath.clamp(feederSpeed + RPS_STEP, -MAX_RPS, MAX_RPS);
     }
+
     /**
      * will decrease speed by the constant value RPS_STEP up to max of MAX_RPS
      */
@@ -146,17 +168,17 @@ public class ShooterSubsystem extends SubsystemBase {
     public void setActuatorTargetPosition(double position) {
         linearActuator.setTargetPosition(position);
     }
-    
+
     @Logged
     public double getActuatorPosition() {
         return linearActuator.getTargetPosition();
     }
 
-    public void setActuatorPositionViaInterpolatedValue(double distance) { 
+    public void setActuatorPositionViaInterpolatedValue(double distance) {
         linearActuator.setTargetPosition(shooterAngleInterpolator.interpolate(distance));
     }
-    
-    public void updateParameters(){
+
+    public void updateParameters() {
         shooterSpeed = SmartDashboard.getNumber("Shooter Speed", shooterSpeed);
         shootPIDMotor.fetchPIDFFromDashboard();
 
@@ -165,7 +187,8 @@ public class ShooterSubsystem extends SubsystemBase {
     }
 
     /**
-     * sets the linear actuator to an interpolated passing position based on provided distance 
+     * sets the linear actuator to an interpolated passing position based on
+     * provided distance
      * 
      * @param distance the distance from the driver station to the robot
      */
@@ -174,13 +197,15 @@ public class ShooterSubsystem extends SubsystemBase {
     }
 
     /**
-     * use this to determine if the shooter is at speed before spinning up the feeder motor
+     * use this to determine if the shooter is at speed before spinning up the
+     * feeder motor
      *
      * @return if the shooter motor is at or above the expected speed
      */
     public boolean isShooterAtSpeed() {
-        // Why >5? Because we only set a velocity target in periodic, but isShooterAtSpeed is called when target is still 0,
-        // atVelocity() can return true unexpectedly, because its velocity is really 0. 
+        // Why >5? Because we only set a velocity target in periodic, but
+        // isShooterAtSpeed is called when target is still 0,
+        // atVelocity() can return true unexpectedly, because its velocity is really 0.
         return shootPIDMotor.getVelocity() > 5 && shootPIDMotor.atVelocity(3);
     }
 
@@ -208,42 +233,41 @@ public class ShooterSubsystem extends SubsystemBase {
 
     @Override
     public void periodic() {
+        if (!this.isDisabled) {
+            this.counter.update(this.isBeamBroken());
+            if (isShooting) {
+                if (rc.passing) {
+                    setShooterSpeedViaInterpolatedValue(rc.getDistanceToTarget(rc.passTarget));
+                } else {
+                    setShooterSpeedViaInterpolatedValue(rc.getDistanceToTarget(rc.compensatedTargetHub));
+                }
+                shootPIDMotor.setVelocityTarget(shooterSpeed);
+            } else {
+                shootPIDMotor.setPercentOutput(0);
+            }
 
-        this.counter.update(this.isBeamBroken());
-        if (isShooting) {
             if (rc.passing) {
-                setShooterSpeedViaInterpolatedValue(rc.getDistanceToTarget(rc.passTarget));
+                setActuatorPositionViaInterpolatedValue(rc.getDistanceToTarget(rc.passTarget));
+            } else if (isShooting) {
+                setActuatorPositionViaInterpolatedValue(rc.getDistanceToTarget(rc.compensatedTargetHub));
+            } else if (!rc.isOutsideAllianceZone()) {
+                setActuatorPositionViaInterpolatedValue(rc.getDistanceToTarget(rc.targetHub));
             }
-            else {
-                setShooterSpeedViaInterpolatedValue(rc.getDistanceToTarget(rc.compensatedTargetHub));
+
+            // Feed at full speed first,
+            // then try to preload (until beam break is broken),
+            // then stop
+            if (isFeeding) {
+                feedPIDMotor.setPercentOutput(1);
+            } else if (wantsToPreload()) {
+                feedPIDMotor.setPercentOutput(PRELOAD_SPEED_PERCENT);
+            } else {
+                feedPIDMotor.setPercentOutput(0);
             }
-            shootPIDMotor.setVelocityTarget(shooterSpeed);
-        } 
-        else {
-            shootPIDMotor.setPercentOutput(0);
-        }
-
-        if (rc.passing) {
-            setActuatorPositionViaInterpolatedValue(rc.getDistanceToTarget(rc.passTarget));
-        }
-        else if (isShooting) {
-            setActuatorPositionViaInterpolatedValue(rc.getDistanceToTarget(rc.compensatedTargetHub));
-        }
-        else if (!rc.isOutsideAllianceZone()) {
-            setActuatorPositionViaInterpolatedValue(rc.getDistanceToTarget(rc.targetHub));
-        }
-
-        // Feed at full speed first,
-        // then try to preload (until beam break is broken),
-        // then stop
-        if (isFeeding) {
-            feedPIDMotor.setPercentOutput(1);
-        } 
-        else if (wantsToPreload()) {
-            feedPIDMotor.setPercentOutput(PRELOAD_SPEED_PERCENT);
-        } 
-        else {
-            feedPIDMotor.setPercentOutput(0);
+        } else {
+            // kill power
+            this.shootPIDMotor.setPercentOutput(0);
+            this.feedPIDMotor.setPercentOutput(0);
         }
     }
 }
