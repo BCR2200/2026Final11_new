@@ -10,6 +10,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.units.Units;
 import edu.wpi.first.units.measure.Distance;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Constants;
@@ -36,10 +37,16 @@ public class BlendAdamModeCmd extends Command {
             .withDriveRequestType(DriveRequestType.OpenLoopVoltage);
     private CommandXboxController m_driverController;
 
-    private Distance blueHUBXLine = Distance.ofBaseUnits(245, Units.Inches);
-    private Distance redHUBXLine = Distance.ofBaseUnits(457, Units.Inches);
-    private Distance wallLFromBYLine = Distance.ofBaseUnits(30, Units.Inches);
-    private Distance wallRFromBYLine = Distance.ofBaseUnits(287.69, Units.Inches);
+    //in meters
+    private double blueHUBXLine = 5.7;
+
+    //TODO FIND VALUE
+    private double redHUBXLine = 11.6;
+
+    private double wallLFromBYLine = 7.590;
+    private double wallRFromBYLine = 0.319;
+
+
 
     public BlendAdamModeCmd(RobotContainer robot) {
         this.drivetrain = robot.drivetrain;
@@ -67,29 +74,33 @@ public class BlendAdamModeCmd extends Command {
              * If (Not on either, free reign)
              */
 
-            if((ExtraMath.within(y, redHUBXLine.in(Units.Meters), 0.5)
-                || ExtraMath.within(y, blueHUBXLine.in(Units.Meters), 0.5)) &&
-                    (ExtraMath.within(x, wallLFromBYLine.in(Units.Meters), 0.5)
-                || ExtraMath.within(x, wallRFromBYLine.in(Units.Meters), 0.5))){
+            if((ExtraMath.within(y, redHUBXLine, 0.5)
+                || ExtraMath.within(y, blueHUBXLine, 0.5)) &&
+                    (ExtraMath.within(x, wallLFromBYLine, 0.5)
+                || ExtraMath.within(x, wallRFromBYLine, 0.5))){
 
                     drivetrain.setControl(driveFC.withVelocityX(-m_driverController.getLeftY() * MaxSpeed)
                     .withVelocityY(-m_driverController.getLeftX() * MaxSpeed));
+
+                    SmartDashboard.putString("BlendState", "On Corner");
             }
-            else if(ExtraMath.within(x, redHUBXLine.in(Units.Meters), 0.5)
-                || ExtraMath.within(x, blueHUBXLine.in(Units.Meters), 0.5)){
+            else if(ExtraMath.within(x, redHUBXLine, 0.5)
+                || ExtraMath.within(x, blueHUBXLine, 0.5)){
                     ChassisSpeeds fieldSpeeds = ChassisSpeeds.fromRobotRelativeSpeeds(drivetrain.getState().Speeds, drivetrain.getState().Pose.getRotation());
 
                     double robotVelocityX = fieldSpeeds.vxMetersPerSecond;
                     double robotVelocityY = fieldSpeeds.vyMetersPerSecond;
 
-                    if(ExtraMath.within(x, redHUBXLine.in(Units.Meters), 0.5)){
+                    if(ExtraMath.within(x, redHUBXLine, 0.5)){
+                        SmartDashboard.putString("BlendState", "On Red Hub Line");
                         //TODO Is > and angle correct?
                         if(robotVelocityY > 0){
                             robot.drivetrain.setControl(robot.driveFCFA.withTargetDirection(Rotation2d.fromDegrees(0)).withVelocityY(-m_driverController.getLeftX() * MaxSpeed));
                         } else {
                             robot.drivetrain.setControl(robot.driveFCFA.withTargetDirection(Rotation2d.fromDegrees(180)));
                         }
-                    } else if (ExtraMath.within(x, blueHUBXLine.in(Units.Meters), 0.5)){
+                    } else if (ExtraMath.within(x, blueHUBXLine, 0.5)){
+                        SmartDashboard.putString("BlendState", "On Blue Hub Line");
                         if(robotVelocityY > 0){
                             robot.drivetrain.setControl(robot.driveFCFA.withTargetDirection(Rotation2d.fromDegrees(180)).withVelocityY(-m_driverController.getLeftX() * MaxSpeed));
                         } else {
@@ -98,21 +109,23 @@ public class BlendAdamModeCmd extends Command {
                     }
 
             }
-            else if(ExtraMath.within(y, wallLFromBYLine.in(Units.Meters), 0.5)
-                || ExtraMath.within(y, wallRFromBYLine.in(Units.Meters), 0.5)){
+            else if(ExtraMath.within(y, wallLFromBYLine, 0.5)
+                || ExtraMath.within(y, wallRFromBYLine, 0.5)){
                 ChassisSpeeds fieldSpeeds = ChassisSpeeds.fromRobotRelativeSpeeds(drivetrain.getState().Speeds, drivetrain.getState().Pose.getRotation());
 
                 double robotVelocityX = fieldSpeeds.vxMetersPerSecond;
                 double robotVelocityY = fieldSpeeds.vyMetersPerSecond;
 
-                if(ExtraMath.within(y, wallRFromBYLine.in(Units.Meters), 0.5)){
+                if(ExtraMath.within(y, wallRFromBYLine, 0.5)){
+                    SmartDashboard.putString("BlendState", "On Right From Blue Line");
                     //TODO Is > and angle correct?
                     if(robotVelocityX > 0){
                         robot.drivetrain.setControl(robot.driveFCFA.withTargetDirection(Rotation2d.fromDegrees(90)).withVelocityY(-m_driverController.getLeftX() * MaxSpeed));
                     } else {
                         robot.drivetrain.setControl(robot.driveFCFA.withTargetDirection(Rotation2d.fromDegrees(270)));
                     }
-                } else if (ExtraMath.within(y, wallLFromBYLine.in(Units.Meters), 0.5)){
+                } else if (ExtraMath.within(y, wallLFromBYLine, 0.5)){
+                    SmartDashboard.putString("BlendState", "On Left From Blue Line");
                     if(robotVelocityX > 0){
                         robot.drivetrain.setControl(robot.driveFCFA.withTargetDirection(Rotation2d.fromDegrees(270)).withVelocityY(-m_driverController.getLeftX() * MaxSpeed));
                     } else {
@@ -120,6 +133,7 @@ public class BlendAdamModeCmd extends Command {
                     }
                 }
             } else {
+                SmartDashboard.putString("BlendState", "Free Roam");
                 drivetrain.setControl(driveFC.withVelocityX(-m_driverController.getLeftY() * MaxSpeed)
                     .withVelocityY(-m_driverController.getLeftX() * MaxSpeed));
             } 
