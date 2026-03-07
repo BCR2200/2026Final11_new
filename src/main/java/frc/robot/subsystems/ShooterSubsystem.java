@@ -61,7 +61,7 @@ public class ShooterSubsystem extends SubsystemBase {
     private final Interpolator timeOfFlightInterpolator;
 
     @NotLogged
-    public final EdgeCounter counter = new EdgeCounter(EdgeCounter.EdgeType.FALLING);
+    public final EdgeCounter counter = new EdgeCounter(EdgeCounter.EdgeType.FALLING, false);
 
     public ShooterSubsystem(String name, int shooterMotorID, int feederMotorID, int beambreakChannel, int actuatorChannel, int shootCurrentLimit, int feedCurrentLimit, 
                             Interpolator shooterAngleInterpolator, Interpolator shooterVelocityInterpolator, Interpolator timeOfFlightInterpolator, 
