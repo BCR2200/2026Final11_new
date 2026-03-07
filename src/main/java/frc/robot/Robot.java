@@ -104,7 +104,7 @@ public class Robot extends TimedRobot {
 
   @Logged(name = "Total ball count")
   @SuppressWarnings("unused")
-  private int getTotalBallCount() {
+  public int getTotalBallCount() {
     return m_robotContainer.shooterSubsystemJohn.getBallCount() +
             m_robotContainer.shooterSubsystemJawbreaker.getBallCount() +
             m_robotContainer.shooterSubsystemTaylor.getBallCount();
