@@ -493,6 +493,16 @@ public class RobotContainer {
 
   private void configureCoDriverBindings() {
 
+    /*
+     * TODO:
+     * - Override who won auto
+     * - Fixed shot
+     * - re-zero intake
+     * - reseed field centric zero
+     * - Just climb now 
+     * - disable shooter J/J/T
+     */
+
   }
 
   public void updateDrivetrainRobotPerspective() {
