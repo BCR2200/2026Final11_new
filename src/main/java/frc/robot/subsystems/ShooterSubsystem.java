@@ -114,7 +114,7 @@ public class ShooterSubsystem extends SubsystemBase {
      * @param distance in m
      */
     public void setShooterSpeedViaInterpolatedValue(double distance) {
-        this.shooterSpeed = shooterVelocityInterpolator.clampedInterpolate(distance, 0, 110); // In rps
+        this.shooterSpeed = shooterVelocityInterpolator.clampedInterpolate(distance, 0, 95); // In rps
     }
 
     /**
