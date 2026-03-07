@@ -29,42 +29,42 @@ public class ClimbCommand extends Command {
     public static final Pose2d BLUE_L_CLIMB_INITIAL = new Pose2d(
             Distance.ofBaseUnits(1.535, Meters),
             Distance.ofBaseUnits(4.155, Meters),
-            Rotation2d.fromDegrees(180)
+            Rotation2d.kZero
     );
     public static final Pose2d BLUE_L_CLIMB_FINAL = new Pose2d(
             Distance.ofBaseUnits(1.355, Meters),
             Distance.ofBaseUnits(4.155, Meters),
-            Rotation2d.fromDegrees(180)
+            Rotation2d.kZero
     );
     public static final Pose2d BLUE_R_CLIMB_INITIAL = new Pose2d(
             Distance.ofBaseUnits(1.535, Meters),
             Distance.ofBaseUnits(3.290, Meters),
-            Rotation2d.fromDegrees(180)
+            Rotation2d.kZero
     );
     public static final Pose2d BLUE_R_CLIMB_FINAL = new Pose2d(
             Distance.ofBaseUnits(1.355, Meters),
             Distance.ofBaseUnits(3.290, Meters),
-            Rotation2d.fromDegrees(180)
+            Rotation2d.kZero
     );
     public static final Pose2d RED_L_CLIMB_INITIAL = new Pose2d(
             Distance.ofBaseUnits(15.0, Meters),
             Distance.ofBaseUnits(3.89, Meters),
-            Rotation2d.kZero
+            Rotation2d.k180deg
     );
     public static final Pose2d RED_L_CLIMB_FINAL = new Pose2d(
             Distance.ofBaseUnits(15.20, Meters),
             Distance.ofBaseUnits(3.89, Meters),
-            Rotation2d.kZero
+            Rotation2d.k180deg
     );
     public static final Pose2d RED_R_CLIMB_INITIAL = new Pose2d(
             Distance.ofBaseUnits(15.0, Meters),
             Distance.ofBaseUnits(4.73, Meters),
-            Rotation2d.kZero
+            Rotation2d.k180deg
     );
     public static final Pose2d RED_R_CLIMB_FINAL = new Pose2d(
             Distance.ofBaseUnits(15.22, Meters),
             Distance.ofBaseUnits(4.73, Meters),
-            Rotation2d.kZero
+            Rotation2d.k180deg
     );
 
     public Pose2d targetClimbInitial = RED_R_CLIMB_INITIAL;
@@ -110,8 +110,8 @@ public class ClimbCommand extends Command {
     }
 
     private SwerveRequest.FieldCentricFacingAngle driveToPose(Pose2d target) {
-        return robot.driveFCFAVelocityMode.withVelocityX(ExtraMath.clampedDeadzone(getXToTarget(target)*-TRANSLATION_P, 1, 0.0001))
-                .withVelocityY(ExtraMath.clampedDeadzone(getYToTarget(target)*-TRANSLATION_P, 1, 0.0001))
+        return robot.driveFCFAVelocityMode.withVelocityX(ExtraMath.clampedDeadzone(getXToTarget(target)*TRANSLATION_P, 1, 0.0001))
+                .withVelocityY(ExtraMath.clampedDeadzone(getYToTarget(target)*TRANSLATION_P, 1, 0.0001))
                 .withTargetDirection(target.getRotation())
                 .withForwardPerspective(ForwardPerspectiveValue.BlueAlliance);
     }
