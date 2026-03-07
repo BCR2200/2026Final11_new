@@ -56,15 +56,15 @@ public class ShootAt extends Command {
     if (rc.shootingAtHub) {
       rc.drivetrain.setControl(rc.driveFCFA
           .withTargetDirection(Rotation2d.fromDegrees(rc.getDegreesToTarget(rc.compensatedTargetHub)).rotateBy(Rotation2d.k180deg))
-          .withVelocityX(-blueSpaceDriverInputs.getX() * RobotContainer.MaxSpeed)
-          .withVelocityY(-blueSpaceDriverInputs.getY() * RobotContainer.MaxSpeed)
+          .withVelocityX(-blueSpaceDriverInputs.getY() * RobotContainer.MaxSpeed)
+          .withVelocityY(-blueSpaceDriverInputs.getX() * RobotContainer.MaxSpeed)
           .withForwardPerspective(ForwardPerspectiveValue.BlueAlliance)); // Drive left with negative X
     }
     else if (rc.passing) {
       rc.drivetrain.setControl(rc.driveFCFA
           .withTargetDirection(Rotation2d.fromDegrees(rc.getDegreesToTarget(rc.passTarget)).rotateBy(Rotation2d.k180deg))
-          .withVelocityX(-blueSpaceDriverInputs.getX() * RobotContainer.MaxSpeed)
-          .withVelocityY(-blueSpaceDriverInputs.getY() * RobotContainer.MaxSpeed)
+          .withVelocityX(-blueSpaceDriverInputs.getY() * RobotContainer.MaxSpeed)
+          .withVelocityY(-blueSpaceDriverInputs.getX() * RobotContainer.MaxSpeed)
           .withForwardPerspective(ForwardPerspectiveValue.BlueAlliance));
     }
 
