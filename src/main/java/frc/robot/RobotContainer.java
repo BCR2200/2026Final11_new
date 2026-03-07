@@ -516,7 +516,9 @@ public class RobotContainer {
 
     // Just climb now
     coDriverController.a().whileTrue(new InstantCommand(() -> {
-
+      climberSubsystem.climb();
+    })).onFalse(new InstantCommand(() -> {
+      climberSubsystem.goHome();
     }));
 
     // Disable shooter J/J/T
