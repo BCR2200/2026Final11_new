@@ -223,41 +223,58 @@ public class ShooterSubsystem extends SubsystemBase {
 
     @Override
     public void periodic() {
-        if (!this.isDisabled) {
-            this.counter.update(this.isBeamBroken());
-            if (isShooting) {
-                if (rc.passing) {
-                    setShooterSpeedViaInterpolatedValue(rc.getDistanceToTarget(rc.passTarget));
-                } else {
-                    setShooterSpeedViaInterpolatedValue(rc.getDistanceToTarget(rc.compensatedTargetHub));
-                }
-                shootPIDMotor.setVelocityTarget(shooterSpeed);
-            } else {
-                shootPIDMotor.setPercentOutput(0);
-            }
-
-            if (rc.passing) {
-                setActuatorPositionViaInterpolatedValue(rc.getDistanceToTarget(rc.passTarget));
-            } else if (isShooting) {
-                setActuatorPositionViaInterpolatedValue(rc.getDistanceToTarget(rc.compensatedTargetHub));
-            } else if (!rc.isOutsideAllianceZone()) {
-                setActuatorPositionViaInterpolatedValue(rc.getDistanceToTarget(rc.targetHub));
-            }
-
-            // Feed at full speed first,
-            // then try to preload (until beam break is broken),
-            // then stop
-            if (isFeeding) {
-                feedPIDMotor.setPercentOutput(1);
-            } else if (wantsToPreload()) {
-                feedPIDMotor.setPercentOutput(PRELOAD_SPEED_PERCENT);
-            } else {
-                feedPIDMotor.setPercentOutput(0);
-            }
-        } else {
-            // kill power
+        if (this.isDisabled) { 
             this.shootPIDMotor.setPercentOutput(0);
             this.feedPIDMotor.setPercentOutput(0);
+            return;
+        }
+
+        this.counter.update(this.isBeamBroken());
+
+        if (rc.fixedPassingShot) {
+            setShooterSpeedViaInterpolatedValue(8.5);
+            setActuatorPositionViaInterpolatedValue(8.5);
+            return;
+        }
+        else if (rc.fixedShotFromHub) {
+            setShooterSpeedViaInterpolatedValue(1);
+            setActuatorPositionViaInterpolatedValue(1);
+            return;
+        }
+        else if (rc.fixedShotFromClimber) {
+            setShooterSpeedViaInterpolatedValue(3.5);
+            setActuatorPositionViaInterpolatedValue(3.5);
+            return;
+        }
+
+        if (isShooting) {
+            if (rc.passing) {
+                setShooterSpeedViaInterpolatedValue(rc.getDistanceToTarget(rc.passTarget));
+            } else {
+                setShooterSpeedViaInterpolatedValue(rc.getDistanceToTarget(rc.compensatedTargetHub));
+            }
+            shootPIDMotor.setVelocityTarget(shooterSpeed);
+        } else {
+            shootPIDMotor.setPercentOutput(0);
+        }
+
+        if (rc.passing) {
+            setActuatorPositionViaInterpolatedValue(rc.getDistanceToTarget(rc.passTarget));
+        } else if (isShooting) {
+            setActuatorPositionViaInterpolatedValue(rc.getDistanceToTarget(rc.compensatedTargetHub));
+        } else if (!rc.isOutsideAllianceZone()) {
+            setActuatorPositionViaInterpolatedValue(rc.getDistanceToTarget(rc.targetHub));
+        }
+
+        // Feed at full speed first,
+        // then try to preload (until beam break is broken),
+        // then stop
+        if (isFeeding) {
+            feedPIDMotor.setPercentOutput(1);
+        } else if (wantsToPreload()) {
+            feedPIDMotor.setPercentOutput(PRELOAD_SPEED_PERCENT);
+        } else {
+            feedPIDMotor.setPercentOutput(0);
         }
     }
 }

@@ -9,8 +9,6 @@ import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 
-import java.util.Optional;
-
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 import com.ctre.phoenix6.swerve.SwerveRequest.ForwardPerspectiveValue;
@@ -63,6 +61,9 @@ public class RobotContainer {
 
   public boolean shootingAtHub = false;
   public boolean passing = false;
+  public boolean fixedPassingShot = false;
+  public boolean fixedShotFromHub = false;
+  public boolean fixedShotFromClimber = false;
 
   public boolean redWonAuto = false;
 
@@ -495,24 +496,18 @@ public class RobotContainer {
 
   private void configureCoDriverBindings() {
 
-    /*
-     * TODO:
-     * - Fixed shot
-     * - re-zero intake
-     * - reseed field centric zero
-     * - Just climb now
-     * - disable shooter J/J/T
-     * - reset odometry
-     * - manual intake tilt control
-     */
+    // Fixed shot positions
+    coDriverController.y().and(coDriverController.b().negate()).and(coDriverController.x().negate())
+      .whileTrue(new InstantCommand(() -> {fixedPassingShot = true;}))
+      .whileFalse(new InstantCommand(() -> {fixedPassingShot = false;})); // pass shot
+    coDriverController.x().and(coDriverController.b().negate()).and(coDriverController.y().negate())
+      .whileTrue(new InstantCommand(() -> {fixedShotFromHub = true;})) 
+      .whileFalse(new InstantCommand(() -> {fixedShotFromHub = false;})); // hub shot
+    coDriverController.b().and(coDriverController.x().negate()).and(coDriverController.y().negate())
+      .whileTrue(new InstantCommand(() -> {fixedShotFromClimber = true;}))
+      .whileFalse(new InstantCommand(() -> {fixedShotFromClimber = false;})); // climb shot
 
-
-    // Fixed shot
-
-    // Re-zero intake
-
-    // Reseed field centric zero
-
+    
     // Just climb now
     coDriverController.a().whileTrue(new InstantCommand(() -> {
       climberSubsystem.climb();
@@ -521,7 +516,6 @@ public class RobotContainer {
     }));
 
     // Disable shooter J/J/T
-
     // John is on the "left", but is bound to dpad right, because if the shooters are the front it's on the right
     coDriverController.povLeft().and(coDriverController.start())
         .onTrue(new InstantCommand(() -> this.shooterSubsystemTaylor.setIsDisabled(true)));

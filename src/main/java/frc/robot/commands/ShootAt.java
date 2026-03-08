@@ -36,31 +36,33 @@ public class ShootAt extends Command {
   @Override
   public void execute() {
 
-    if (rc.isOutsideAllianceZone()) { // We want to pass
-      rc.passing = true;
-      rc.shootingAtHub = false;
-    }
-    else {
-      rc.shootingAtHub = true;
-      rc.passing = false;
-    }
-    rc.updateDriverInputs();
-    Translation2d blueSpaceDriverInputs = new Translation2d(RobotContainer.driverX, RobotContainer.driverY)
-        .rotateBy(Robot.alliance == Alliance.Blue ? Rotation2d.kZero : Rotation2d.k180deg);
+    if (!rc.fixedPassingShot && !rc.fixedShotFromClimber && !rc.fixedShotFromHub) {
+      if (rc.isOutsideAllianceZone()) { // We want to pass
+        rc.passing = true;
+        rc.shootingAtHub = false;
+      }
+      else {
+        rc.shootingAtHub = true;
+        rc.passing = false;
+      }
+      rc.updateDriverInputs();
+      Translation2d blueSpaceDriverInputs = new Translation2d(RobotContainer.driverX, RobotContainer.driverY)
+          .rotateBy(Robot.alliance == Alliance.Blue ? Rotation2d.kZero : Rotation2d.k180deg);
 
-    if (rc.shootingAtHub) {
-      rc.drivetrain.setControl(rc.driveFCFA
-          .withTargetDirection(Rotation2d.fromDegrees(rc.getDegreesToTarget(rc.compensatedTargetHub)).rotateBy(Rotation2d.k180deg))
-          .withVelocityX(-blueSpaceDriverInputs.getY() * RobotContainer.MaxSpeed)
-          .withVelocityY(-blueSpaceDriverInputs.getX() * RobotContainer.MaxSpeed)
-          .withForwardPerspective(ForwardPerspectiveValue.BlueAlliance)); // Drive left with negative X
-    }
-    else if (rc.passing) {
-      rc.drivetrain.setControl(rc.driveFCFA
-          .withTargetDirection(Rotation2d.fromDegrees(rc.getDegreesToTarget(rc.passTarget)).rotateBy(Rotation2d.k180deg))
-          .withVelocityX(-blueSpaceDriverInputs.getY() * RobotContainer.MaxSpeed)
-          .withVelocityY(-blueSpaceDriverInputs.getX() * RobotContainer.MaxSpeed)
-          .withForwardPerspective(ForwardPerspectiveValue.BlueAlliance));
+      if (rc.shootingAtHub) {
+        rc.drivetrain.setControl(rc.driveFCFA
+            .withTargetDirection(Rotation2d.fromDegrees(rc.getDegreesToTarget(rc.compensatedTargetHub)).rotateBy(Rotation2d.k180deg))
+            .withVelocityX(-blueSpaceDriverInputs.getY() * RobotContainer.MaxSpeed)
+            .withVelocityY(-blueSpaceDriverInputs.getX() * RobotContainer.MaxSpeed)
+            .withForwardPerspective(ForwardPerspectiveValue.BlueAlliance)); // Drive left with negative X
+      }
+      else if (rc.passing) {
+        rc.drivetrain.setControl(rc.driveFCFA
+            .withTargetDirection(Rotation2d.fromDegrees(rc.getDegreesToTarget(rc.passTarget)).rotateBy(Rotation2d.k180deg))
+            .withVelocityX(-blueSpaceDriverInputs.getY() * RobotContainer.MaxSpeed)
+            .withVelocityY(-blueSpaceDriverInputs.getX() * RobotContainer.MaxSpeed)
+            .withForwardPerspective(ForwardPerspectiveValue.BlueAlliance));
+      }
     }
 
     activateShooters();
