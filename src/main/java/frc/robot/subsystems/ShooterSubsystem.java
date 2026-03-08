@@ -187,16 +187,6 @@ public class ShooterSubsystem extends SubsystemBase {
     }
 
     /**
-     * sets the linear actuator to an interpolated passing position based on
-     * provided distance
-     * 
-     * @param distance the distance from the driver station to the robot
-     */
-    public void setActuatorToPassPosition(double distance) {
-        setActuatorTargetPosition(1);
-    }
-
-    /**
      * use this to determine if the shooter is at speed before spinning up the
      * feeder motor
      *
