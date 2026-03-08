@@ -41,7 +41,8 @@ import frc.robot.commands.auto.RightOutpost;
 import frc.robot.commands.auto.TestOverrideAuto;
 import frc.robot.drive.CommandSwerveDrivetrain;
 import frc.robot.drive.Telemetry;
-import frc.robot.drive.TunerConstants;
+import frc.robot.drive.TunerConstantsComp;
+import frc.robot.drive.TunerConstantsPrac;
 import frc.robot.subsystems.ClimbSubsystem;
 import frc.robot.subsystems.FloorFeedSubsystem;
 import frc.robot.subsystems.IntakeSubsystem;
@@ -137,7 +138,11 @@ public class RobotContainer {
   // Thank you! A.T.S.T Also give us an angled floor.
 
   @NotLogged
-  public final static double MaxSpeed = TunerConstants.kSpeedAt12Volts.in(MetersPerSecond) * 0.7;
+  public final static double speedFactor = 0.7;
+
+  @NotLogged
+  public final static double MaxSpeed = TunerConstantsComp.kSpeedAt12Volts.in(MetersPerSecond) * speedFactor;
+
   @NotLogged
   public final static double MaxAngularRate = RotationsPerSecond.of(0.75).in(RadiansPerSecond);
 
@@ -164,7 +169,7 @@ public class RobotContainer {
   private final Telemetry logger = new Telemetry(MaxSpeed);
 
   @NotLogged
-  public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
+  public final CommandSwerveDrivetrain drivetrain;
 
   @NotLogged
   final SendableChooser<AutoCommand> autoChooser;
@@ -262,6 +267,13 @@ public class RobotContainer {
    * The container for the robot. Contains subsystems, OI devices, and commands.
    */
   public RobotContainer() {
+
+    if (Robot.isCompBot) {
+      drivetrain = TunerConstantsComp.createDrivetrain();
+    } else {
+      drivetrain = TunerConstantsPrac.createDrivetrain();
+    }
+
     new EventTrigger("IntakeDown").whileTrue(new InstantCommand(() -> {
       intakeSubsystem.setTiltPosition(IntakeSubsystem.tiltMaxExtensionPos);
     }));

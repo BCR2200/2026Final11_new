@@ -4,8 +4,6 @@
 
 package frc.robot;
 
-import java.util.Optional;
-
 import edu.wpi.first.epilogue.Epilogue;
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.epilogue.NotLogged;
@@ -45,6 +43,9 @@ public class Robot extends TimedRobot {
 
   // Logged - current alliance
   public static Alliance alliance = Alliance.Red;
+
+  // Is the robot the competiton bot, determines drivetrain constants and beam break channels
+  public static final boolean isCompBot = false;
 
   @NotLogged
   private final Timer teleopTimer = new Timer();
