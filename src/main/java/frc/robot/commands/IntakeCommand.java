@@ -37,7 +37,7 @@ public class IntakeCommand extends Command {
             .withVelocityY(-RobotContainer.driverX * RobotContainer.MaxSpeed)
             .withVelocityX(-RobotContainer.driverY * RobotContainer.MaxSpeed)
             .withForwardPerspective(ForwardPerspectiveValue.OperatorPerspective)
-            .withTargetDirection(new Rotation2d(-Math.atan2(RobotContainer.driverY, RobotContainer.driverX)))
+            .withTargetDirection(new Rotation2d(-Math.atan2(RobotContainer.driverX, RobotContainer.driverY)))
         );
     }
 
