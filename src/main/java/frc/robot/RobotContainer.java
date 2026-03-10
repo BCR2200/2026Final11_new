@@ -30,6 +30,7 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.commands.BlendAdamModeCmd;
 import frc.robot.commands.ClimbCommand;
+import frc.robot.commands.IntakeCommand;
 import frc.robot.commands.ShootAt;
 import frc.robot.commands.auto.AutoCommand;
 import frc.robot.commands.auto.LeftBumpBack;
@@ -407,14 +408,7 @@ public class RobotContainer {
     }));
 
     // intake
-    driverController.leftTrigger()
-        .whileTrue(new InstantCommand(() -> {
-          intakeSubsystem.setIsIntaking(true);
-          intakeSubsystem.setTiltPosition(IntakeSubsystem.tiltMaxExtensionPos);
-        }))
-        .whileFalse(new InstantCommand(() -> {
-          intakeSubsystem.setIsIntaking(false);
-        }));
+    driverController.leftTrigger().whileTrue(new IntakeCommand(intakeSubsystem, drivetrain, this));
     driverController.rightBumper().whileTrue(new BlendAdamModeCmd(this));
     // m_driverController.rightTrigger().onTrue(new
     // SnapTowardsGoalCmd(drivetrain).andThen(JustShootCmd.getStartCommand(m_shooterSubsystemJohn,
