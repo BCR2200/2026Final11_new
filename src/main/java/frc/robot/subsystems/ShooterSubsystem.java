@@ -231,6 +231,17 @@ public class ShooterSubsystem extends SubsystemBase {
 
         this.counter.update(this.isBeamBroken());
 
+        // Feed at full speed first,
+        // then try to preload (until beam break is broken),
+        // then stop
+        if (isFeeding) {
+            feedPIDMotor.setPercentOutput(1);
+        } else if (wantsToPreload()) {
+            feedPIDMotor.setPercentOutput(PRELOAD_SPEED_PERCENT);
+        } else {
+            feedPIDMotor.setPercentOutput(0);
+        }
+
         if (rc.fixedPassingShot) {
             setShooterSpeedViaInterpolatedValue(8.5);
             setActuatorPositionViaInterpolatedValue(8.5);
@@ -264,17 +275,6 @@ public class ShooterSubsystem extends SubsystemBase {
             setActuatorPositionViaInterpolatedValue(rc.getDistanceToTarget(rc.compensatedTargetHub));
         } else if (!rc.isOutsideAllianceZone()) {
             setActuatorPositionViaInterpolatedValue(rc.getDistanceToTarget(rc.targetHub));
-        }
-
-        // Feed at full speed first,
-        // then try to preload (until beam break is broken),
-        // then stop
-        if (isFeeding) {
-            feedPIDMotor.setPercentOutput(1);
-        } else if (wantsToPreload()) {
-            feedPIDMotor.setPercentOutput(PRELOAD_SPEED_PERCENT);
-        } else {
-            feedPIDMotor.setPercentOutput(0);
         }
     }
 }
