@@ -13,6 +13,7 @@ public class IntakeCommand extends Command {
     private IntakeSubsystem intakeSubsystem;
     private CommandSwerveDrivetrain drivetrain;
     private RobotContainer robotContainer;
+    private final double epsilon = 0.1;
 
     public IntakeCommand(IntakeSubsystem intakeSubsystem, CommandSwerveDrivetrain drivetrain, RobotContainer robotContainer) {
         this.intakeSubsystem = intakeSubsystem;
@@ -33,12 +34,16 @@ public class IntakeCommand extends Command {
         intakeSubsystem.setIsIntaking(true);
         intakeSubsystem.setTiltPosition(IntakeSubsystem.tiltMaxExtensionPos);
 
-        drivetrain.setControl(robotContainer.driveFCFA
-            .withVelocityY(-RobotContainer.driverX * RobotContainer.MaxSpeed)
-            .withVelocityX(-RobotContainer.driverY * RobotContainer.MaxSpeed)
-            .withForwardPerspective(ForwardPerspectiveValue.OperatorPerspective)
-            .withTargetDirection(new Rotation2d(-Math.atan2(RobotContainer.driverX, RobotContainer.driverY)))
-        );
+        // If the driver is giving input
+        if(Math.abs(RobotContainer.driverX) > epsilon || Math.abs(RobotContainer.driverY) > epsilon){
+            drivetrain.setControl(robotContainer.driveFCFA
+                .withVelocityY(-RobotContainer.driverX * RobotContainer.MaxSpeed)
+                .withVelocityX(-RobotContainer.driverY * RobotContainer.MaxSpeed)
+                .withForwardPerspective(ForwardPerspectiveValue.OperatorPerspective)
+                .withTargetDirection(new Rotation2d(-Math.atan2(RobotContainer.driverX, RobotContainer.driverY)))
+            );
+        }
+        
     }
 
     // Called once the command ends or is interrupted.
