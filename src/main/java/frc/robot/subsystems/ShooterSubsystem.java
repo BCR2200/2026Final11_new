@@ -254,6 +254,9 @@ public class ShooterSubsystem extends SubsystemBase {
             if (isShooting) {
                 shootPIDMotor.setVelocityTarget(shooterSpeed);
             }
+            else {
+                shootPIDMotor.setPercentOutput(0);
+            }
             return;
         }
         else if (rc.fixedShotFromHub) {
@@ -262,6 +265,9 @@ public class ShooterSubsystem extends SubsystemBase {
             if (isShooting) {
                 shootPIDMotor.setVelocityTarget(shooterSpeed);
             }
+            else {
+                shootPIDMotor.setPercentOutput(0);
+            }
             return;
         }
         else if (rc.fixedShotFromClimber) {
@@ -269,6 +275,9 @@ public class ShooterSubsystem extends SubsystemBase {
             setActuatorPositionViaInterpolatedValue(3.5);
             if (isShooting) {
                 shootPIDMotor.setVelocityTarget(shooterSpeed);
+            }
+            else {
+                shootPIDMotor.setPercentOutput(0);
             }
             return;
         }

@@ -88,11 +88,11 @@ public class RobotContainer {
       Distance.ofBaseUnits(6.0, Meters),
       Rotation2d.kZero);
   public static final Pose2d BLUE_ZONE_L = new Pose2d(
-      Distance.ofBaseUnits(2.2, Meters),
+      Distance.ofBaseUnits(1.6, Meters),
       Distance.ofBaseUnits(6.0, Meters),
       Rotation2d.kZero);
   public static final Pose2d BLUE_ZONE_R = new Pose2d(
-      Distance.ofBaseUnits(2.2, Meters),
+      Distance.ofBaseUnits(1.6, Meters),
       Distance.ofBaseUnits(1.5, Meters),
       Rotation2d.kZero);
   public Pose2d passTarget = RED_ZONE_R;
@@ -419,7 +419,6 @@ public class RobotContainer {
     driverController.rightBumper().whileTrue(new InstantCommand(() -> {
       intakeSubsystem.setIsOuttaking(true);
       floorFeedSubsystem.setIsOuttaking(true);
-      intakeSubsystem.setTiltPosition(IntakeSubsystem.tiltMaxExtensionPos);
     })).whileFalse(new InstantCommand(() -> {
       intakeSubsystem.setIsOuttaking(false);
       floorFeedSubsystem.setIsOuttaking(false);
