@@ -54,70 +54,35 @@ public class BlendAdamModeCmd extends Command {
         var x = currentPose2d.getX();
         var y = currentPose2d.getY();
 
-        double epsilon = 0.1;
-
         // Red/blue lines are parallel to Y, compare to X
         // Side lines are parallel to X, compare to Y
         // wallSomethingLine is from blue's perspective
-        boolean onRedHubLine = ExtraMath.within(x, redHUBLine, epsilon);
-        boolean onBlueHubLine = ExtraMath.within(x, blueHUBLine, epsilon);
-        boolean onWallLFromBlueLine = ExtraMath.within(y, wallLeftLine, epsilon);
-        boolean onWallRFromBlueLine = ExtraMath.within(y, wallRightLine, epsilon);
+        boolean passedRedHubLine = x > redHUBLine;
+        boolean passedBlueHubLine = x < blueHUBLine;
+        boolean passedWallLFromBlueLine = y > wallLeftLine;
+        boolean passedWallRFromBlueLine = y < wallRightLine;
 
-        if ((onRedHubLine || onBlueHubLine) && (onWallLFromBlueLine || onWallRFromBlueLine)) {
+        double velocityX = -RobotContainer.driverY * RobotContainer.MaxSpeed;
+        double velocityY = -RobotContainer.driverX * RobotContainer.MaxSpeed;
 
-            // we're in a corner
-            drivetrain.setControl(robot.driveFC
-                    .withVelocityX(-RobotContainer.driverY * RobotContainer.MaxSpeed)
-                    .withVelocityY(-RobotContainer.driverX * RobotContainer.MaxSpeed)
+        if (passedRedHubLine) {
+            velocityX = Math.min(velocityX, 0);
+        } else if (passedBlueHubLine) {
+            velocityX = Math.max(velocityX, 0);
+        }
+
+        if (passedWallLFromBlueLine) {
+            velocityY = Math.min(velocityY, 0); 
+        } else if (passedWallRFromBlueLine) {
+            velocityY = Math.max(velocityY, 0);
+        }
+
+        drivetrain.setControl(robot.driveFC
+                    .withVelocityX(velocityX)
+                    .withVelocityY(velocityY)
                     .withRotationalRate(-RobotContainer.driverRot * RobotContainer.MaxAngularRate)
                     .withForwardPerspective(ForwardPerspectiveValue.OperatorPerspective));
-            SmartDashboard.putString("BlendState", "On Corner");
 
-        } else if (onBlueHubLine || onRedHubLine) {
-
-            // on a hub line (parallel to Y)
-            robot.drivetrain.setControl(robot.driveFC
-                    .withVelocityX(0)
-                    .withVelocityY(-RobotContainer.driverX * RobotContainer.MaxSpeed)
-                    .withRotationalRate(-RobotContainer.driverRot * RobotContainer.MaxAngularRate)
-                    .withForwardPerspective(ForwardPerspectiveValue.OperatorPerspective)
-            );
-
-            if (onRedHubLine) {
-                SmartDashboard.putString("BlendState", "On Red Hub Line");
-            } else if (onBlueHubLine) {
-                SmartDashboard.putString("BlendState", "On Blue Hub Line");
-            }
-
-        } else if (onWallLFromBlueLine || onWallRFromBlueLine) {
-        
-            // on a left/right wall line (parallel to X)
-            robot.drivetrain.setControl(robot.driveFC
-                    .withVelocityX(-RobotContainer.driverY * RobotContainer.MaxSpeed)
-                    .withVelocityY(0)
-                    .withRotationalRate(-RobotContainer.driverRot * RobotContainer.MaxAngularRate)
-                    .withForwardPerspective(ForwardPerspectiveValue.OperatorPerspective)
-            );
-
-            if (onWallRFromBlueLine) {
-                SmartDashboard.putString("BlendState", "On Right From Blue Line");
-            } else if (onWallLFromBlueLine) {
-                SmartDashboard.putString("BlendState", "On Left From Blue Line");
-            }
-
-        } else {
-
-            // somewhere in the middle or in an alliance
-            SmartDashboard.putString("BlendState", "Free Roam");
-            drivetrain.setControl(robot.driveFC
-                    .withVelocityX(-RobotContainer.driverY * RobotContainer.MaxSpeed)
-                    .withVelocityY(-RobotContainer.driverX * RobotContainer.MaxSpeed)
-                    .withRotationalRate(-RobotContainer.driverRot * RobotContainer.MaxAngularRate)
-                    .withForwardPerspective(ForwardPerspectiveValue.OperatorPerspective)
-            );
-
-        }
     }
 
     @Override
