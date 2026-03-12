@@ -4,31 +4,28 @@ import com.ctre.phoenix6.swerve.SwerveRequest;
 import com.ctre.phoenix6.swerve.SwerveRequest.ForwardPerspectiveValue;
 
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.ExtraMath;
 import frc.robot.RobotContainer;
 import frc.robot.drive.CommandSwerveDrivetrain;
 
-public class BlendAdamModeCmd extends Command {
+public class AdamsGuidingHandCmd extends Command {
 
     private final RobotContainer robot;
 
     private CommandSwerveDrivetrain drivetrain;
     private Pose2d currentPose2d;
 
-    // TODO correct these values for the errors on the blue side, and for a rotation buffer
+    // Values from engineering drawings. TODO verify they work well
 
     // in meters
-    private double blueHUBLine = 5.7;
-    // TODO FIND VALUE
-    private double redHUBLine = 11.6;
+    private double blueHUBLine = 5.822494;
+    private double redHUBLine = 10.718494;
 
     // left/right from blue's perspective
-    private double wallLeftLine = 7.590;
-    private double wallRightLine = 0.319;
+    private double wallLeftLine = 7.469326;
+    private double wallRightLine = 0.6;
 
-    public BlendAdamModeCmd(RobotContainer robot) {
+    public AdamsGuidingHandCmd(RobotContainer robot) {
         addRequirements(robot.drivetrain);
         this.drivetrain = robot.drivetrain;
         this.robot = robot;
@@ -42,13 +39,6 @@ public class BlendAdamModeCmd extends Command {
     // Called every time the scheduler runs while the command is scheduled.
     @Override
     public void execute() {
-
-        /*
-         * If (in a corner, allow driver X and Y)
-         * If (On one of the X lines, only allow Y)
-         * If (On one of the Y lines, only allow X)
-         * If (Not on either, free reign)
-         */
 
         currentPose2d = drivetrain.getState().Pose;
         var x = currentPose2d.getX();
