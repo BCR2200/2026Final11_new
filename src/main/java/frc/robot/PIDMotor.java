@@ -473,10 +473,15 @@ public class PIDMotor {
      * @param limit Current limit in amps.
      */
     public void setStatorCurrentLimit(int limit) {
-        talonFXConfigs.CurrentLimits.StatorCurrentLimit = limit;
-        talonFXConfigs.CurrentLimits.StatorCurrentLimitEnable = true;
+        CurrentLimitsConfigs currentLimits = new CurrentLimitsConfigs();
 
-        StatusCode code = motor.getConfigurator().apply(talonFXConfigs.CurrentLimits);
+        currentLimits.StatorCurrentLimit = limit;
+        currentLimits.StatorCurrentLimitEnable = true;
+        currentLimits.SupplyCurrentLimit = this.talonFXConfigs.CurrentLimits.SupplyCurrentLimit;
+        currentLimits.SupplyCurrentLimitEnable = this.talonFXConfigs.CurrentLimits.SupplyCurrentLimitEnable;
+        this.talonFXConfigs.CurrentLimits = currentLimits;
+
+        StatusCode code = motor.getConfigurator().apply(currentLimits);
         if (!code.isOK()) {
             System.err.printf("Error setting stator current limit (%s): %s\n", name, code.getDescription());
         }
@@ -489,10 +494,15 @@ public class PIDMotor {
      * @param limit Current limit in amps.
      */
     public void setSupplyCurrentLimit(int limit) {
-        talonFXConfigs.CurrentLimits.SupplyCurrentLimit = limit;
-        talonFXConfigs.CurrentLimits.SupplyCurrentLimitEnable = true;
+        CurrentLimitsConfigs currentLimits = new CurrentLimitsConfigs();
 
-        StatusCode code = motor.getConfigurator().apply(talonFXConfigs.CurrentLimits);
+        currentLimits.StatorCurrentLimit = this.talonFXConfigs.CurrentLimits.StatorCurrentLimit;
+        currentLimits.StatorCurrentLimitEnable = this.talonFXConfigs.CurrentLimits.StatorCurrentLimitEnable;
+        currentLimits.SupplyCurrentLimit = limit;
+        currentLimits.SupplyCurrentLimitEnable = true;
+        this.talonFXConfigs.CurrentLimits = currentLimits;
+
+        StatusCode code = motor.getConfigurator().apply(currentLimits);
         if (!code.isOK()) {
             System.err.printf("Error setting supply current limit (%s): %s\n", name, code.getDescription());
         }
