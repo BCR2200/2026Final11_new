@@ -467,22 +467,46 @@ public class PIDMotor {
     }
 
     /**
-     * Sets the current limit of the motor.
-     * 
+     * Sets the stator current limit of the motor.
+     * Stator current is the current in the motor windings.
+     *
      * @param limit Current limit in amps.
      */
-    public void setCurrentLimit(int limit) {
-        var limitConfigs = new CurrentLimitsConfigs();
+    public void setStatorCurrentLimit(int limit) {
+        talonFXConfigs.CurrentLimits.StatorCurrentLimit = limit;
+        talonFXConfigs.CurrentLimits.StatorCurrentLimitEnable = true;
 
-        // enable stator current limit
-        limitConfigs.StatorCurrentLimit = limit;
-        limitConfigs.StatorCurrentLimitEnable = true;
-        talonFXConfigs.CurrentLimits = limitConfigs;
-
-        StatusCode code = motor.getConfigurator().apply(limitConfigs);
+        StatusCode code = motor.getConfigurator().apply(talonFXConfigs.CurrentLimits);
         if (!code.isOK()) {
-            System.err.printf("Error setting current limit (%s): %s\n", name, code.getDescription());
+            System.err.printf("Error setting stator current limit (%s): %s\n", name, code.getDescription());
         }
+    }
+
+    /**
+     * Sets the supply (input) current limit of the motor.
+     * Supply current is the current drawn from the battery.
+     *
+     * @param limit Current limit in amps.
+     */
+    public void setSupplyCurrentLimit(int limit) {
+        talonFXConfigs.CurrentLimits.SupplyCurrentLimit = limit;
+        talonFXConfigs.CurrentLimits.SupplyCurrentLimitEnable = true;
+
+        StatusCode code = motor.getConfigurator().apply(talonFXConfigs.CurrentLimits);
+        if (!code.isOK()) {
+            System.err.printf("Error setting supply current limit (%s): %s\n", name, code.getDescription());
+        }
+    }
+
+    /**
+     * Sets the current limit of the motor (stator current).
+     *
+     * @param limit Current limit in amps.
+     * @deprecated Use {@link #setStatorCurrentLimit(int)} or {@link #setSupplyCurrentLimit(int)} instead.
+     */
+    @Deprecated
+    public void setCurrentLimit(int limit) {
+        setStatorCurrentLimit(limit);
     }
 
     public double getCurrent() {
