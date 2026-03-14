@@ -45,6 +45,7 @@ public class LinearActuator {
      * Initialize Servo Hub channels (comp bot).
      * ServoHub channels are 0-5, while PWM channels are 1-6, so we subtract 1.
      */
+    @SuppressWarnings("removal")
     private void initServoHub(int channel) {
         // Create shared ServoHub instance on first use
         if (servoHub == null) {
@@ -61,8 +62,8 @@ public class LinearActuator {
             servoHub.configure(config, ResetMode.kResetSafeParameters);
         }
 
-        // Map PWM channel (1-6) to ServoHub channel (0-5)
-        int hubChannel = channel - 1;
+        // Map PWM channel (1-3) to ServoHub channel (3-5)
+        int hubChannel = channel + 2;
 
         ServoChannel.ChannelId channelId = getChannelId(hubChannel);
 
