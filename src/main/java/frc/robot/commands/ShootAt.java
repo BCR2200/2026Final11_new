@@ -1,5 +1,6 @@
 package frc.robot.commands;
 
+import com.ctre.phoenix6.swerve.SwerveRequest;
 import com.ctre.phoenix6.swerve.SwerveRequest.ForwardPerspectiveValue;
 
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -7,6 +8,7 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.ExtraMath;
 import frc.robot.Robot;
 import frc.robot.RobotContainer;
 import frc.robot.subsystems.ShooterSubsystem;
@@ -50,11 +52,29 @@ public class ShootAt extends Command {
           .rotateBy(Robot.alliance == Alliance.Blue ? Rotation2d.kZero : Rotation2d.k180deg);
 
       if (rc.shootingAtHub) {
-        rc.drivetrain.setControl(rc.driveFCFA
-            .withTargetDirection(Rotation2d.fromDegrees(rc.getDegreesToTarget(rc.compensatedTargetHub)).rotateBy(Rotation2d.k180deg))
-            .withVelocityX(-blueSpaceDriverInputs.getY() * RobotContainer.MaxSpeed)
-            .withVelocityY(-blueSpaceDriverInputs.getX() * RobotContainer.MaxSpeed)
-            .withForwardPerspective(ForwardPerspectiveValue.BlueAlliance)); // Drive left with negative X
+
+        // Check that:
+        //  - we are not moving more than 10 cm/s in x/y;
+        //  - the driver is not moving the left stick (more than 10%);
+        //  - the robot is within 2deg of aiming at the goal
+        if (ExtraMath.within(rc.drivetrain.getState().Speeds.vxMetersPerSecond, 0, 0.1) && 
+            ExtraMath.within(rc.drivetrain.getState().Speeds.vyMetersPerSecond, 0, 0.1) && 
+            ExtraMath.within(RobotContainer.driverX, 0, 0.1) && 
+            ExtraMath.within(RobotContainer.driverY, 0, 0.1) &&
+            ExtraMath.within(
+              rc.drivetrain.getState().Pose.getRotation().minus(
+                Rotation2d.fromDegrees(rc.getDegreesToTarget(rc.targetHub))).getDegrees(),
+            0, 2)
+        ) {
+          rc.drivetrain.setControl(new SwerveRequest.SwerveDriveBrake());
+        } else {
+          rc.drivetrain.setControl(rc.driveFCFA
+              .withTargetDirection(Rotation2d.fromDegrees(rc.getDegreesToTarget(rc.compensatedTargetHub)).rotateBy(Rotation2d.k180deg))
+              .withVelocityX(-blueSpaceDriverInputs.getY() * RobotContainer.MaxSpeed)
+              .withVelocityY(-blueSpaceDriverInputs.getX() * RobotContainer.MaxSpeed)
+              .withForwardPerspective(ForwardPerspectiveValue.BlueAlliance)); // Drive left with negative X
+        }
+
       }
       else if (rc.passing) {
         rc.drivetrain.setControl(rc.driveFCFA
