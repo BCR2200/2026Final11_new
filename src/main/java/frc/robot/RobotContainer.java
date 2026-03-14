@@ -181,7 +181,9 @@ public class RobotContainer {
   @NotLogged
   private static final int climbInitialCurrentLimit = 5;
   @NotLogged
-  private static final int floorCurrentLimit = 60;
+  private static final int floorStatorCurrentLimit = 110;
+  @NotLogged
+  private static final int floorSupplyCurrentLimit = 75;
   @NotLogged
   private static final int intakeCurrentLimit = 80;
   @NotLogged
@@ -242,8 +244,8 @@ public class RobotContainer {
       true, this);
 
   @Logged(name = "FloorFeed")
-  private final FloorFeedSubsystem floorFeedSubsystem = new FloorFeedSubsystem(floorCurrentLimit, shooterSubsystemJohn,
-      shooterSubsystemJawbreaker, shooterSubsystemTaylor);
+  private final FloorFeedSubsystem floorFeedSubsystem = new FloorFeedSubsystem(floorStatorCurrentLimit, floorSupplyCurrentLimit,
+      shooterSubsystemJohn, shooterSubsystemJawbreaker, shooterSubsystemTaylor);
 
   @Logged(name = "Climber")
   public final ClimbSubsystem climberSubsystem = new ClimbSubsystem(climbInitialCurrentLimit, climbFinalCurrentLimit);

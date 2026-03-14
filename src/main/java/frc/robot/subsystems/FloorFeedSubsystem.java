@@ -53,12 +53,13 @@ public class FloorFeedSubsystem extends SubsystemBase {
     @NotLogged
     public ShooterSubsystem[] shooters;
 
-    public FloorFeedSubsystem(int currentLimit, ShooterSubsystem... shooters) {
+    public FloorFeedSubsystem(int statorCurrentLimit, int supplyCurrentLimit, ShooterSubsystem... shooters) {
         this.shooters = shooters;
         motor = PIDMotor.makeMotor(Constants.FLOOR_FEED_MOTOR_ID, "Floor Feed",
                 PARAM_P, PARAM_I, PARAM_D, PARAM_S, PARAM_V, PARAM_A, PARAM_MV, PARAM_MA, PARAM_MJ);
         motor.setInverted(InvertedValue.Clockwise_Positive);
-        motor.setCurrentLimit(currentLimit);
+        motor.setStatorCurrentLimit(statorCurrentLimit);
+        motor.setSupplyCurrentLimit(supplyCurrentLimit);
         motor.setIdleCoastMode();
     }
 
