@@ -29,6 +29,7 @@ import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.commands.BlendAdamModeCmd;
+import frc.robot.commands.BlendHugoCmd;
 import frc.robot.commands.ClimbCommand;
 import frc.robot.commands.ShootAt;
 import frc.robot.commands.auto.AutoCommand;
@@ -398,8 +399,8 @@ public class RobotContainer {
     // Start button is 3 horizontal lines
     // POV is the D-pad
 
-    // Blend and intake
-    driverController.leftBumper().whileTrue(new BlendAdamModeCmd(this))
+    // Wall hug and intake
+    driverController.leftBumper().whileTrue(new BlendHugoCmd(this))
       .whileTrue(new InstantCommand(() -> {
           intakeSubsystem.setIsIntaking(true);
           intakeSubsystem.setTiltPosition(IntakeSubsystem.tiltMaxExtensionPos);
