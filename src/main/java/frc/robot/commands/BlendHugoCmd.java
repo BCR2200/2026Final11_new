@@ -33,6 +33,12 @@ public class BlendHugoCmd extends Command {
     private static final double MIN_X_WALL = 0.0;         // Blue alliance wall
     private static final double MAX_X_WALL = FIELD_LENGTH; // Red alliance wall
 
+    // Middle walls spanning the full width of the field
+    private static final double MIDDLE_WALL_1_X = 4.625;  // Center X, closer to blue alliance wall
+    private static final double MIDDLE_WALL_2_X = 11.916; // Center X, closer to red alliance wall
+    private static final double MIDDLE_WALL_THICKNESS = 1.12; // meters
+    private static final double MIDDLE_WALL_HALF_THICKNESS = MIDDLE_WALL_THICKNESS / 2.0;
+
     // Target distance from wall (robot center to wall)
     private static final double WALL_OFFSET = 0.5; // meters
 
@@ -43,10 +49,12 @@ public class BlendHugoCmd extends Command {
     private static final double MAX_CORRECTION_VELOCITY = 3.0;
 
     private enum NearestWall {
-        MIN_Y,  // Y = 0 (right wall from blue's view)
-        MAX_Y,  // Y = FIELD_WIDTH (left wall from blue's view)
-        MIN_X,  // X = 0 (blue alliance wall)
-        MAX_X   // X = FIELD_LENGTH (red alliance wall)
+        MIN_Y,     // Y = 0 (right wall from blue's view)
+        MAX_Y,     // Y = FIELD_WIDTH (left wall from blue's view)
+        MIN_X,     // X = 0 (blue alliance wall)
+        MAX_X,     // X = FIELD_LENGTH (red alliance wall)
+        MIDDLE_1,  // X = 4.625 (middle wall closer to blue)
+        MIDDLE_2   // X = 11.916 (middle wall closer to red)
     }
 
     public BlendHugoCmd(RobotContainer robot) {
@@ -69,10 +77,14 @@ public class BlendHugoCmd extends Command {
         double distToMaxY = MAX_Y_WALL - y;
         double distToMinX = x - MIN_X_WALL;
         double distToMaxX = MAX_X_WALL - x;
+        // Distance to nearest face of each middle wall (0 if inside the wall)
+        double distToMiddle1 = Math.max(0, Math.abs(x - MIDDLE_WALL_1_X) - MIDDLE_WALL_HALF_THICKNESS);
+        double distToMiddle2 = Math.max(0, Math.abs(x - MIDDLE_WALL_2_X) - MIDDLE_WALL_HALF_THICKNESS);
 
         // Find the nearest wall
-        double minDist = Math.min(Math.min(distToMinY, distToMaxY),
-                                   Math.min(distToMinX, distToMaxX));
+        double minDist = Math.min(
+                Math.min(Math.min(distToMinY, distToMaxY), Math.min(distToMinX, distToMaxX)),
+                Math.min(distToMiddle1, distToMiddle2));
 
         NearestWall nearestWall;
         if (minDist == distToMinY) {
@@ -81,8 +93,12 @@ public class BlendHugoCmd extends Command {
             nearestWall = NearestWall.MAX_Y;
         } else if (minDist == distToMinX) {
             nearestWall = NearestWall.MIN_X;
-        } else {
+        } else if (minDist == distToMaxX) {
             nearestWall = NearestWall.MAX_X;
+        } else if (minDist == distToMiddle1) {
+            nearestWall = NearestWall.MIDDLE_1;
+        } else {
+            nearestWall = NearestWall.MIDDLE_2;
         }
 
         SmartDashboard.putString("WallHug/NearestWall", nearestWall.toString());
@@ -123,12 +139,32 @@ public class BlendHugoCmd extends Command {
                 break;
 
             case MAX_X:
-            default:
                 // Target X = FIELD_LENGTH - WALL_OFFSET (just inside the X=16.54 wall)
                 double errorMaxX = (FIELD_LENGTH - WALL_OFFSET) - x;
                 correctionFieldX = kP * errorMaxX; // Positive to increase X towards the wall
                 correctionFieldX = ExtraMath.clamp(correctionFieldX, -MAX_CORRECTION_VELOCITY, MAX_CORRECTION_VELOCITY);
                 SmartDashboard.putNumber("WallHug/Error", errorMaxX);
+                break;
+
+            case MIDDLE_1:
+            case MIDDLE_2:
+            default:
+                // Middle walls have thickness; the robot targets WALL_OFFSET from the nearest face.
+                double wallCenterX = (nearestWall == NearestWall.MIDDLE_1) ? MIDDLE_WALL_1_X : MIDDLE_WALL_2_X;
+                double nearFace, targetX;
+                if (x < wallCenterX) {
+                    // Robot is on the min-X side of this wall
+                    nearFace = wallCenterX - MIDDLE_WALL_HALF_THICKNESS;
+                    targetX = nearFace - WALL_OFFSET;
+                } else {
+                    // Robot is on the max-X side of this wall
+                    nearFace = wallCenterX + MIDDLE_WALL_HALF_THICKNESS;
+                    targetX = nearFace + WALL_OFFSET;
+                }
+                double errorMiddle = targetX - x;
+                correctionFieldX = kP * errorMiddle;
+                correctionFieldX = ExtraMath.clamp(correctionFieldX, -MAX_CORRECTION_VELOCITY, MAX_CORRECTION_VELOCITY);
+                SmartDashboard.putNumber("WallHug/Error", errorMiddle);
                 break;
         }
 
@@ -151,11 +187,11 @@ public class BlendHugoCmd extends Command {
         double velocityY;
 
         if (nearestWall == NearestWall.MIN_Y || nearestWall == NearestWall.MAX_Y) {
-            // Hugging a Y-axis wall: driver controls movement along wall (X), P loop controls perpendicular (Y)
+            // Hugging a constant-Y wall: driver controls movement along wall (X), P loop controls perpendicular (Y)
             velocityX = driverVelX;
             velocityY = correctionOperY;
         } else {
-            // Hugging an X-axis wall: driver controls movement along wall (Y), P loop controls perpendicular (X)
+            // Hugging a constant-X wall (perimeter or middle): driver controls movement along wall (Y), P loop controls perpendicular (X)
             velocityX = correctionOperX;
             velocityY = driverVelY;
         }
