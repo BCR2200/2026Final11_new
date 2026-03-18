@@ -24,14 +24,25 @@ public class DriveToOutpostCmd extends Command {
     @NotLogged
     public static final double TRANSLATION_P = 6.0;
 
-    public Pose2d targetOutpost;
+    public Pose2d finalTarget;
+    public Pose2d initialTarget;
+    public boolean goneToInitialPos = false;
 
-    public static final Pose2d OUTPOST_RED = new Pose2d(
+    public static final Pose2d OUTPOST_RED_INITIAL = new Pose2d(
+        Distance.ofBaseUnits(15.5, Meters),
+        Distance.ofBaseUnits(7.44, Meters),
+        Rotation2d.kZero
+    );public static final Pose2d OUTPOST_RED_FINAL = new Pose2d(
+        Distance.ofBaseUnits(15.94, Meters),
+        Distance.ofBaseUnits(7.44, Meters),
+        Rotation2d.kZero
+    );
+    public static final Pose2d OUTPOST_BLUE_INITIAL = new Pose2d(
         Distance.ofBaseUnits(15.22, Meters), // TODO
         Distance.ofBaseUnits(4.73, Meters), // TODO
         Rotation2d.k180deg
     );
-    public static final Pose2d OUTPOST_BLUE = new Pose2d(
+    public static final Pose2d OUTPOST_BLUE_FINAL = new Pose2d(
         Distance.ofBaseUnits(15.22, Meters), // TODO
         Distance.ofBaseUnits(4.73, Meters), // TODO
         Rotation2d.k180deg
@@ -71,28 +82,44 @@ public class DriveToOutpostCmd extends Command {
         return robotPose.getTranslation().getDistance(targetPose.getTranslation());
     }
 
-    private SwerveRequest.FieldCentricFacingAngle driveToPose(Pose2d target) {
-        return robotContainer.driveFCFAVelocityMode.withVelocityX(ExtraMath.clampedDeadzone(getXToTarget(target)*TRANSLATION_P, 1, 0.0001))
-                .withVelocityY(ExtraMath.clampedDeadzone(getYToTarget(target)*TRANSLATION_P, 1, 0.0001))
+    private SwerveRequest.FieldCentricFacingAngle driveToPose(Pose2d target, double maxSpeed) {
+        return robotContainer.driveFCFAVelocityMode.withVelocityX(ExtraMath.clampedDeadzone(getXToTarget(target)*TRANSLATION_P, maxSpeed, 0.0001))
+                .withVelocityY(ExtraMath.clampedDeadzone(getYToTarget(target)*TRANSLATION_P, maxSpeed, 0.0001))
                 .withTargetDirection(target.getRotation())
                 .withForwardPerspective(ForwardPerspectiveValue.BlueAlliance);
     }
 
     @Override
     public void initialize() {
+        goneToInitialPos = false;
         if (Robot.alliance == DriverStation.Alliance.Red) {
-            targetOutpost = OUTPOST_RED;
+            initialTarget = OUTPOST_RED_INITIAL;
+            finalTarget = OUTPOST_RED_FINAL;
         }
         else {
-            targetOutpost = OUTPOST_BLUE;
+            initialTarget = OUTPOST_BLUE_INITIAL;
+            finalTarget = OUTPOST_BLUE_FINAL;
         }
     }
 
     @Override
     public void execute() {
-        drivetrain.setControl(driveToPose(targetOutpost));
+        if (atTargetPos(finalTarget, 0.015)) { // At final
+            drivetrain.setControl(robotContainer.driveFC.withVelocityX(0)
+                    .withVelocityY(0)
+                    .withRotationalRate(0));
+        } 
+        else if (atTargetPos(initialTarget, 0.06) || goneToInitialPos) { // Past initial
+            goneToInitialPos = true;
+            drivetrain.setControl(driveToPose(finalTarget, 0.6));
+        } 
+        else { // Not at initial
+            drivetrain.setControl(driveToPose(initialTarget, 2));
+        }
     }
 
     @Override
-    public void end(boolean interrupted) {}
+    public void end(boolean interrupted) {
+        goneToInitialPos = false;
+    }
 }

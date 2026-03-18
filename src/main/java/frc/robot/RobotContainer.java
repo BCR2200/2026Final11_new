@@ -452,11 +452,18 @@ public class RobotContainer {
     }));
 
     driverController.y().onTrue(new InstantCommand(() -> {
-      // TODO: Boost driver speed while held?
+      // TODO: Set driver speed to optimal for intaking?
     }));
 
     // Drive to the outpost to pickup fuel from human
-    driverController.povRight().whileTrue(new DriveToOutpostCmd(this));
+    driverController.povRight().whileTrue(new DriveToOutpostCmd(this))
+        .onTrue(new InstantCommand(() -> {
+          intakeSubsystem.setTiltPosition(IntakeSubsystem.tiltMaxExtensionPos);
+          intakeSubsystem.setIsIntaking(true);
+        }))
+        .onFalse(new InstantCommand(() -> 
+          intakeSubsystem.setIsIntaking(false)
+        ));
 
     driverController.start().whileTrue(new InstantCommand(() -> {})); // Used in disabled for syncing autos
     driverController.back().whileTrue(new InstantCommand(() -> {})); // Unused
