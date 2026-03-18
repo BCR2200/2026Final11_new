@@ -30,6 +30,7 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.commands.BlendAdamModeCmd;
 import frc.robot.commands.ClimbCommand;
+import frc.robot.commands.DriveToOutpostCmd;
 import frc.robot.commands.ShootAt;
 import frc.robot.commands.auto.AutoCommand;
 import frc.robot.commands.auto.LeftBumpBack;
@@ -451,27 +452,11 @@ public class RobotContainer {
     }));
 
     driverController.y().onTrue(new InstantCommand(() -> {
-      shooterSubsystemJohn.updateParameters();
-      shooterSubsystemJawbreaker.updateParameters();
-      shooterSubsystemTaylor.updateParameters();
-      climberSubsystem.updateParameters();
-      floorFeedSubsystem.updateParameters();
-      intakeSubsystem.updateParameters();
+      // TODO: Boost driver speed while held?
     }));
 
-    // Linear actuator
-    driverController.povUp().whileTrue(new InstantCommand(() -> {
-      shooterSubsystemJohn.setActuatorTargetPosition(shooterSubsystemJohn.getActuatorPosition() + ACTUATOR_STEP);
-      shooterSubsystemJawbreaker
-          .setActuatorTargetPosition(shooterSubsystemJawbreaker.getActuatorPosition() + ACTUATOR_STEP);
-      shooterSubsystemTaylor.setActuatorTargetPosition(shooterSubsystemTaylor.getActuatorPosition() + ACTUATOR_STEP);
-    }));
-    driverController.povDown().whileTrue(new InstantCommand(() -> {
-      shooterSubsystemJohn.setActuatorTargetPosition(shooterSubsystemJohn.getActuatorPosition() - ACTUATOR_STEP);
-      shooterSubsystemJawbreaker
-          .setActuatorTargetPosition(shooterSubsystemJawbreaker.getActuatorPosition() - ACTUATOR_STEP);
-      shooterSubsystemTaylor.setActuatorTargetPosition(shooterSubsystemTaylor.getActuatorPosition() - ACTUATOR_STEP);
-    }));
+    // Drive to the outpost to pickup fuel from human
+    driverController.povRight().whileTrue(new DriveToOutpostCmd(this));
 
     driverController.start().whileTrue(new InstantCommand(() -> {})); // Used in disabled for syncing autos
     driverController.back().whileTrue(new InstantCommand(() -> {})); // Unused
