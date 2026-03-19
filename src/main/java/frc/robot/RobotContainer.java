@@ -39,6 +39,7 @@ import frc.robot.commands.auto.LongLeftBumpBack;
 import frc.robot.commands.auto.RightBumpBack;
 import frc.robot.commands.auto.RightBumpToLeft;
 import frc.robot.commands.auto.RightOutpost;
+import frc.robot.commands.auto.RightOutpostAroundClimber;
 import frc.robot.commands.auto.TestOverrideAuto;
 import frc.robot.drive.CommandSwerveDrivetrain;
 import frc.robot.drive.Telemetry;
@@ -304,6 +305,7 @@ public class RobotContainer {
     autoChooser.setDefaultOption("None", null);
     autoChooser.addOption("TestOverrideAuto", new TestOverrideAuto(this, drivetrain, driveRC));
     autoChooser.addOption("RightOutpost", new RightOutpost(this, drivetrain, driveRC));
+    autoChooser.addOption("RightOutpostAroundClimber", new RightOutpostAroundClimber(this, drivetrain, driveRC));
     autoChooser.addOption("RightBumpBack", new RightBumpBack(this, drivetrain, driveRC));
     autoChooser.addOption("LeftBumpBack", new LeftBumpBack(this, drivetrain, driveRC));
     autoChooser.addOption("LongLeftBumpBack", new LongLeftBumpBack(this, drivetrain, driveRC));

@@ -12,89 +12,60 @@
         "y": 0.6386019971469341
       },
       "isLocked": false,
-      "linkedName": "Outpost"
+      "linkedName": "RightOutpostAroundClimber1-2"
     },
     {
       "anchor": {
-        "x": 0.9467189728958629,
-        "y": 1.0655777460770333
+        "x": 2.4236746987951805,
+        "y": 2.5706867469879513
       },
       "prevControl": {
-        "x": 0.9467189728958629,
-        "y": 0.8155777460770333
+        "x": 2.4236746987951805,
+        "y": 1.761962312064815
       },
       "nextControl": {
-        "x": 0.9467189728958629,
-        "y": 1.6871722578923907
+        "x": 2.4236746987951805,
+        "y": 3.192281258803309
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 0.3774179743223962,
-        "y": 2.721726105563481
+        "x": 2.4236746987951805,
+        "y": 5.717867469879518
       },
       "prevControl": {
-        "x": 0.3774179743223964,
-        "y": 0.43154799841530433
+        "x": 2.423674698795181,
+        "y": 3.427689362731342
       },
       "nextControl": {
-        "x": 0.37741797432239627,
-        "y": 3.213395149786021
+        "x": 2.4236746987951805,
+        "y": 6.209536514102059
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 0.3774179743223962,
-        "y": 4.6495863052781745
-      },
-      "prevControl": {
-        "x": 0.3774179743223961,
-        "y": 3.92455945029429
-      },
-      "nextControl": {
-        "x": 0.37741797432239627,
-        "y": 5.374613160262059
-      },
-      "isLocked": false,
-      "linkedName": null
-    },
-    {
-      "anchor": {
-        "x": 0.3774179743223962,
-        "y": 6.344550641940086
-      },
-      "prevControl": {
         "x": 0.3903566333808842,
-        "y": 5.632924393723253
+        "y": 5.82700427960057
+      },
+      "prevControl": {
+        "x": 1.0897301273567883,
+        "y": 5.82700427960057
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "RightOutpost2-3"
+      "linkedName": "RightOutpostAroundClimber2-3"
     }
   ],
-  "rotationTargets": [
-    {
-      "waypointRelativePos": 1.000951927653503,
-      "rotationDegrees": 90.0
-    },
-    {
-      "waypointRelativePos": 3,
-      "rotationDegrees": 90.0
-    },
-    {
-      "waypointRelativePos": 3.2,
-      "rotationDegrees": 95.0
-    }
-  ],
+  "rotationTargets": [],
   "constraintZones": [
     {
       "name": "Constraints Zone",
-      "minWaypointRelativePos": 3.0,
-      "maxWaypointRelativePos": 4.0,
+      "minWaypointRelativePos": 2.5,
+      "maxWaypointRelativePos": 3.0,
       "constraints": {
         "maxVelocity": 1.0,
         "maxAcceleration": 3.0,
@@ -109,7 +80,7 @@
   "eventMarkers": [
     {
       "name": "IntakeRun",
-      "waypointRelativePos": 3.0,
+      "waypointRelativePos": 2.5,
       "endWaypointRelativePos": 4.0,
       "command": null
     }
@@ -124,10 +95,10 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 103.32453126189078
+    "rotation": 180.0
   },
   "reversed": false,
-  "folder": "RightOutpost",
+  "folder": "RightOutpostAroundClimber",
   "idealStartingState": {
     "velocity": 0,
     "rotation": 180.0
