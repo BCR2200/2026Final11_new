@@ -38,13 +38,13 @@ public class DriveToOutpostCmd extends Command {
         Rotation2d.kZero
     );
     public static final Pose2d OUTPOST_BLUE_INITIAL = new Pose2d(
-        Distance.ofBaseUnits(15.22, Meters), // TODO
-        Distance.ofBaseUnits(4.73, Meters), // TODO
+        Distance.ofBaseUnits(1.2, Meters),
+        Distance.ofBaseUnits(0.46, Meters),
         Rotation2d.k180deg
     );
     public static final Pose2d OUTPOST_BLUE_FINAL = new Pose2d(
-        Distance.ofBaseUnits(15.22, Meters), // TODO
-        Distance.ofBaseUnits(4.73, Meters), // TODO
+        Distance.ofBaseUnits(0.72, Meters),
+        Distance.ofBaseUnits(0.46, Meters),
         Rotation2d.k180deg
     );
 
