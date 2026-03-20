@@ -28,42 +28,42 @@ public class ClimbCommand extends Command {
 
     public static final Pose2d BLUE_L_CLIMB_INITIAL = new Pose2d(
             Distance.ofBaseUnits(1.535, Meters),
-            Distance.ofBaseUnits(4.155, Meters),
+            Distance.ofBaseUnits(4.24, Meters),
             Rotation2d.kZero
     );
     public static final Pose2d BLUE_L_CLIMB_FINAL = new Pose2d(
-            Distance.ofBaseUnits(1.355, Meters),
-            Distance.ofBaseUnits(4.155, Meters),
+            Distance.ofBaseUnits(1.34, Meters),
+            Distance.ofBaseUnits(4.24, Meters),
             Rotation2d.kZero
     );
     public static final Pose2d BLUE_R_CLIMB_INITIAL = new Pose2d(
             Distance.ofBaseUnits(1.535, Meters),
-            Distance.ofBaseUnits(3.290, Meters),
+            Distance.ofBaseUnits(3.38, Meters),
             Rotation2d.kZero
     );
     public static final Pose2d BLUE_R_CLIMB_FINAL = new Pose2d(
-            Distance.ofBaseUnits(1.355, Meters),
-            Distance.ofBaseUnits(3.290, Meters),
+            Distance.ofBaseUnits(1.32, Meters),
+            Distance.ofBaseUnits(3.38, Meters),
             Rotation2d.kZero
     );
     public static final Pose2d RED_L_CLIMB_INITIAL = new Pose2d(
             Distance.ofBaseUnits(15.0, Meters),
-            Distance.ofBaseUnits(3.91, Meters),
+            Distance.ofBaseUnits(3.84, Meters),
             Rotation2d.k180deg
     );
     public static final Pose2d RED_L_CLIMB_FINAL = new Pose2d(
-            Distance.ofBaseUnits(15.17, Meters),
-            Distance.ofBaseUnits(3.91, Meters),
+            Distance.ofBaseUnits(15.20, Meters),
+            Distance.ofBaseUnits(3.84, Meters),
             Rotation2d.k180deg
     );
     public static final Pose2d RED_R_CLIMB_INITIAL = new Pose2d(
             Distance.ofBaseUnits(15.0, Meters),
-            Distance.ofBaseUnits(4.73, Meters),
+            Distance.ofBaseUnits(4.69, Meters),
             Rotation2d.k180deg
     );
     public static final Pose2d RED_R_CLIMB_FINAL = new Pose2d(
             Distance.ofBaseUnits(15.22, Meters),
-            Distance.ofBaseUnits(4.73, Meters),
+            Distance.ofBaseUnits(4.69, Meters),
             Rotation2d.k180deg
     );
 
