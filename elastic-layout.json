@@ -25,61 +25,10 @@
             }
           },
           {
-            "title": "J. beam broken",
-            "x": 1280.0,
-            "y": 384.0,
-            "width": 128.0,
-            "height": 128.0,
-            "type": "Boolean Box",
-            "properties": {
-              "topic": "Telemetry/m_robotContainer/John/BeamBroken",
-              "period": 0.06,
-              "data_type": "boolean",
-              "true_color": 4283215696,
-              "false_color": 4294198070,
-              "true_icon": "None",
-              "false_icon": "None"
-            }
-          },
-          {
-            "title": "Jaw. beam broken",
-            "x": 1408.0,
-            "y": 384.0,
-            "width": 128.0,
-            "height": 128.0,
-            "type": "Boolean Box",
-            "properties": {
-              "topic": "Telemetry/m_robotContainer/Jawbreaker/BeamBroken",
-              "period": 0.06,
-              "data_type": "boolean",
-              "true_color": 4283215696,
-              "false_color": 4294198070,
-              "true_icon": "None",
-              "false_icon": "None"
-            }
-          },
-          {
-            "title": "T. beam broken",
-            "x": 1536.0,
-            "y": 384.0,
-            "width": 128.0,
-            "height": 128.0,
-            "type": "Boolean Box",
-            "properties": {
-              "topic": "Telemetry/m_robotContainer/Taylor/BeamBroken",
-              "period": 0.06,
-              "data_type": "boolean",
-              "true_color": 4283215696,
-              "false_color": 4294198070,
-              "true_icon": "None",
-              "false_icon": "None"
-            }
-          },
-          {
             "title": "shooterSpeed",
-            "x": 1664.0,
+            "x": 1792.0,
             "y": 256.0,
-            "width": 256.0,
+            "width": 128.0,
             "height": 128.0,
             "type": "Text Display",
             "properties": {
@@ -91,9 +40,9 @@
           },
           {
             "title": "Distance to Target",
-            "x": 1664.0,
+            "x": 1792.0,
             "y": 384.0,
-            "width": 256.0,
+            "width": 128.0,
             "height": 128.0,
             "type": "Text Display",
             "properties": {
@@ -213,48 +162,9 @@
             }
           },
           {
-            "title": "Jawbreaker Ball count",
-            "x": 1408.0,
-            "y": 512.0,
-            "width": 128.0,
-            "height": 128.0,
-            "type": "Large Text Display",
-            "properties": {
-              "topic": "Telemetry/m_robotContainer/Jawbreaker/Ball count",
-              "period": 0.06,
-              "data_type": "int"
-            }
-          },
-          {
-            "title": "Taylor Ball count",
-            "x": 1536.0,
-            "y": 512.0,
-            "width": 128.0,
-            "height": 128.0,
-            "type": "Large Text Display",
-            "properties": {
-              "topic": "Telemetry/m_robotContainer/Taylor/Ball count",
-              "period": 0.06,
-              "data_type": "int"
-            }
-          },
-          {
-            "title": "John Ball count",
-            "x": 1280.0,
-            "y": 512.0,
-            "width": 128.0,
-            "height": 128.0,
-            "type": "Large Text Display",
-            "properties": {
-              "topic": "Telemetry/m_robotContainer/John/Ball count",
-              "period": 0.06,
-              "data_type": "int"
-            }
-          },
-          {
             "title": "John disabled",
             "x": 1280.0,
-            "y": 256.0,
+            "y": 128.0,
             "width": 128.0,
             "height": 128.0,
             "type": "Boolean Box",
@@ -271,7 +181,7 @@
           {
             "title": "Jawbreaker disabled",
             "x": 1408.0,
-            "y": 256.0,
+            "y": 128.0,
             "width": 128.0,
             "height": 128.0,
             "type": "Boolean Box",
@@ -288,7 +198,7 @@
           {
             "title": "Taylor disabled",
             "x": 1536.0,
-            "y": 256.0,
+            "y": 128.0,
             "width": 128.0,
             "height": 128.0,
             "type": "Boolean Box",
@@ -403,6 +313,19 @@
               "topic": "/SmartDashboard/Auto Chooser",
               "period": 0.06,
               "sort_options": false
+            }
+          },
+          {
+            "title": "limelight-shooter",
+            "x": 1280.0,
+            "y": 256.0,
+            "width": 384.0,
+            "height": 512.0,
+            "type": "Camera Stream",
+            "properties": {
+              "topic": "/CameraPublisher/limelight-shooter",
+              "period": 0.06,
+              "rotation_turns": 0
             }
           }
         ]
@@ -672,6 +595,20 @@
               "topic": "/SmartDashboard/BlendState",
               "period": 0.06,
               "data_type": "string",
+              "show_submit_button": false
+            }
+          },
+          {
+            "title": "botpose",
+            "x": 0.0,
+            "y": 0.0,
+            "width": 512.0,
+            "height": 128.0,
+            "type": "Text Display",
+            "properties": {
+              "topic": "/limelight-shooter/botpose",
+              "period": 0.06,
+              "data_type": "double[]",
               "show_submit_button": false
             }
           }
