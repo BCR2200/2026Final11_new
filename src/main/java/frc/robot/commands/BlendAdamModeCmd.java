@@ -6,6 +6,7 @@ import com.ctre.phoenix6.swerve.SwerveRequest.ForwardPerspectiveValue;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.Constants;
 import frc.robot.ExtraMath;
 import frc.robot.RobotContainer;
 import frc.robot.drive.CommandSwerveDrivetrain;
@@ -20,9 +21,12 @@ public class BlendAdamModeCmd extends Command {
     // TODO correct these values for the errors on the blue side, and for a rotation buffer
 
     // in meters
-    private double blueHUBLine = 5.7;
-    // TODO FIND VALUE
-    private double redHUBLine = 11.6;
+    private final double blueHUBLine = 5.7;
+    private final double redHUBLine = 11.6;
+
+    // TODO FIND VALUES
+    private final double REDDRIVERLINE = 0;
+    private final double BLUEDRIVERLINE = 0;
 
     // left/right from blue's perspective
     private double wallLeftLine = 7.590;
@@ -63,6 +67,10 @@ public class BlendAdamModeCmd extends Command {
         boolean onBlueHubLine = ExtraMath.within(x, blueHUBLine, epsilon);
         boolean onWallLFromBlueLine = ExtraMath.within(y, wallLeftLine, epsilon);
         boolean onWallRFromBlueLine = ExtraMath.within(y, wallRightLine, epsilon);
+
+        // Driver line
+        boolean onRedDriveLine = ExtraMath.within(x, REDDRIVERLINE, epsilon);
+        boolean onBlueDriveLine = ExtraMath.within(x, BLUEDRIVERLINE, epsilon);
 
         if ((onRedHubLine || onBlueHubLine) && (onWallLFromBlueLine || onWallRFromBlueLine)) {
 
@@ -106,7 +114,22 @@ public class BlendAdamModeCmd extends Command {
                 SmartDashboard.putString("BlendState", "On Left From Blue Line");
             }
 
-        } else {
+        } else if (onBlueDriveLine || onRedDriveLine) {
+
+            // on a Drive line (parallel to Y)
+            robot.drivetrain.setControl(robot.driveFC
+                    .withVelocityX(0)
+                    .withVelocityY(-RobotContainer.driverX * RobotContainer.MaxSpeed)
+                    .withRotationalRate(-RobotContainer.driverRot * RobotContainer.MaxAngularRate)
+                    .withForwardPerspective(ForwardPerspectiveValue.OperatorPerspective)
+            );
+
+            if (onRedDriveLine) {
+                SmartDashboard.putString("BlendState", "On Red Drive Line");
+            } else if (onBlueDriveLine) {
+                SmartDashboard.putString("BlendState", "On Blue Drive Line");
+            }
+        }else {
 
             // somewhere in the middle or in an alliance
             SmartDashboard.putString("BlendState", "Free Roam");
