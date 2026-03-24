@@ -313,15 +313,19 @@ public class RobotContainer {
 
     autoChooser = new SendableChooser<>();
     autoChooser.setDefaultOption("None", null);
-    autoChooser.addOption("TestOverrideAuto", new TestOverrideAuto(this, drivetrain, driveRC));
-    autoChooser.addOption("RightOutpost", new RightOutpost(this, drivetrain, driveRC));
-    autoChooser.addOption("RightOutpostAroundClimber", new RightOutpostAroundClimber(this, drivetrain, driveRC));
-    autoChooser.addOption("RightBumpBack", new RightBumpBack(this, drivetrain, driveRC));
-    autoChooser.addOption("LongRightBumpBack", new LongRightBumpBack(this, drivetrain, driveRC));
-    autoChooser.addOption("LeftBumpBack", new LeftBumpBack(this, drivetrain, driveRC));
-    autoChooser.addOption("LongLeftBumpBack", new LongLeftBumpBack(this, drivetrain, driveRC));
+
+    autoChooser.addOption("LeftBump", new LeftBumpBack(this, drivetrain, driveRC));
+    autoChooser.addOption("LongLeftBump", new LongLeftBumpBack(this, drivetrain, driveRC));
+
+    autoChooser.addOption("RightBump", new RightBumpBack(this, drivetrain, driveRC));
+    autoChooser.addOption("LongRightBump", new LongRightBumpBack(this, drivetrain, driveRC));
+
+    autoChooser.addOption("OutpostAroundClimber", new RightOutpostAroundClimber(this, drivetrain, driveRC));
+    autoChooser.addOption("OutpostUnderClimber", new RightOutpost(this, drivetrain, driveRC));
+
     autoChooser.addOption("LeftBumpToRight", new LeftBumpToRight(this, drivetrain, driveRC));
     autoChooser.addOption("RightBumpToLeft", new RightBumpToLeft(this, drivetrain, driveRC));
+
     SmartDashboard.putData("Auto Chooser", autoChooser);
   }
 
