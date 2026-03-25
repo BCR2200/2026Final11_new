@@ -112,6 +112,7 @@ public class ClimbCommand extends Command {
         return robot.driveFCFAVelocityMode.withVelocityX(ExtraMath.clampedDeadzone(getXToTarget(target)*TRANSLATION_P, 1, 0.0001))
                 .withVelocityY(ExtraMath.clampedDeadzone(getYToTarget(target)*TRANSLATION_P, 1, 0.0001))
                 .withTargetDirection(target.getRotation())
+                .withMaxAbsRotationalRate(6)
                 .withForwardPerspective(ForwardPerspectiveValue.BlueAlliance);
     }
 

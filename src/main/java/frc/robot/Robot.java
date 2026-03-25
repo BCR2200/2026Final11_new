@@ -199,6 +199,8 @@ public class Robot extends TimedRobot {
     var botState = m_robotContainer.drivetrain.getState();
     LimelightHelpers.SetRobotOrientation(Constants.SHOOTER_LIMELIGHT_NAME, 
         botState.Pose.getRotation().getDegrees(), 0, 0, 0, 0, 0);
+    LimelightHelpers.SetRobotOrientation(Constants.SIDE_LIMELIGHT_NAME, 
+        botState.Pose.getRotation().getDegrees(), 0, 0, 0, 0, 0);
     
 
     // Getting the robot's angular velocity in rotations per second

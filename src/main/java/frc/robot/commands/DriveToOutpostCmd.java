@@ -63,6 +63,7 @@ public class DriveToOutpostCmd extends Command {
         return robotContainer.driveFCFAVelocityMode.withVelocityX(ExtraMath.clampedDeadzone(getXToTarget(target)*TRANSLATION_P, maxSpeed, 0.0001))
                 .withVelocityY(ExtraMath.clampedDeadzone(getYToTarget(target)*TRANSLATION_P, maxSpeed, 0.0001))
                 .withTargetDirection(target.getRotation())
+                .withMaxAbsRotationalRate(6)
                 .withForwardPerspective(ForwardPerspectiveValue.BlueAlliance);
     }
 

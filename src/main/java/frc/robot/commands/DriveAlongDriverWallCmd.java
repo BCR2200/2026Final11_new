@@ -35,7 +35,7 @@ public class DriveAlongDriverWallCmd extends Command {
 
     public static final Pose2d RED_RIGHT_INITIAL = Constants.OUTPOST_RED_INITIAL;
     public static final Pose2d RED_RIGHT_FINAL = new Pose2d(
-        Distance.ofBaseUnits(Constants.OUTPOST_RED_FINAL.getX() + 0.25, Meters),
+        Distance.ofBaseUnits(Constants.OUTPOST_RED_FINAL.getX() + 0.3, Meters),
         Distance.ofBaseUnits(Constants.OUTPOST_RED_FINAL.getY() - 0.5, Meters),
         Rotation2d.kCW_90deg
     );
@@ -45,16 +45,16 @@ public class DriveAlongDriverWallCmd extends Command {
         Rotation2d.kZero
     );
     public static final Pose2d RED_LEFT_FINAL = new Pose2d(
-        Distance.ofBaseUnits(Constants.OUTPOST_RED_INITIAL.getX() + 0.25, Meters),
+        Distance.ofBaseUnits(Constants.OUTPOST_RED_FINAL.getX() + 0.3, Meters),
         Distance.ofBaseUnits(Constants.OUTPOST_BLUE_INITIAL.getY() + 0.5, Meters),
         Rotation2d.kCCW_90deg
     );
 
     public static final Pose2d BLUE_RIGHT_INITIAL = Constants.OUTPOST_BLUE_INITIAL;
     public static final Pose2d BLUE_RIGHT_FINAL = new Pose2d(
-        Distance.ofBaseUnits(Constants.OUTPOST_BLUE_FINAL.getX() - 0.25, Meters),
+        Distance.ofBaseUnits(Constants.OUTPOST_BLUE_FINAL.getX() - 0.3, Meters),
         Distance.ofBaseUnits(Constants.OUTPOST_BLUE_FINAL.getY() + 0.5, Meters),
-        Rotation2d.kCCW_90deg
+        Rotation2d.fromDegrees(100)
     );
     public static final Pose2d BLUE_LEFT_INITIAL = new Pose2d(
         Distance.ofBaseUnits(Constants.OUTPOST_BLUE_INITIAL.getX(), Meters),
@@ -62,7 +62,7 @@ public class DriveAlongDriverWallCmd extends Command {
         Rotation2d.k180deg
     );
     public static final Pose2d BLUE_LEFT_FINAL = new Pose2d(
-        Distance.ofBaseUnits(Constants.OUTPOST_BLUE_INITIAL.getX() - 0.25, Meters),
+        Distance.ofBaseUnits(Constants.OUTPOST_BLUE_FINAL.getX() - 0.3, Meters),
         Distance.ofBaseUnits(Constants.OUTPOST_RED_INITIAL.getY() - 0.5, Meters),
         Rotation2d.kCW_90deg
     );
@@ -157,14 +157,14 @@ public class DriveAlongDriverWallCmd extends Command {
         }
         else if (atTargetPos(middleTarget, 0.06) || goneToMiddlePos) { // Past middle
             goneToMiddlePos = true;
-            drivetrain.setControl(driveToPose(finalTarget, 0.6, 0.001, false));
+            drivetrain.setControl(driveToPose(finalTarget, 0.9, 0.001, false));
         }
         else if (atTargetPos(initialTarget, 0.06) || goneToInitialPos) { // Past initial
             goneToInitialPos = true;
-            drivetrain.setControl(driveToPose(middleTarget, 0.6, 0.5, true));
+            drivetrain.setControl(driveToPose(middleTarget, 0.6, 2.0, true));
         }
         else { // Not at initial
-            drivetrain.setControl(driveToPose(initialTarget, 2, 0, true)); // maxRotationalRate of 0 means no max
+            drivetrain.setControl(driveToPose(initialTarget, 1.5, 0, true)); // maxRotationalRate of 0 means no max
         }
     }
 
