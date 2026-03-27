@@ -27,12 +27,12 @@ public class LongerLeftBumpBack extends AutoCommand {
             AutoBuildingBlocks.autoStep("PATH 1"),
             AutoBuildingBlocks.followPathCommand(path1, drivetrain),
             AutoBuildingBlocks.autoStep("Shoot"),
-            Commands.parallel(
+            Commands.race(
                 new ShootAt(robot),
                 Commands.sequence(
                     new WaitCommand(4), // Wait before intake up
                     new InstantCommand(() -> robot.intakeSubsystem.setTiltPosition(IntakeSubsystem.tiltHalfExtensionPos)),
-                    new WaitCommand(2) // Wait to finish shooting
+                    new WaitCommand(2.5) // Wait to finish shooting
                 )
             ),
             AutoBuildingBlocks.autoStep("PATH 2"),

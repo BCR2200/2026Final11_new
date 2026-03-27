@@ -37,6 +37,12 @@
       "waypointRelativePos": 0,
       "endWaypointRelativePos": null,
       "command": null
+    },
+    {
+      "name": "IntakeRun",
+      "waypointRelativePos": 0,
+      "endWaypointRelativePos": 1.0,
+      "command": null
     }
   ],
   "globalConstraints": {
@@ -49,7 +55,7 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 131.98721249581658
+    "rotation": -2.8841405269035496
   },
   "reversed": false,
   "folder": "LongLeftBumpBack",
