@@ -157,7 +157,7 @@ public class DriveAlongDriverWallCmd extends Command {
         }
         else if (atTargetPos(middleTarget, 0.06) || goneToMiddlePos) { // Past middle
             goneToMiddlePos = true;
-            drivetrain.setControl(driveToPose(finalTarget, 0.9, 0.001, false));
+            drivetrain.setControl(driveToPose(finalTarget, 1.1, 0.001, false));
         }
         else if (atTargetPos(initialTarget, 0.06) || goneToInitialPos) { // Past initial
             goneToInitialPos = true;
