@@ -156,14 +156,8 @@ public class IntakeSubsystem extends SubsystemBase {
             intakePIDMotor.setPercentOutput(0);
         }
 
-        isJiggling = false;
-        // for (ShooterSubsystem shooter : floorSubsystem.shooters) {
-        //     if (shooter.getIsShooting()) {
-        //         isJiggling = true;
-        //         break;
-        //     }
-        // }
-        isJiggling = false; // TODO: FOR NOW MUST NOT JIGGLE
+        // isJiggling = floorSubsystem.getNeedToRun();
+        isJiggling = false; // FOR NOW MUST NOT JIGGLE
 
         if (isGoingUp) {
             tiltPos += 2.0;
