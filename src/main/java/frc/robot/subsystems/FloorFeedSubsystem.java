@@ -21,6 +21,8 @@ public class FloorFeedSubsystem extends SubsystemBase {
     private double secondsToHighPoint = 0.001;
     private double secondsToLowPoint = 1.25;
     private double speedChangeFactor = 1.0;
+    @NotLogged
+    private Timer delayTimer = new Timer();
     @Logged
     private boolean needsToRun = false;
 
@@ -51,10 +53,10 @@ public class FloorFeedSubsystem extends SubsystemBase {
     private static final double PARAM_MJ = 0.00;
 
     @NotLogged
-    public ShooterSubsystem[] shooters;
+    public ShooterSubsystem shooterSubsystem;
 
-    public FloorFeedSubsystem(int statorCurrentLimit, int supplyCurrentLimit, ShooterSubsystem... shooters) {
-        this.shooters = shooters;
+    public FloorFeedSubsystem(int statorCurrentLimit, int supplyCurrentLimit, ShooterSubsystem shooterSubsystem) {
+        this.shooterSubsystem = shooterSubsystem;
         motor = PIDMotor.makeMotor(Constants.FLOOR_FEED_MOTOR_ID, "Floor Feed",
                 PARAM_P, PARAM_I, PARAM_D, PARAM_S, PARAM_V, PARAM_A, PARAM_MV, PARAM_MA, PARAM_MJ);
         motor.setInverted(InvertedValue.Clockwise_Positive);
@@ -149,15 +151,18 @@ public class FloorFeedSubsystem extends SubsystemBase {
 
     @Override
     public void periodic() {
-        // Control logic only - telemetry handled by Epilogue
-
-        // Check if any shooter needs the floor to run (or if isFeeding is manually set to true)
-        boolean tmpNeedsToRun = false;
-        for (ShooterSubsystem shooter : shooters) {
-            tmpNeedsToRun |= shooter.needsFloorFeed();
-            if (tmpNeedsToRun) break;
+        if (!needsToRun && shooterSubsystem.needsFloorFeed() && !delayTimer.isRunning()) {
+            delayTimer.reset();
+            delayTimer.start();
         }
-        this.needsToRun = tmpNeedsToRun;
+
+        if (shooterSubsystem.needsFloorFeed() && delayTimer.hasElapsed(0.5)) {
+            needsToRun = true;
+            delayTimer.stop();
+        }
+        else {
+            needsToRun = false;
+        }
 
         if (isOuttaking) {
             motor.setVelocityTarget(-getVelocityAtTime(Timer.getFPGATimestamp()));

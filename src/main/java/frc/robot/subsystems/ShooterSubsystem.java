@@ -18,7 +18,7 @@ public class ShooterSubsystem extends SubsystemBase {
     private double shooterSpeed = 54; // in rps
     private boolean isFeeding = false;
 
-    public boolean isManualMode = true;
+    public boolean isManualMode = false;
     public double manualShooterSpeed = 0;
     public double manualTagetHoodPosition = 0;
 
@@ -133,17 +133,17 @@ public class ShooterSubsystem extends SubsystemBase {
      * 
      * @param distance in m
      */
-    public void setShooterSpeedViaInterpolatedValue(double distance) {
+    public void setShooterTargetSpeedViaInterpolatedValue(double distance) {
         this.shooterSpeed = shooterVelocityInterpolator.clampedInterpolate(distance, 0, 95); // In rps
     }
 
-     /**
+    /**
      * Interpolate the shooter hood positon given a distance from the target
      * 
      * @param distance in m
      */
     public void setHoodPositionViaInterpolatedValue(double distance) {
-        this.shooterSpeed = shooterAngleInterpolator.clampedInterpolate(distance, 0, -7); // in rotations
+        vantHoodPIDMotor.setTarget(shooterAngleInterpolator.clampedInterpolate(distance, -7, 0)); // in rotations
     }
 
     /**
@@ -186,7 +186,7 @@ public class ShooterSubsystem extends SubsystemBase {
 
         // Fixed shots
         if (rc.fixedPassingShot) {
-            setShooterSpeedViaInterpolatedValue(8.5);
+            setShooterTargetSpeedViaInterpolatedValue(8.5);
             setHoodPositionViaInterpolatedValue(8.5);
             if (isShooting) {
                 johnShootPIDMotor.setVelocityTarget(shooterSpeed);
@@ -197,7 +197,7 @@ public class ShooterSubsystem extends SubsystemBase {
             return;
         }
         else if (rc.fixedShotFromHub) {
-            setShooterSpeedViaInterpolatedValue(1);
+            setShooterTargetSpeedViaInterpolatedValue(1);
             setHoodPositionViaInterpolatedValue(1);
             if (isShooting) {
                 johnShootPIDMotor.setVelocityTarget(shooterSpeed);
@@ -208,7 +208,7 @@ public class ShooterSubsystem extends SubsystemBase {
             return;
         }
         else if (rc.fixedShotFromClimber) {
-            setShooterSpeedViaInterpolatedValue(3.5);
+            setShooterTargetSpeedViaInterpolatedValue(3.5);
             setHoodPositionViaInterpolatedValue(3.5);
             if (isShooting) {
                 johnShootPIDMotor.setVelocityTarget(shooterSpeed);
@@ -222,9 +222,9 @@ public class ShooterSubsystem extends SubsystemBase {
         // Shoot
         if (isShooting) {
             if (rc.passing) {
-                setShooterSpeedViaInterpolatedValue(rc.getDistanceToTarget(rc.passTarget));
+                setShooterTargetSpeedViaInterpolatedValue(rc.getDistanceToTarget(rc.passTarget));
             } else {
-                setShooterSpeedViaInterpolatedValue(rc.getDistanceToTarget(rc.compensatedTargetHub));
+                setShooterTargetSpeedViaInterpolatedValue(rc.getDistanceToTarget(rc.compensatedTargetHub));
             }
             johnShootPIDMotor.setVelocityTarget(shooterSpeed);
         } else {
