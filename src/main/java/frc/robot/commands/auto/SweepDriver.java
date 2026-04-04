@@ -21,9 +21,8 @@ public class SweepDriver extends AutoCommand {
         addCommands(
             new WaitCommand(0.01),
             AutoBuildingBlocks.autoStep("PATH"),
-            // TODO: MAKE THE MAX SPEED to drive to the path HIGHER LATER
             Commands.race(
-                drivetrain.applyRequest(() -> robotContainer.driveToPose(getProperFlippedStartingPose(), 1, 6.0)),
+                drivetrain.applyRequest(() -> robotContainer.driveToPose(getProperFlippedStartingPose(), 2, 6.0)),
                 new WaitUntilCommand(() -> robotContainer.atTargetPos(getProperFlippedStartingPose(), 0.1))
             ),
             AutoBuildingBlocks.followPathCommand(path, drivetrain)
