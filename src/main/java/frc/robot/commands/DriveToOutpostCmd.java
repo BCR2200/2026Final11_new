@@ -1,14 +1,10 @@
 package frc.robot.commands;
 
-import com.ctre.phoenix6.swerve.SwerveRequest;
-import com.ctre.phoenix6.swerve.SwerveRequest.ForwardPerspectiveValue;
-
 import edu.wpi.first.epilogue.NotLogged;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants;
-import frc.robot.ExtraMath;
 import frc.robot.Robot;
 import frc.robot.RobotContainer;
 import frc.robot.drive.CommandSwerveDrivetrain;
@@ -34,39 +30,6 @@ public class DriveToOutpostCmd extends Command {
         addRequirements(drivetrain);
     }
 
-    public double getXToTarget(Pose2d targetPose) {
-        Pose2d robotPose2d = drivetrain.getState().Pose;
-        return targetPose.getX() - robotPose2d.getX();
-    }
-
-    public double getYToTarget(Pose2d targetPose) {
-        Pose2d robotPose2d = drivetrain.getState().Pose;
-        return targetPose.getY() - robotPose2d.getY();
-    }
-
-    /**
-     * Returns true if the robot is at the specified postion, false otherwise
-     * @param targetPos the target pos
-     * @param threashold the threashold that the robot can be within to count as there
-     * @return if robot is at the targetPos
-     */
-    public boolean atTargetPos(Pose2d targetPos, double threashold) {
-        return getDistanceToTarget(targetPos) < threashold;
-    }
-
-    public double getDistanceToTarget(Pose2d targetPose) {
-        Pose2d robotPose = drivetrain.getState().Pose;
-        return robotPose.getTranslation().getDistance(targetPose.getTranslation());
-    }
-
-    private SwerveRequest.FieldCentricFacingAngle driveToPose(Pose2d target, double maxSpeed) {
-        return robotContainer.driveFCFAVelocityMode.withVelocityX(ExtraMath.clampedDeadzone(getXToTarget(target)*TRANSLATION_P, maxSpeed, 0.0001))
-                .withVelocityY(ExtraMath.clampedDeadzone(getYToTarget(target)*TRANSLATION_P, maxSpeed, 0.0001))
-                .withTargetDirection(target.getRotation())
-                .withMaxAbsRotationalRate(6)
-                .withForwardPerspective(ForwardPerspectiveValue.BlueAlliance);
-    }
-
     @Override
     public void initialize() {
         goneToInitialPos = false;
@@ -82,17 +45,17 @@ public class DriveToOutpostCmd extends Command {
 
     @Override
     public void execute() {
-        if (atTargetPos(finalTarget, 0.015)) { // At final
+        if (robotContainer.atTargetPos(finalTarget, 0.015)) { // At final
             drivetrain.setControl(robotContainer.driveFC.withVelocityX(0)
                     .withVelocityY(0)
                     .withRotationalRate(0));
         } 
-        else if (atTargetPos(initialTarget, 0.06) || goneToInitialPos) { // Past initial
+        else if (robotContainer.atTargetPos(initialTarget, 0.06) || goneToInitialPos) { // Past initial
             goneToInitialPos = true;
-            drivetrain.setControl(driveToPose(finalTarget, 0.6));
+            drivetrain.setControl(robotContainer.driveToPose(finalTarget, 0.6, TRANSLATION_P));
         } 
         else { // Not at initial
-            drivetrain.setControl(driveToPose(initialTarget, 2));
+            drivetrain.setControl(robotContainer.driveToPose(initialTarget, 2, TRANSLATION_P));
         }
     }
 

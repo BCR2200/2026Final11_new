@@ -1,15 +1,11 @@
 package frc.robot.commands;
 
-import com.ctre.phoenix6.swerve.SwerveRequest;
-import com.ctre.phoenix6.swerve.SwerveRequest.ForwardPerspectiveValue;
-
 import edu.wpi.first.epilogue.NotLogged;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.ExtraMath;
 import frc.robot.Robot;
 import frc.robot.RobotContainer;
 import frc.robot.drive.CommandSwerveDrivetrain;
@@ -71,49 +67,16 @@ public class ClimbCommand extends Command {
 
     private final CommandSwerveDrivetrain drivetrain;
     private final ClimbSubsystem climberSubsystem;
-    private final RobotContainer robot;
+    private final RobotContainer robotContainer;
     private final boolean isOnRight;
     private boolean goneToInitialPos = false;
 
-    public ClimbCommand(RobotContainer robot, boolean isRight) {
-        this.robot = robot;
-        this.drivetrain = robot.drivetrain;
-        this.climberSubsystem = robot.climberSubsystem;
+    public ClimbCommand(RobotContainer robotContainer, boolean isRight) {
+        this.robotContainer = robotContainer;
+        this.drivetrain = robotContainer.drivetrain;
+        this.climberSubsystem = robotContainer.climberSubsystem;
         this.isOnRight = isRight;
         addRequirements(drivetrain, climberSubsystem);
-    }
-
-    public double getXToTarget(Pose2d targetPose) {
-        Pose2d robotPose2d = drivetrain.getState().Pose;
-        return targetPose.getX() - robotPose2d.getX();
-    }
-
-    public double getYToTarget(Pose2d targetPose) {
-        Pose2d robotPose2d = drivetrain.getState().Pose;
-        return targetPose.getY() - robotPose2d.getY();
-    }
-
-    /**
-     * Returns true if the robot is at the specified postion, false otherwise
-     * @param targetPos the target pos
-     * @param threashold the threashold that the robot can be within to count as there
-     * @return if robot is at the targetPos
-     */
-    public boolean atTargetPos(Pose2d targetPos, double threashold) {
-        return getDistanceToTarget(targetPos) < threashold;
-    }
-
-    public double getDistanceToTarget(Pose2d targetPose) {
-        Pose2d robotPose = drivetrain.getState().Pose;
-        return robotPose.getTranslation().getDistance(targetPose.getTranslation());
-    }
-
-    private SwerveRequest.FieldCentricFacingAngle driveToPose(Pose2d target) {
-        return robot.driveFCFAVelocityMode.withVelocityX(ExtraMath.clampedDeadzone(getXToTarget(target)*TRANSLATION_P, 1, 0.0001))
-                .withVelocityY(ExtraMath.clampedDeadzone(getYToTarget(target)*TRANSLATION_P, 1, 0.0001))
-                .withTargetDirection(target.getRotation())
-                .withMaxAbsRotationalRate(6)
-                .withForwardPerspective(ForwardPerspectiveValue.BlueAlliance);
     }
 
     @Override
@@ -128,16 +91,16 @@ public class ClimbCommand extends Command {
 
     @Override
     public void execute() {
-        if (atTargetPos(targetClimbFinal, 0.015)) { // At final
+        if (robotContainer.atTargetPos(targetClimbFinal, 0.015)) { // At final
             climberSubsystem.climb();
-            drivetrain.setControl(robot.driveFC.withVelocityX(0)
+            drivetrain.setControl(robotContainer.driveFC.withVelocityX(0)
                     .withVelocityY(0)
                     .withRotationalRate(0));
-        } else if (atTargetPos(targetClimbInitial, 0.06) || goneToInitialPos) { // Past initial
+        } else if (robotContainer.atTargetPos(targetClimbInitial, 0.06) || goneToInitialPos) { // Past initial
             goneToInitialPos = true;
-            drivetrain.setControl(driveToPose(targetClimbFinal));
+            drivetrain.setControl(robotContainer.driveToPose(targetClimbFinal, 1, TRANSLATION_P));
         } else { // Not at initial
-            drivetrain.setControl(driveToPose(targetClimbInitial));
+            drivetrain.setControl(robotContainer.driveToPose(targetClimbInitial, 1, TRANSLATION_P));
         }
     }
 

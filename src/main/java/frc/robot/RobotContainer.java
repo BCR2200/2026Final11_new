@@ -30,7 +30,6 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.commands.BlendAdamModeCmd;
 import frc.robot.commands.ClimbCommand;
-import frc.robot.commands.DriveAlongDriverWallCmd;
 import frc.robot.commands.DriveToOutpostCmd;
 import frc.robot.commands.ShootAt;
 import frc.robot.commands.auto.AutoCommand;
@@ -44,6 +43,7 @@ import frc.robot.commands.auto.RightBumpBack;
 import frc.robot.commands.auto.RightBumpToLeft;
 import frc.robot.commands.auto.RightOutpost;
 import frc.robot.commands.auto.RightOutpostAroundClimber;
+import frc.robot.commands.auto.SweepDriver;
 import frc.robot.drive.CommandSwerveDrivetrain;
 import frc.robot.drive.Telemetry;
 import frc.robot.drive.TunerConstantsComp;
@@ -353,6 +353,37 @@ public class RobotContainer {
     }
   }
 
+  public double getXToTarget(Pose2d targetPose) {
+      return targetPose.getX() - drivetrain.getState().Pose.getX();
+  }
+  public double getYToTarget(Pose2d targetPose) {
+      return targetPose.getY() - drivetrain.getState().Pose.getY();
+  }
+
+  /**
+   * Returns true if the robot is at the specified postion, false otherwise
+   * @param targetPos the target pos
+   * @param threashold the threashold that the robot can be within to count as there
+   * @return if robot is at the targetPos
+   */
+  public boolean atTargetPos(Pose2d targetPos, double threashold) {
+      return getDistanceToTarget(targetPos) < threashold;
+  }
+
+  /**
+   * Drives the robot to a target pose while facing the target pose, using field-centric
+   * @param target
+   * @return a SwerveRequest that can be applied to the drivetrain
+   */
+  public SwerveRequest.FieldCentricFacingAngle driveToPose(Pose2d target, double maxSpeed, double translationP) {
+    return driveFCFAVelocityMode
+            .withVelocityX(ExtraMath.clampedDeadzone(getXToTarget(target)*translationP, maxSpeed, 0.0001))
+            .withVelocityY(ExtraMath.clampedDeadzone(getYToTarget(target)*translationP, maxSpeed, 0.0001))
+            .withTargetDirection(target.getRotation())
+            .withMaxAbsRotationalRate(6)
+            .withForwardPerspective(ForwardPerspectiveValue.BlueAlliance);
+  }
+
   /**
    * Checks if the robot is outside its alliance zone, which is past 4.625 (on
    * blue) and before 11.916 meters (on red) from the starting wall.
@@ -445,8 +476,15 @@ public class RobotContainer {
           intakeSubsystem.setIsIntaking(false)
         ));
     
-    // ALL of the poses here are guesses, USE AT YOUR OWN RISK!
-    driverController.povDown().whileTrue(new DriveAlongDriverWallCmd(this));
+    // Sweep the driver wall, for fun and profit (and to look cool)!
+    driverController.povDown().whileTrue(new SweepDriver(this, drivetrain, driveRC))
+        .onTrue(new InstantCommand(() -> {
+          intakeSubsystem.setTiltPosition(IntakeSubsystem.tiltMaxExtensionPos);
+          intakeSubsystem.setIsIntaking(true);
+        }))
+        .onFalse(new InstantCommand(() -> 
+          intakeSubsystem.setIsIntaking(false)
+        ));
 
     driverController.start().whileTrue(new InstantCommand(() -> {})); // Used in disabled for syncing autos
     driverController.back().whileTrue(new InstantCommand(() -> {})); // Unused

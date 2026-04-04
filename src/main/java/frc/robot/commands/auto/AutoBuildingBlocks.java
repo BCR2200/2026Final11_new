@@ -77,8 +77,7 @@ public class AutoBuildingBlocks {
             // PID constants for rotation
             new PIDConstants(7.0, 0, 0)),
         config,
-        // Assume the path needs to be flipped for Red vs Blue, this is normally the
-        // case
+        // Assume the path needs to be flipped for Red vs Blue, this is normally the case
         () -> Robot.alliance == Alliance.Red,
         drivetrain // Subsystem for requirements
     );
