@@ -65,7 +65,7 @@ public class ShooterSubsystem extends SubsystemBase {
 
         // John shooter (top left)
         johnShootPIDMotor = PIDMotor.makeMotor(Constants.JOHN_SHOOTER_MOTOR_ID, "john shooter", shootP, shootI, shootD,
-                shootS, shootV, shootA, maxRps, maxRps, 0.00);
+                shootS, shootV, shootA, 0,  maxRps, maxRps, 0.00, true);
         johnShootPIDMotor.setInverted(InvertedValue.Clockwise_Positive);
         johnShootPIDMotor.setStatorCurrentLimit(shootStatorCurrentLimit);
         johnShootPIDMotor.setSupplyCurrentLimit(shootSupplyCurrentLimit);
@@ -73,7 +73,7 @@ public class ShooterSubsystem extends SubsystemBase {
 
         // Jawbreaker shooter (top right)
         jawbreakerShootPIDMotor = PIDMotor.makeMotor(Constants.JAWBREAKER_SHOOTER_MOTOR_ID, "jawbreaker shooter", shootP, shootI, shootD,
-                shootS, shootV, shootA, maxRps, maxRps, 0.00);
+                shootS, shootV, shootA, 0, maxRps, maxRps, 0.00, true);
         jawbreakerShootPIDMotor.setInverted(InvertedValue.CounterClockwise_Positive); // The one on the other side is flipped
         jawbreakerShootPIDMotor.setStatorCurrentLimit(shootStatorCurrentLimit);
         jawbreakerShootPIDMotor.setSupplyCurrentLimit(shootSupplyCurrentLimit);
@@ -82,7 +82,7 @@ public class ShooterSubsystem extends SubsystemBase {
 
         // Taylor shooter (middle left)
         taylorShootPIDMotor = PIDMotor.makeMotor(Constants.TAYLOR_SHOOTER_MOTOR_ID, "taylor shooter", shootP, shootI, shootD,
-                shootS, shootV, shootA, maxRps, maxRps, 0.00);
+                shootS, shootV, shootA, 0, maxRps, maxRps, 0.00, true);
         taylorShootPIDMotor.setInverted(InvertedValue.Clockwise_Positive);
         taylorShootPIDMotor.setStatorCurrentLimit(shootStatorCurrentLimit);
         taylorShootPIDMotor.setSupplyCurrentLimit(shootSupplyCurrentLimit);
