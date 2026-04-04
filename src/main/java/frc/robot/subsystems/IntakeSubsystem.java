@@ -16,6 +16,8 @@ public class IntakeSubsystem extends SubsystemBase {
     private boolean isGoingUp = false;
     private boolean isOuttaking = false;
 
+    public boolean powerSavingMode = false;
+
     @Logged(name = "IntakeMotor")
     public PIDMotor intakePIDMotor;
     @Logged(name = "TiltMotor")
@@ -145,7 +147,7 @@ public class IntakeSubsystem extends SubsystemBase {
         if (isOuttaking) {
             intakePIDMotor.setPercentOutput(-1);
         } 
-        else if (isIntaking || floorSubsystem.getNeedToRun()) {
+        else if (isIntaking || (floorSubsystem.getNeedToRun() && !powerSavingMode)) {
             intakePIDMotor.setPercentOutput(1);
         }
         else {

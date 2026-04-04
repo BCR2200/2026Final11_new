@@ -191,7 +191,7 @@ public class RobotContainer {
   @NotLogged
   private static final int floorStatorCurrentLimit = 100;
   @NotLogged
-  private static final int floorSupplyCurrentLimit = 50;
+  private static final int floorSupplyCurrentLimit = 20;
   @NotLogged
   private static final int intakeCurrentLimit = 100;
   @NotLogged
@@ -547,8 +547,13 @@ public class RobotContainer {
     // coDriverController.povRight().onTrue(new InstantCommand(() -> shooterSubsystem.manualTagetHoodPosition += 0.25));
     // coDriverController.povLeft().onTrue(new InstantCommand(() -> shooterSubsystem.manualTagetHoodPosition -= 0.25));
 
+    // Disables the floor and intake
     coDriverController.povLeft().onTrue(new InstantCommand(() -> shooterSubsystem.powerSavingMode = true));
     coDriverController.povRight().onTrue(new InstantCommand(() -> shooterSubsystem.powerSavingMode = false));
+
+    // Disables only the intake
+    coDriverController.povUp().onTrue(new InstantCommand(() -> intakeSubsystem.powerSavingMode = true));
+    coDriverController.povDown().onTrue(new InstantCommand(() -> intakeSubsystem.powerSavingMode = false));
 
     // Reset odometry
     coDriverController.back().and(coDriverController.start()).onTrue(new InstantCommand(() -> {
