@@ -59,12 +59,12 @@ public class IntakeSubsystem extends SubsystemBase {
         this.floorSubsystem = floorSubsystem;
         intakePIDMotor = PIDMotor.makeMotor(intakeMotorID, "intake", 0.11, 0.0, 0.0,
                 0.25, 0.13, 0.01, 100, 1000, 0.00);
-        intakePIDMotor.setCurrentLimit(intakeCurrentLimit);
+        intakePIDMotor.setStatorCurrentLimit(intakeCurrentLimit);
         intakePIDMotor.setIdleCoastMode();
 
         tiltPIDMotor = PIDMotor.makeMotor(tiltMotorID, "tilt", 0.1, 0.0, 0.0,
                 0.25, 0.12, 0.00, tiltMaxSpeed, tiltMaxAccel, 0.00);
-        tiltPIDMotor.setCurrentLimit(tiltCurrentLimit);
+        tiltPIDMotor.setStatorCurrentLimit(tiltCurrentLimit);
         tiltPIDMotor.setIdleCoastMode();
     }
 

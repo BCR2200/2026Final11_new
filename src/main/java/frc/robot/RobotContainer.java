@@ -197,7 +197,9 @@ public class RobotContainer {
   @NotLogged
   private static final int tiltCurrentLimit = 35;
   @NotLogged
-  private static final int shooterCurrentLimit = 80;
+  private static final int shooterStatorCurrentLimit = 80;
+  @NotLogged
+  private static final int shooterSupplyCurrentLimit = 50;
   @NotLogged
   private static final int feederCurrentLimit = 60;
   @NotLogged
@@ -229,8 +231,8 @@ public class RobotContainer {
 
   // Subsystems - logged via their @Logged annotations
   @Logged(name = "Shooter")
-  public final ShooterSubsystem shooterSubsystem = new ShooterSubsystem(shooterCurrentLimit, feederCurrentLimit, hoodCurrentLimit,
-      HOOD_INTERPOLATOR, SHOTER_WEEL_VELOSITY_INTERPOLATOR, TIME_OF_FLIGHT_INTERPOLATOR, this);
+  public final ShooterSubsystem shooterSubsystem = new ShooterSubsystem(shooterStatorCurrentLimit, shooterSupplyCurrentLimit, 
+      feederCurrentLimit, hoodCurrentLimit, HOOD_INTERPOLATOR, SHOTER_WEEL_VELOSITY_INTERPOLATOR, TIME_OF_FLIGHT_INTERPOLATOR, this);
 
   @Logged(name = "FloorFeed")
   private final FloorFeedSubsystem floorFeedSubsystem = new FloorFeedSubsystem(floorStatorCurrentLimit, floorSupplyCurrentLimit, shooterSubsystem);
@@ -537,12 +539,16 @@ public class RobotContainer {
       climberSubsystem.goHome();
     }));
 
-    coDriverController.rightBumper().onTrue(new InstantCommand(() -> shooterSubsystem.setManualMode(true)));
-    coDriverController.leftBumper().onTrue(new InstantCommand(() -> shooterSubsystem.setManualMode(false)));
-    coDriverController.povUp().onTrue(new InstantCommand(() -> shooterSubsystem.manualShooterSpeed += 1));
-    coDriverController.povDown().onTrue(new InstantCommand(() -> shooterSubsystem.manualShooterSpeed -= 1));
-    coDriverController.povRight().onTrue(new InstantCommand(() -> shooterSubsystem.manualTagetHoodPosition += 0.25));
-    coDriverController.povLeft().onTrue(new InstantCommand(() -> shooterSubsystem.manualTagetHoodPosition -= 0.25));
+    // Manual shooter controls for testing and fine-tuning
+    // coDriverController.rightBumper().onTrue(new InstantCommand(() -> shooterSubsystem.setManualMode(true)));
+    // coDriverController.leftBumper().onTrue(new InstantCommand(() -> shooterSubsystem.setManualMode(false)));
+    // coDriverController.povUp().onTrue(new InstantCommand(() -> shooterSubsystem.manualShooterSpeed += 1));
+    // coDriverController.povDown().onTrue(new InstantCommand(() -> shooterSubsystem.manualShooterSpeed -= 1));
+    // coDriverController.povRight().onTrue(new InstantCommand(() -> shooterSubsystem.manualTagetHoodPosition += 0.25));
+    // coDriverController.povLeft().onTrue(new InstantCommand(() -> shooterSubsystem.manualTagetHoodPosition -= 0.25));
+
+    coDriverController.povLeft().onTrue(new InstantCommand(() -> shooterSubsystem.powerSavingMode = true));
+    coDriverController.povRight().onTrue(new InstantCommand(() -> shooterSubsystem.powerSavingMode = false));
 
     // Reset odometry
     coDriverController.back().and(coDriverController.start()).onTrue(new InstantCommand(() -> {

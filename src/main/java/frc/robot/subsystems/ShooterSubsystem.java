@@ -18,6 +18,8 @@ public class ShooterSubsystem extends SubsystemBase {
     private double shooterSpeed = 54; // in rps
     private boolean isFeeding = false;
 
+    public boolean powerSavingMode = false;
+
     public boolean isManualMode = false;
     public double manualShooterSpeed = 0;
     public double manualTagetHoodPosition = 0;
@@ -49,7 +51,7 @@ public class ShooterSubsystem extends SubsystemBase {
     @NotLogged
     private final Interpolator timeOfFlightInterpolator;
 
-    public ShooterSubsystem(int shootCurrentLimit, int feedCurrentLimit, int hoodCurrentLimit,
+    public ShooterSubsystem(int shootStatorCurrentLimit, int shootSupplyCurrentLimit, int feedCurrentLimit, int hoodCurrentLimit,
             Interpolator shooterAngleInterpolator, Interpolator shooterVelocityInterpolator,
             Interpolator timeOfFlightInterpolator, RobotContainer rc) {
 
@@ -65,14 +67,16 @@ public class ShooterSubsystem extends SubsystemBase {
         johnShootPIDMotor = PIDMotor.makeMotor(Constants.JOHN_SHOOTER_MOTOR_ID, "john shooter", shootP, shootI, shootD,
                 shootS, shootV, shootA, maxRps, maxRps, 0.00);
         johnShootPIDMotor.setInverted(InvertedValue.Clockwise_Positive);
-        johnShootPIDMotor.setStatorCurrentLimit(shootCurrentLimit);
+        johnShootPIDMotor.setStatorCurrentLimit(shootStatorCurrentLimit);
+        johnShootPIDMotor.setSupplyCurrentLimit(shootSupplyCurrentLimit);
         johnShootPIDMotor.setIdleCoastMode();
 
         // Jawbreaker shooter (top right)
         jawbreakerShootPIDMotor = PIDMotor.makeMotor(Constants.JAWBREAKER_SHOOTER_MOTOR_ID, "jawbreaker shooter", shootP, shootI, shootD,
                 shootS, shootV, shootA, maxRps, maxRps, 0.00);
         jawbreakerShootPIDMotor.setInverted(InvertedValue.CounterClockwise_Positive); // The one on the other side is flipped
-        jawbreakerShootPIDMotor.setStatorCurrentLimit(shootCurrentLimit);
+        jawbreakerShootPIDMotor.setStatorCurrentLimit(shootStatorCurrentLimit);
+        jawbreakerShootPIDMotor.setSupplyCurrentLimit(shootSupplyCurrentLimit);
         jawbreakerShootPIDMotor.setIdleCoastMode();
         jawbreakerShootPIDMotor.follow(johnShootPIDMotor, true); // Inverted follower
 
@@ -80,7 +84,8 @@ public class ShooterSubsystem extends SubsystemBase {
         taylorShootPIDMotor = PIDMotor.makeMotor(Constants.TAYLOR_SHOOTER_MOTOR_ID, "taylor shooter", shootP, shootI, shootD,
                 shootS, shootV, shootA, maxRps, maxRps, 0.00);
         taylorShootPIDMotor.setInverted(InvertedValue.Clockwise_Positive);
-        taylorShootPIDMotor.setStatorCurrentLimit(shootCurrentLimit);
+        taylorShootPIDMotor.setStatorCurrentLimit(shootStatorCurrentLimit);
+        taylorShootPIDMotor.setSupplyCurrentLimit(shootSupplyCurrentLimit);
         taylorShootPIDMotor.setIdleCoastMode();
         taylorShootPIDMotor.follow(johnShootPIDMotor, false); // Not inverted follower
 
@@ -159,8 +164,12 @@ public class ShooterSubsystem extends SubsystemBase {
         return johnShootPIDMotor.getVelocity() > 5 && johnShootPIDMotor.atVelocity(3);
     }
 
+    /**
+     * Should the floor (and subsequentlty the intake) be running?
+     * @return 
+     */
     public boolean needsFloorFeed() {
-        return isFeeding;
+        return isFeeding && !powerSavingMode;
     }
 
     public void setManualMode(boolean isManualMode) {
