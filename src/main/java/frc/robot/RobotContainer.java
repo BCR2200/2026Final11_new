@@ -194,7 +194,7 @@ public class RobotContainer {
   @NotLogged
   private static final int floorSupplyCurrentLimit = 20;
   @NotLogged
-  private static final int intakeCurrentLimit = 100;
+  private static final int intakeCurrentLimit = 70;
   @NotLogged
   private static final int tiltCurrentLimit = 35;
   @NotLogged

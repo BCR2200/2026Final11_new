@@ -43,7 +43,7 @@ public final class Constants {
 
   // intake motor IDs
   public static final int INTAKE_MOTOR_1_ID = 7;
-  public static final int INTAKE_MOTOR_2_ID = 11;
+  public static final int INTAKE_MOTOR_2_ID = 30;
   public static final int TILT_MOTOR_ID = 8;
   public static final int FLOOR_FEED_MOTOR_ID = 9;
   
