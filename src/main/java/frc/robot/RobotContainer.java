@@ -242,11 +242,7 @@ public class RobotContainer {
   public final ClimbSubsystem climberSubsystem = new ClimbSubsystem(climbInitialCurrentLimit, climbFinalCurrentLimit);
 
   @Logged(name = "Intake")
-  public final IntakeSubsystem intakeSubsystem = new IntakeSubsystem(
-      Constants.INTAKE_MOTOR_ID,
-      Constants.TILT_MOTOR_ID,
-      intakeCurrentLimit, tiltCurrentLimit,
-      floorFeedSubsystem);
+  public final IntakeSubsystem intakeSubsystem = new IntakeSubsystem(intakeCurrentLimit, tiltCurrentLimit, floorFeedSubsystem);
 
   @NotLogged
   public final CommandXboxController driverController = new CommandXboxController(

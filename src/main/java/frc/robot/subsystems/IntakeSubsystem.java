@@ -4,6 +4,7 @@ import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.epilogue.NotLogged;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants;
 import frc.robot.ExtraMath;
 import frc.robot.PIDMotor;
 
@@ -18,8 +19,10 @@ public class IntakeSubsystem extends SubsystemBase {
 
     public boolean powerSavingMode = false;
 
-    @Logged(name = "IntakeMotor")
-    public PIDMotor intakePIDMotor;
+    @Logged(name = "IntakeMotor1") 
+    public PIDMotor intakeMotor1; // This is the old motor
+    @Logged(name = "IntakeMotor2")
+    public PIDMotor intakeMotor2; // This is the new motor
     @Logged(name = "TiltMotor")
     public PIDMotor tiltPIDMotor;
 
@@ -53,18 +56,25 @@ public class IntakeSubsystem extends SubsystemBase {
      * absolute position, where 0.0 is the "home" position and 1.0 is exactly
      * one rotation away from home.
      * 
-     * @param intakeMotorID The motor ID for the fuel-moving intake motor.
-     * @param tiltMotorID   The motor ID for the tilt motor.
+     * @param intakeCurrentLimit the current limit for the intake motors, in amps
+     * @param tiltCurrentLimit the current limit for the tilt motor, in amps
+     * @param floorSubsystem the floor feed subsystem
      */
-    public IntakeSubsystem(int intakeMotorID, int tiltMotorID, int intakeCurrentLimit, int tiltCurrentLimit,
-            FloorFeedSubsystem floorSubsystem) {
+    public IntakeSubsystem(int intakeCurrentLimit, int tiltCurrentLimit, FloorFeedSubsystem floorSubsystem) {
         this.floorSubsystem = floorSubsystem;
-        intakePIDMotor = PIDMotor.makeMotor(intakeMotorID, "intake", 0.11, 0.0, 0.0,
-                0.25, 0.13, 0.01, 100, 1000, 0.00);
-        intakePIDMotor.setStatorCurrentLimit(intakeCurrentLimit);
-        intakePIDMotor.setIdleCoastMode();
 
-        tiltPIDMotor = PIDMotor.makeMotor(tiltMotorID, "tilt", 0.1, 0.0, 0.0,
+        intakeMotor1 = PIDMotor.makeMotor(Constants.INTAKE_MOTOR_1_ID, "intake", 0.11, 0.0, 0.0,
+                0.25, 0.13, 0.01, 100, 1000, 0.00);
+        intakeMotor1.setStatorCurrentLimit(intakeCurrentLimit);
+        intakeMotor1.setIdleCoastMode();
+
+        intakeMotor2 = PIDMotor.makeMotor(Constants.INTAKE_MOTOR_2_ID, "intake", 0.11, 0.0, 0.0,
+                0.25, 0.13, 0.01, 100, 1000, 0.00);
+        intakeMotor2.setStatorCurrentLimit(intakeCurrentLimit);
+        intakeMotor2.setIdleCoastMode();
+        intakeMotor2.follow(intakeMotor1, false);
+
+        tiltPIDMotor = PIDMotor.makeMotor(Constants.TILT_MOTOR_ID, "tilt", 0.1, 0.0, 0.0,
                 0.25, 0.12, 0.00, tiltMaxSpeed, tiltMaxAccel, 0.00);
         tiltPIDMotor.setStatorCurrentLimit(tiltCurrentLimit);
         tiltPIDMotor.setIdleCoastMode();
@@ -145,13 +155,13 @@ public class IntakeSubsystem extends SubsystemBase {
     @Override
     public void periodic() {
         if (isOuttaking) {
-            intakePIDMotor.setPercentOutput(-1);
+            intakeMotor1.setPercentOutput(-1);
         } 
         else if (isIntaking || (floorSubsystem.getNeedToRun() && !powerSavingMode)) {
-            intakePIDMotor.setPercentOutput(1);
+            intakeMotor1.setPercentOutput(1);
         }
         else {
-            intakePIDMotor.setPercentOutput(0);
+            intakeMotor1.setPercentOutput(0);
         }
 
         // isJiggling = floorSubsystem.getNeedToRun();
