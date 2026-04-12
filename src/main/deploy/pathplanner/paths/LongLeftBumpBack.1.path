@@ -186,6 +186,12 @@
       "waypointRelativePos": 2.65,
       "endWaypointRelativePos": 6.607444168734457,
       "command": null
+    },
+    {
+      "name": "SpinUp",
+      "waypointRelativePos": 6.144496961512418,
+      "endWaypointRelativePos": null,
+      "command": null
     }
   ],
   "globalConstraints": {

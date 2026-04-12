@@ -156,7 +156,7 @@ public class FloorFeedSubsystem extends SubsystemBase {
             delayTimer.start();
         }
 
-        if (shooterSubsystem.needsFloorFeed() && delayTimer.hasElapsed(0.5)) {
+        if (shooterSubsystem.needsFloorFeed() && delayTimer.hasElapsed(0.1)) {
             needsToRun = true;
             delayTimer.stop();
         }
