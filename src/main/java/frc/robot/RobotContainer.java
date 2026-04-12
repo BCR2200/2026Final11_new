@@ -29,18 +29,15 @@ import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.commands.BlendAdamModeCmd;
-import frc.robot.commands.ClimbCommand;
 import frc.robot.commands.DriveToOutpostCmd;
 import frc.robot.commands.ShootAt;
 import frc.robot.commands.auto.AutoCommand;
-import frc.robot.commands.auto.LeftBumpBack;
 import frc.robot.commands.auto.LeftBumpToRight;
 import frc.robot.commands.auto.LongLeftBumpBack;
 import frc.robot.commands.auto.LongRightBumpBack;
 import frc.robot.commands.auto.LongerLeftBumpBack;
 import frc.robot.commands.auto.LongerRightBumpBack;
 import frc.robot.commands.auto.LongestLeftBumpBack;
-import frc.robot.commands.auto.RightBumpBack;
 import frc.robot.commands.auto.RightBumpToLeft;
 import frc.robot.commands.auto.RightOutpost;
 import frc.robot.commands.auto.RightOutpostAroundClimber;
@@ -49,7 +46,6 @@ import frc.robot.drive.CommandSwerveDrivetrain;
 import frc.robot.drive.Telemetry;
 import frc.robot.drive.TunerConstantsComp;
 import frc.robot.drive.TunerConstantsPrac;
-import frc.robot.subsystems.ClimbSubsystem;
 import frc.robot.subsystems.ShooterSubsystem;
 import frc.robot.subsystems.FloorFeedSubsystem;
 import frc.robot.subsystems.IntakeSubsystem;
@@ -186,10 +182,6 @@ public class RobotContainer {
   final SendableChooser<AutoCommand> autoChooser;
 
   @NotLogged
-  private static final int climbFinalCurrentLimit = 20;
-  @NotLogged
-  private static final int climbInitialCurrentLimit = 5;
-  @NotLogged
   private static final int floorStatorCurrentLimit = 100;
   @NotLogged
   private static final int floorSupplyCurrentLimit = 20;
@@ -238,9 +230,6 @@ public class RobotContainer {
   @Logged(name = "FloorFeed")
   private final FloorFeedSubsystem floorFeedSubsystem = new FloorFeedSubsystem(floorStatorCurrentLimit, floorSupplyCurrentLimit, shooterSubsystem);
 
-  @Logged(name = "Climber")
-  public final ClimbSubsystem climberSubsystem = new ClimbSubsystem(climbInitialCurrentLimit, climbFinalCurrentLimit);
-
   @Logged(name = "Intake")
   public final IntakeSubsystem intakeSubsystem = new IntakeSubsystem(intakeCurrentLimit, tiltCurrentLimit, floorFeedSubsystem);
 
@@ -287,12 +276,10 @@ public class RobotContainer {
     autoChooser = new SendableChooser<>();
     autoChooser.setDefaultOption("None", null);
 
-    autoChooser.addOption("LeftBump", new LeftBumpBack(this, drivetrain, driveRC));
     autoChooser.addOption("LongLeftBump", new LongLeftBumpBack(this, drivetrain, driveRC));
     autoChooser.addOption("LongerLeftBump", new LongerLeftBumpBack(this, drivetrain, driveRC));
     autoChooser.addOption("LongestLeftBump", new LongestLeftBumpBack(this, drivetrain, driveRC));
 
-    autoChooser.addOption("RightBump", new RightBumpBack(this, drivetrain, driveRC));
     autoChooser.addOption("LongRightBump", new LongRightBumpBack(this, drivetrain, driveRC));
     autoChooser.addOption("LongerRightBump", new LongerRightBumpBack(this, drivetrain, driveRC));
 
@@ -448,10 +435,6 @@ public class RobotContainer {
     }));
     driverController.rightTrigger().whileTrue(new ShootAt(this));
 
-    // climb
-    driverController.b().whileTrue(new ClimbCommand(this, true)); // right
-    driverController.x().whileTrue(new ClimbCommand(this, false)); // left
-
     // bring intake up
     driverController.a().onTrue(new InstantCommand(() -> {
       intakeSubsystem.setIsGoingUp(true);
@@ -529,13 +512,6 @@ public class RobotContainer {
     coDriverController.b().and(coDriverController.x().negate()).and(coDriverController.y().negate())
       .whileTrue(new InstantCommand(() -> {fixedShotFromClimber = true;}))
       .whileFalse(new InstantCommand(() -> {fixedShotFromClimber = false;})); // climb shot
-    
-    // Just climb now
-    coDriverController.a().whileTrue(new InstantCommand(() -> {
-      climberSubsystem.climb();
-    })).onFalse(new InstantCommand(() -> {
-      climberSubsystem.goHome();
-    }));
 
     // Manual shooter controls for testing and fine-tuning
     // coDriverController.rightBumper().onTrue(new InstantCommand(() -> shooterSubsystem.setManualMode(true)));
