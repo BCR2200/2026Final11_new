@@ -22,7 +22,7 @@ public class ZeroTheHood extends Command {
     @Override
     public void execute() {
         shooterSubsystem.vantHoodPIDMotor.setStatorCurrentLimit(5);
-        shooterSubsystem.vantHoodPIDMotor.setPercentOutput(0.2);
+        shooterSubsystem.vantHoodPIDMotor.setPercentOutput(0.1);
     }
 
     @Override

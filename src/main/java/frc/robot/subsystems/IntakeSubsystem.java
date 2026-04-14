@@ -171,8 +171,6 @@ public class IntakeSubsystem extends SubsystemBase {
             tiltPos += 2.0;
             setTiltPosition(tiltPos);
             intakeMotor1.setPercentOutput(1);
-        } else {
-            intakeMotor1.setPercentOutput(0);
         }
 
         // Slightly less Horrible untested garbage jiggle function

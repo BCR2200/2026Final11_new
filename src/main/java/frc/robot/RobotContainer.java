@@ -548,7 +548,8 @@ public class RobotContainer {
     coDriverController.povDown().onTrue(new InstantCommand(() -> this.powerSavingState = PowerSavingState.NO_FLOOR));
     coDriverController.povRight().onTrue(new InstantCommand(() -> this.powerSavingState = PowerSavingState.HALF_FEED));
 
-    coDriverController.a().whileTrue(new ZeroTheHood(shooterSubsystem, hoodCurrentLimit));
+    // Reset the hood
+    coDriverController.a().and(coDriverController.start()).whileTrue(new ZeroTheHood(shooterSubsystem, hoodCurrentLimit));
 
     // Reset odometry
     coDriverController.back().and(coDriverController.start()).onTrue(new InstantCommand(() -> {
