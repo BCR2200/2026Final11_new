@@ -157,7 +157,7 @@ public class IntakeSubsystem extends SubsystemBase {
         if (isOuttaking) {
             intakeMotor1.setPercentOutput(-1);
         } 
-        else if (isIntaking || (floorSubsystem.getNeedToRun() && !powerSavingMode)) {
+        else if (isIntaking) {
             intakeMotor1.setPercentOutput(1);
         }
         else {
@@ -170,6 +170,9 @@ public class IntakeSubsystem extends SubsystemBase {
         if (isGoingUp) {
             tiltPos += 2.0;
             setTiltPosition(tiltPos);
+            intakeMotor1.setPercentOutput(1);
+        } else {
+            intakeMotor1.setPercentOutput(0);
         }
 
         // Slightly less Horrible untested garbage jiggle function
