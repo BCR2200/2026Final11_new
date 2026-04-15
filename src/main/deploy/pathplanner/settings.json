@@ -5,14 +5,16 @@
   "pathFolders": [
     "BlendModePaths",
     "LeftBumpBack",
+    "LeftBumpCrisis",
     "LeftBumpToRight",
     "LongLeftBumpBack",
     "LongRightBumpBack",
-    "SweepDriver",
+    "RightBumpCrisis",
     "RightBumpBack",
     "RightBumpToLeft",
     "RightOutpost",
-    "RightOutpostAroundClimber"
+    "RightOutpostAroundClimber",
+    "SweepDriver"
   ],
   "autoFolders": [],
   "defaultMaxVel": 3.0,

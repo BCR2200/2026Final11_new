@@ -1,0 +1,182 @@
+{
+  "version": "2025.0",
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 3.6250213980028523,
+        "y": 2.261
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 4.401340941512124,
+        "y": 2.235122681883023
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 5.833888888888888,
+        "y": 2.015977175463624
+      },
+      "prevControl": {
+        "x": 5.287181919678236,
+        "y": 2.361731187589158
+      },
+      "nextControl": {
+        "x": 6.380595858099539,
+        "y": 1.670223163338089
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 6.92437945791726,
+        "y": 1.097332382310985
+      },
+      "prevControl": {
+        "x": 6.734871786336978,
+        "y": 0.7617389443651921
+      },
+      "nextControl": {
+        "x": 7.2499872700726105,
+        "y": 1.673941467273176
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 6.471526390870184,
+        "y": 4.65546362339515
+      },
+      "prevControl": {
+        "x": 7.49086311379499,
+        "y": 4.799794486818131
+      },
+      "nextControl": {
+        "x": 5.370404168647964,
+        "y": 4.499552512284039
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 5.833888888888888,
+        "y": 2.792296718972896
+      },
+      "prevControl": {
+        "x": 6.394102422770472,
+        "y": 2.977989596337945
+      },
+      "nextControl": {
+        "x": 5.083566666666665,
+        "y": 2.543588888888889
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 2.4217261055634807,
+        "y": 2.792296718972896
+      },
+      "prevControl": {
+        "x": 2.400964735600044,
+        "y": 2.5431602794116763
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": "Crisis1-2"
+    }
+  ],
+  "rotationTargets": [
+    {
+      "waypointRelativePos": 1.0,
+      "rotationDegrees": 90.0
+    },
+    {
+      "waypointRelativePos": 1.2793176972281552,
+      "rotationDegrees": 28.027737391951035
+    },
+    {
+      "waypointRelativePos": 2.05,
+      "rotationDegrees": 90.0
+    },
+    {
+      "waypointRelativePos": 2.8,
+      "rotationDegrees": 90.0
+    },
+    {
+      "waypointRelativePos": 3.0063965884861426,
+      "rotationDegrees": 180.0
+    },
+    {
+      "waypointRelativePos": 3.3,
+      "rotationDegrees": -90.0
+    },
+    {
+      "waypointRelativePos": 3.7,
+      "rotationDegrees": -90.0
+    },
+    {
+      "waypointRelativePos": 4.1,
+      "rotationDegrees": 180.0
+    },
+    {
+      "waypointRelativePos": 4.4,
+      "rotationDegrees": 180.0
+    }
+  ],
+  "constraintZones": [
+    {
+      "name": "Constraints Zone",
+      "minWaypointRelativePos": 0.7697501688048818,
+      "maxWaypointRelativePos": 3.6191762322754943,
+      "constraints": {
+        "maxVelocity": 1.1,
+        "maxAcceleration": 3.0,
+        "maxAngularVelocity": 540.0,
+        "maxAngularAcceleration": 720.0,
+        "nominalVoltage": 12.0,
+        "unlimited": false
+      }
+    }
+  ],
+  "pointTowardsZones": [],
+  "eventMarkers": [
+    {
+      "name": "IntakeDown",
+      "waypointRelativePos": 0.0,
+      "endWaypointRelativePos": null,
+      "command": null
+    },
+    {
+      "name": "IntakeRun",
+      "waypointRelativePos": 0.7427413909520807,
+      "endWaypointRelativePos": 5.0,
+      "command": null
+    }
+  ],
+  "globalConstraints": {
+    "maxVelocity": 3.0,
+    "maxAcceleration": 3.0,
+    "maxAngularVelocity": 540.0,
+    "maxAngularAcceleration": 720.0,
+    "nominalVoltage": 12.0,
+    "unlimited": false
+  },
+  "goalEndState": {
+    "velocity": 0,
+    "rotation": -141.34019174590995
+  },
+  "reversed": false,
+  "folder": "RightBumpCrisis",
+  "idealStartingState": {
+    "velocity": 0.0,
+    "rotation": 90.0
+  },
+  "useDefaultConstraints": false
+}
