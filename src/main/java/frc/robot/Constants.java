@@ -58,22 +58,22 @@ public final class Constants {
 
   public static final Pose2d OUTPOST_RED_INITIAL = new Pose2d(
     Distance.ofBaseUnits(15.5, Meters),
-    Distance.ofBaseUnits(7.67, Meters),
+    Distance.ofBaseUnits(7.45, Meters),
     Rotation2d.kZero
   );
   public static final Pose2d OUTPOST_RED_FINAL = new Pose2d(
-    Distance.ofBaseUnits(15.84, Meters),
-    Distance.ofBaseUnits(7.61, Meters),
+    Distance.ofBaseUnits(15.92, Meters),
+    Distance.ofBaseUnits(7.45, Meters),
     Rotation2d.kZero
   );
   public static final Pose2d OUTPOST_BLUE_INITIAL = new Pose2d(
     Distance.ofBaseUnits(1.2, Meters),
-    Distance.ofBaseUnits(0.466, Meters),
+    Distance.ofBaseUnits(0.639, Meters),
     Rotation2d.k180deg
   );
   public static final Pose2d OUTPOST_BLUE_FINAL = new Pose2d(
-    Distance.ofBaseUnits(0.69, Meters),
-    Distance.ofBaseUnits(0.466, Meters),
+    Distance.ofBaseUnits(0.667, Meters),
+    Distance.ofBaseUnits(0.639, Meters),
     Rotation2d.k180deg
   );
 }
