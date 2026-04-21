@@ -149,70 +149,6 @@
             }
           },
           {
-            "title": "Total ball count",
-            "x": 1280.0,
-            "y": 0.0,
-            "width": 128.0,
-            "height": 128.0,
-            "type": "Large Text Display",
-            "properties": {
-              "topic": "Telemetry/Total ball count",
-              "period": 0.06,
-              "data_type": "int"
-            }
-          },
-          {
-            "title": "John disabled",
-            "x": 1280.0,
-            "y": 128.0,
-            "width": 128.0,
-            "height": 128.0,
-            "type": "Boolean Box",
-            "properties": {
-              "topic": "Telemetry/m_robotContainer/John/getIsDisabled",
-              "period": 0.06,
-              "data_type": "boolean",
-              "true_color": 4283215696,
-              "false_color": 4294198070,
-              "true_icon": "None",
-              "false_icon": "None"
-            }
-          },
-          {
-            "title": "Jawbreaker disabled",
-            "x": 1408.0,
-            "y": 128.0,
-            "width": 128.0,
-            "height": 128.0,
-            "type": "Boolean Box",
-            "properties": {
-              "topic": "Telemetry/m_robotContainer/Jawbreaker/getIsDisabled",
-              "period": 0.06,
-              "data_type": "boolean",
-              "true_color": 4283215696,
-              "false_color": 4294198070,
-              "true_icon": "None",
-              "false_icon": "None"
-            }
-          },
-          {
-            "title": "Taylor disabled",
-            "x": 1536.0,
-            "y": 128.0,
-            "width": 128.0,
-            "height": 128.0,
-            "type": "Boolean Box",
-            "properties": {
-              "topic": "Telemetry/m_robotContainer/Taylor/getIsDisabled",
-              "period": 0.06,
-              "data_type": "boolean",
-              "true_color": 4283215696,
-              "false_color": 4294198070,
-              "true_icon": "None",
-              "false_icon": "None"
-            }
-          },
-          {
             "title": "Floor Feed current",
             "x": 0.0,
             "y": 512.0,
@@ -326,6 +262,37 @@
               "topic": "/CameraPublisher/limelight-shooter",
               "period": 0.06,
               "rotation_turns": 0
+            }
+          },
+          {
+            "title": "powerSavingState",
+            "x": 1408.0,
+            "y": 0.0,
+            "width": 256.0,
+            "height": 128.0,
+            "type": "Text Display",
+            "properties": {
+              "topic": "Telemetry/m_robotContainer/powerSavingState",
+              "period": 0.06,
+              "data_type": "string",
+              "show_submit_button": false
+            }
+          },
+          {
+            "title": "ZeroingTheHood",
+            "x": 1664.0,
+            "y": 128.0,
+            "width": 256.0,
+            "height": 128.0,
+            "type": "Boolean Box",
+            "properties": {
+              "topic": "Telemetry/m_robotContainer/Shooter/ZeroingTheHood",
+              "period": 0.06,
+              "data_type": "boolean",
+              "true_color": 4283215696,
+              "false_color": 4294198070,
+              "true_icon": "None",
+              "false_icon": "None"
             }
           }
         ]
@@ -1364,6 +1331,64 @@
               "period": 0.06,
               "data_type": "double[]",
               "show_submit_button": false
+            }
+          },
+          {
+            "title": "manualTagetHoodPosition",
+            "x": 512.0,
+            "y": 256.0,
+            "width": 128.0,
+            "height": 128.0,
+            "type": "Text Display",
+            "properties": {
+              "topic": "Telemetry/m_robotContainer/Shooter/manualTagetHoodPosition",
+              "period": 0.06,
+              "data_type": "double",
+              "show_submit_button": false
+            }
+          },
+          {
+            "title": "manualShooterSpeed",
+            "x": 640.0,
+            "y": 256.0,
+            "width": 128.0,
+            "height": 128.0,
+            "type": "Text Display",
+            "properties": {
+              "topic": "Telemetry/m_robotContainer/Shooter/manualShooterSpeed",
+              "period": 0.06,
+              "data_type": "double",
+              "show_submit_button": false
+            }
+          },
+          {
+            "title": "Distance to Target",
+            "x": 768.0,
+            "y": 256.0,
+            "width": 128.0,
+            "height": 128.0,
+            "type": "Text Display",
+            "properties": {
+              "topic": "/SmartDashboard/Distance to Target",
+              "period": 0.06,
+              "data_type": "double",
+              "show_submit_button": false
+            }
+          },
+          {
+            "title": "jawbreaker shooter velocity",
+            "x": 896.0,
+            "y": 256.0,
+            "width": 1024.0,
+            "height": 256.0,
+            "type": "Graph",
+            "properties": {
+              "topic": "Telemetry/m_robotContainer/Shooter/JawbreakerShootMotor/jawbreaker shooter velocity",
+              "period": 0.033,
+              "data_type": "double",
+              "time_displayed": 10.0,
+              "color": 4278238420,
+              "line_width": 2.0
             }
           }
         ]
