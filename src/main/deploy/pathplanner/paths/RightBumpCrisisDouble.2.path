@@ -169,7 +169,7 @@
     "rotation": -179.0122396003603
   },
   "reversed": false,
-  "folder": "RightBumpCrisis",
+  "folder": null,
   "idealStartingState": {
     "velocity": 0.0,
     "rotation": -141.34019174590995

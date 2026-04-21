@@ -143,7 +143,7 @@
   "rotationTargets": [
     {
       "waypointRelativePos": 0.7505330490405127,
-      "rotationDegrees": 0.3288564435236115
+      "rotationDegrees": 0.32885644352361154
     },
     {
       "waypointRelativePos": 1.3646055437099904,
@@ -227,7 +227,7 @@
     "rotation": 138.12213046211573
   },
   "reversed": false,
-  "folder": "LongLeftBumpBack",
+  "folder": "Connor",
   "idealStartingState": {
     "velocity": 0,
     "rotation": 142.76516601891413
